@@ -1,0 +1,29 @@
+<section id="terminate" style="border-radius: 10px;box-shadow: 5px 5px 8px;">
+  <div class="row">
+    <div class="col">
+      <div class="row" style="background: var(--orange);">
+        <div class="col" style="text-align: center;font-weight: bold;color: var(--light);"><span>BAIL TERMINATION MENU</span></div>
+      </div>
+      <div class="row no-gutters" style="background: var(--success);margin-top: 1px;">
+        <div class="col-1" style="text-align: center;padding-left: 5px;"><input [(ngModel)]="terminationIndex" id="terminate1" class="form-check-input" type="radio" name="terminateType" value="1" /></div>
+        <div class="col" style="text-align: left;"><span style="color: var(--light);">Terminate Current Application - Leave Booking Open</span></div>
+      </div>
+      <div class="row no-gutters" style="background: var(--danger);margin-top: 1px;">
+        <div class="col-1" style="text-align: center;padding-left: 5px;"><input [(ngModel)]="terminationIndex" id="terminate2" class="form-check-input" type="radio" name="terminateType" value="2" /></div>
+        <div class="col" style="text-align: left;"><span style="color: var(--light);">Terminate Current Application - Close Booking</span></div>
+      </div>
+      <div class="row no-gutters" style="background: var(--yellow);margin-top: 6px;color: var(--dark);">
+        <div class="col-1" style="text-align: center;padding-left: 5px;"><input [(ngModel)]="terminationIndex" id="terminate3" class="form-check-input" type="radio" name="terminateType" value="3" /></div>
+        <div class="col" style="text-align: left;"><span style="color: #000000;">Delete Application - Error</span></div>
+      </div>
+      <div class="row">
+        <div class="col" style="padding-right: 25px;padding-left: 25px;"><label style="margin-bottom: 0px;margin-top: 3px;">Reason/Comments for Termination</label><textarea class="form-control"></textarea></div>
+      </div>
+      <div class="row">
+        <div class="col" style="text-align: center;">
+          <button class="btn btn-secondary" type="button" style="margin: 3px;" (click)="doCancel()">CANCEL TERMINATION</button>
+          <button class="btn btn-danger" type="button" style="margin: 3px;" (click)="doSubmit()">SUBMIT TERMINATION</button></div>
+      </div>
+    </div>
+  </div>
+</section>

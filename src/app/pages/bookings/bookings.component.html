@@ -1,0 +1,67 @@
+<section *ngIf="showSearch">
+  <div class="row" style="border-bottom-style: solid;border-bottom-color: var(--dark);">
+    <div class="col" style="text-align: center;font-size: 26px;font-weight: bold;"><span>DEFENDANT BOOKING AND RECORDS</span></div>
+  </div>
+  <div class="row" style="margin-top: 12px; background-color: lightblue; border-radius: 10px; border: 1px solid blue">
+    <div class="col d-flex justify-content-center align-items-center" style="text-align: right;">
+      <span style="font-size: 14px;">First, lets find the Defendant that you want to view, add or update a booking or record. Search for Defendant by Last Name</span>
+    </div>
+    <div class="col pt-2">
+      <div class="form-group">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">Last Name</span>
+          </div>
+          <input [(ngModel)]="lastName" class="form-control" type="text" />
+          <div class="input-group-append">
+            <button class="btn btn-success" type="button" (click)="doSearch()">Search!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div>
+    <div class="mt-3">
+      <span class="font-weight-bold h4">SEARCH RESULTS</span>
+      <div *ngIf="defendantResults.length == 0" class="my-3">
+        <div class="row">
+          <div class="col-12">
+            <div class="alert alert-warning" role="alert">
+              <span class="font-weight-bold">No Results Found!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="my-3">
+        <div class="row">
+          <div class="col-2" style="background: #eae5e5;border: 1px solid rgb(69,70,71);"><span style="font-weight: bold;">PHOTO</span></div>
+          <div class="col-3" style="background: #eae5e5;border: 1px solid rgb(69,70,71);"><span style="font-weight: bold;">FULL NAME</span></div>
+          <div class="col-3" style="background: #eae5e5;border: 1px solid rgb(69,70,71);"><span style="font-weight: bold;">ADDRESS</span></div>
+          <div class="col-3" style="background: #eae5e5;border: 1px solid rgb(69,70,71);"><span style="font-weight: bold;">DESCRIPTION</span></div>
+          <div class="col-1" style="background: #eae5e5;border: 1px solid rgb(69,70,71);"><span style="font-weight: bold;">SELECT</span></div>
+        </div>
+        <div class="row" *ngFor="let def of defendantResults">
+          <div class="col-2 d-flex justify-content-center align-items-center" style="border: 1px solid rgb(69,70,71);">
+            <img class="img-fluid m-2 border border-dark" [src]="def.mainPhoto" loading="lazy" /></div>
+          <div class="col-3 d-flex justify-content-start align-items-center" style="border: 1px solid rgb(69,70,71);">
+            <span>{{def.lName+', ' +def.fName+' '+def.mName }}</span>
+          </div>
+          <div class="col-3 d-flex justify-content-start align-items-center" style="border: 1px solid rgb(69,70,71);">
+            <span>{{def.addLine1}}<br>{{def.addLine2}}<br>{{def.city}} {{def.state}} {{def.zip}}</span>
+          </div>
+          <div class="col-3 d-flex justify-content-start align-items-center" style="border: 1px solid rgb(69,70,71);">
+            <span><b>EYES:</b> {{def.eyeColor}} <b>HAIR:</b> {{def.hairColor}}<br><b>HEIGHT:</b> {{def.height}} <b>WEIGHT:</b> {{def.weight}}</span>
+          </div>
+          <div class="col-1 d-flex justify-content-center align-items-center" style="border: 1px solid rgb(69,70,71);">
+            <button class="btn btn-info btn-sm" type="button" (click)="doSelect(def)">SELECT</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-view-booking *ngIf="showViewBooking" [booking]="selectedBooking" (exit)="closeViewBooking()"></app-view-booking>
+<app-defendant-menu *ngIf="showDefendantMenu" [defendant]="selectedDefendant" (doShowBooking)="doViewBooking($event)" (exit)="closeMenu($event)"></app-defendant-menu>
+

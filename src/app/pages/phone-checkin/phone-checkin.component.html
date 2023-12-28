@@ -1,0 +1,28 @@
+<section>
+  <header class="d-flex justify-content-center align-items-center" style="text-align: center;background: var(--blue);color: var(--white);height: 50px;box-shadow: 8px 7px 6px 2px #000000;"><span style="font-weight: bold;">BAIL MANAGEMENT CHECK-IN</span></header>
+</section>
+<app-docheckin *ngIf="agreed" (exit)="doExit($event)"></app-docheckin>
+<section *ngIf="!agreed" class="container d-md-none" style="margin-top: 20px;">
+  <img src="assets/img/app/judiciary_logo.png" style="width: 100%">
+  <div class="row mt-2">
+    <div class="col d-flex flex-column justify-content-start align-items-start"><span style="font-weight: bold;font-size: 20px;color: var(--red);">OFFICIAL USE WARNING </span>
+      <span style="color: rgb(55, 65, 81);">Welcome to the Bahamas Department of Justice and Department of Corrections Bail Check-In Portal.</span>
+      <span style="font-weight: bold;color: var(--red);">Notice to Users:</span>
+      <span style="color: rgb(55, 65, 81);">This system is restricted to authorized users for official purposes only. By accessing and using this portal, you are hereby swearing and affirming, under the penalties of perjury, that you are the individual you claim to be. Any individual using this system must be a defendant on bail and authorized for use of this service. As part of the check-in process, you must consent to having your picture taken and authorize the use of location services on your device. This is to verify your identity and to ensure compliance with the terms of your bail. Unauthorized or improper use of this system may result in administrative disciplinary action, and/or criminal penalties. By continuing to use this system you indicate your awareness of and consent to these terms and conditions of use. LOG OFF IMMEDIATELY if you do not agree to the conditions stated in this warning.</span>
+      <button (click)="agree()" class="btn btn-success btn-block btn-lg d-flex justify-content-center align-items-center" type="button" style="margin-top: 8px;">I AGREE</button></div>
+  </div>
+</section>
+<section class="container d-none d-md-flex justify-content-center align-items-center h-100">
+  <span style="font-weight: bold;font-size: 20px;color: var(--red);">USE ON MOBILE DEVICES ONLY</span>
+</section>
+<div style="height:100px"></div>
+
+<footer class="footer mt-auto py-3 border-top border-dark" style="background: var(--blue);color: var(--white); position: fixed; bottom: 0px; width: 100%">
+  <div class="container">
+    <div class="row">
+      <div class="col d-flex justify-content-center align-items-center">
+        <span style="font-size: 10px; font-weight: bold;">© 2023 Justice Technology Corp V.23.12.05.12.25</span>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,160 @@
+<div class="container-fluid mt-2 mb-2">
+  <section>
+    <div class="row" style="background: var(--blue);padding-top: 3px;padding-bottom: 3px;">
+      <div class="col d-xl-flex justify-content-xl-start align-items-xl-center">
+        <span style="color: var(--light);font-weight: bold;">BAIL APPLICATION MANAGEMENT FOR {{hearings.offenderName.toUpperCase()}}</span>
+      </div>
+      <div class="col-2 text-right d-xl-flex justify-content-xl-end align-items-xl-center">
+        <button class="btn btn-danger btn-sm" type="button" style="padding: 1px;padding-right: 3px;padding-left: 3px;" (click)="exitBailApplicationTable()">EXIT</button>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="row">
+  <div class="col">
+    <fieldset style="border: 1px solid rgb(0,0,0);border-radius: 10px;padding: 5px;overflow: hidden;">
+      <legend style="border: 1px solid rgb(0,0,0);border-radius: 10px;width: auto;margin-left: 6px;font-size: 12px;padding: 5px;">DEFENDANT INFORMATION</legend>
+      <div class="row" style="margin-bottom: 2px;">
+        <div class="col-3" style="text-align: right;background: #f1efef;"><span style="font-weight: bold;">Name</span></div>
+        <div class="col"><span>{{hearings.offenderName}}</span></div>
+      </div>
+      <div class="row" style="margin-bottom: 2px;">
+        <div class="col-3" style="text-align: right;background: #f1efef;"><span style="font-weight: bold;">Address</span></div>
+        <div class="col"><span style="font-size: 12px">{{offender.addLine1}} {{offender.addLine2}} {{offender.city}} {{offender.state}}</span></div>
+      </div>
+      <div class="row" style="margin-bottom: 2px;">
+        <div class="col-3" style="text-align: right;background: #f1efef;"><span style="font-weight: bold;">Phone</span></div>
+        <div class="col"><span>{{offender.phone}}</span></div>
+      </div>
+    </fieldset>
+  </div>
+  <div class="col">
+    <fieldset style="border: 1px solid rgb(0,0,0);border-radius: 10px;padding: 5px;overflow: hidden;">
+      <legend style="border: 1px solid rgb(0,0,0);border-radius: 10px;width: auto;margin-left: 6px;font-size: 12px;padding: 5px;">LINKS AND INFORMATION</legend>
+      <div class="row" style="margin-bottom: 2px;">
+        <div class="col-4" style="text-align: right;background: #f1efef;"><span style="font-weight: bold;">Application</span></div>
+        <div class="col">
+          <span class="btn btn-sm btn-success" (click)="showApplication()">VIEW APPLICATION</span>
+        </div>
+      </div>
+      <div class="row" style="margin-bottom: 2px;">
+        <div class="col-4" style="text-align: right;background: #f1efef;"><span style="font-weight: bold;">Remand Warrant</span></div>
+        <span class="btn btn-sm btn-info" (click)="showRemandWarrant()">VIEW REMAND WARRANT</span>
+      </div>
+      <div class="row" style="margin-bottom: 2px;">
+        <div class="col-4" style="text-align: right;background: #f1efef;"><span style="font-weight: bold;">DPP Response</span></div>
+        <span class="btn btn-sm btn-secondary" (click)="showDPPResponse()">VIEW RESPONSE</span>
+      </div>
+      <div class="row" style="margin-bottom: 2px;">
+        <div class="col-4" style="text-align: right;background: #f1efef;"><span style="font-weight: bold;">Charges</span></div>
+        <div  class="col">
+          <div *ngIf="counts.length == 0" class="font-weight-bold text-danger">NO CHARGES HAVE BEEN ENTERED! PLEASE SEE BOOKING!</div>
+          <div *ngFor="let chg of counts" class="">{{chg.countCharge}}</div>
+        </div>
+
+      </div>
+    </fieldset>
+  </div>
+</div>
+<div class="row" style="color: #000000;background: #83acfb;font-size: 14px;font-weight: bold;margin-top: 11px;">
+  <div class="col"><span>Application Controls</span></div>
+</div>
+<div class="row">
+  <div class="col-12">
+    <p-pickList *ngIf="showPickList" (onMoveToSource)="doDrop($event)" (onMoveToTarget)="doDrop($event)"
+                [source]="sourceControls"
+                [target]="targetControls"
+                sourceHeader="Available Modules"
+                targetHeader="Selected Modules"
+                [dragdrop]="true"
+                [responsive]="true"
+                [sourceStyle]="{ height: '30rem' }" [targetStyle]="{ height: '30rem' }" breakpoint="750px">
+      <ng-template let-control pTemplate="item">
+        <div (click)="doClick(control)" class="row border border-success rounded rounded-lg p-2">
+          <div class="col-4 d-flex flex-column justify-content-center align-items-center">
+            <div><i class="fa {{control.controlIcon}}" style="font-size: 40px;font-weight: bold;color: var(--red);"></i></div>
+            <div style="font-size: 10px; font-weight: bold">{{control.controlDate}}</div>
+          </div>
+          <div class="col d-flex flex-column">
+            <span style="font-weight: bold;font-size: 20px;">{{control.controlName}}</span>
+            <span>{{control.controlDescription}}</span>
+            <span style="font-size: 10px; font-weight: bold">{{control.controlComment}}</span>
+          </div>
+        </div>
+      </ng-template>
+    </p-pickList>
+  </div>
+</div>
+<section (click)="closeOrder()" *ngIf="showOrder" style="position: absolute; top:50px; bottom: 50px; left: 50%; transform: translateX(-50%); overflow: scroll; width: 8.5in">
+  <div class="bg-white rounded border border-dark text-dark h4 text-center">CLICK TO CLOSE ORDER</div>
+  <div class="border border-dark shadow shadow-sm p-3" style="background-color: #ededed; width: 8.5in; min-height: 11in; margin-right: 50%; margin-left: 50%; transform: translateX(-50%)">
+    <div class="text-left font-weight-bold">
+      IN THE SUPREME COURT<BR>
+      COMMONWEALTH OF THE BAHAMAS<br>
+      CRIMINAL DIVISION
+    </div>
+    <div class="row mt-3">
+      <div class="col-6">
+        <div>
+          <div class="font-weight-bold">DEFENDANT</div>
+          {{offender.lName}}, {{offender.fName}} {{offender.mName}}<br>
+          {{offender.addLine1}} {{offender.addLine2}}<br>
+          {{offender.city}} {{offender.state}} {{offender.zip}}</div>
+      </div>
+      <!--              <div class="col-6 text-left">-->
+      <!--                <div class="font-weight-bold">CHARGES</div>-->
+      <!--                <div *ngFor="let c of allCounts">-->
+      <!--                  <div *ngIf="c.bookingID == selectedBooking.id">{{c.chargeDocNumber}} - {{c.countCharge}}</div>-->
+      <!--                </div>-->
+      <!--              </div>-->
+    </div>
+    <div class="text-center font-weight-bold h3 mt-3">RELEASE ORDER - ORDER GRANTING BAIL</div>
+    <div class="p-3">
+      The above named individual came before this court on this {{convertUnixDate(hearings.hearingDateUnix)}} for a bail hearing,
+      <span *ngIf="hearings.attorneyName"> and is represented by {{hearings.attorneyName}}, a private attorney</span>
+      <span *ngIf="!hearings.attorneyName"> and was not represented by a private attorney</span>.
+      The following are conditions of which the Defendant must meet to be released on bail and the conditions the Defendant
+      must adhere to while on bail. If these conditions are not met, the Defendant shall remain in the custody of the Bahamas Department
+      of Corrections. If any condition is broken while on bail, the defendant will be remanded to the custody of the Bahamas Department of Corrections.
+    </div>
+    <div class="px-3 py-1">
+      <div class="font-weight-bold h4">SURETY CONDITIONS</div>
+      <div class="">{{hearings.suretyReq}}</div>
+    </div>
+    <div class="px-3 py-1">
+      <div class="font-weight-bold h4">KIOSK CHECK-IN REQUIREMENTS</div>
+      <div class="">Upon release, the Defendant <b>must check-in at {{getPoliceStation(hearings.bailReportLocation)}}</b>
+        and use the biometric kiosk. If the biometric kiosk is not available, the Defendant must check-in with an officer who will
+        electronically submit the check-in to the bail management system.
+        <div class="font-weight-bold mt-1">CHECK IN DAYS AND TIME</div>
+        The Defendant must check in on the following days before
+        <span *ngIf="hearings.threepmChecked">3 PM:</span>
+        <span *ngIf="hearings.fourpmChecked">4 PM:</span>
+        <span *ngIf="hearings.fivepmChecked">5 PM:</span>
+        <span *ngIf="hearings.sixpmChecked">6 PM:</span>
+        <span *ngIf="hearings.sevenpmChecked">7 PM:</span>
+        <span *ngIf="hearings.eightpmChecked">8 PM:</span>
+        <span *ngIf="hearings.ninepmChecked">9 PM:</span>
+        <span *ngIf="hearings.tenpmChecked">10 PM:</span>
+        <br>
+        <ul>
+          <li *ngIf="hearings.sundayChecked">Every Sunday</li>
+          <li *ngIf="hearings.mondayChecked">Every Monday</li>
+          <li *ngIf="hearings.tuesdayChecked">Every Tuesday</li>
+          <li *ngIf="hearings.wednesdayChecked">Every Wednesday</li>
+          <li *ngIf="hearings.thursdayChecked">Every Thursday</li>
+          <li *ngIf="hearings.fridayChecked">Every Friday</li>
+          <li *ngIf="hearings.saturdayChecked">Every Saturday</li>
+        </ul>
+      </div>
+      <div class="h3 font-weight-bold mt-1">ADDITIONAL REQUIREMENTS</div>
+      The following additional requirements must also be met by the Defendant:<br>
+      <div *ngIf="hearings.surrenderPassportChecked" class="text-danger font-weight-bold">THE DEFENDANT MUST SURRENDER HIS/HER PASSPORT.</div>
+      <div *ngIf="hearings.elecMonitorChecked" class="text-danger font-weight-bold">THE DEFENDANT WILL BE PLACED ON ELECTRONIC MONITORING AND MUST ADHERE TO ALL RULES FOR THIS PURPOSE.</div>
+      <div class="">{{hearings.additionalConditions}}</div>
+    </div>
+  </div>
+  <div class="bg-white rounded border border-dark text-dark h4 text-center">CLICK TO CLOSE ORDER</div>
+</section>
+<app-termination [hearing]="hearings" (closeMenu)="closeTermination($event)" *ngIf="showTermination"></app-termination>
+

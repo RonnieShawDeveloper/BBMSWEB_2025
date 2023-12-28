@@ -1,0 +1,3 @@
+<app-page-one *ngIf="page_one" (newDefendant)="doNewDefendant($event)" (selectDef)="doSelectedDefendant($event)"></app-page-one>
+<app-page-two *ngIf="page_two" [selectedDefendant]="selectedDefendant" (complete)="closePageTwo($event)"></app-page-two>
+<app-add-defendant *ngIf="newDefendant" (complete)="closeAddDefendant($event)"></app-add-defendant>

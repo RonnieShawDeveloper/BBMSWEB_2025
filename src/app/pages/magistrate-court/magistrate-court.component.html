@@ -1,0 +1,114 @@
+<section *ngIf="showSearch">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col" style="text-align: center;"><span style="font-weight: bold;font-size: 31px;color: var(--blue);">MAGISTRATE COURT DEFENDANT PORTAL</span>
+      </div>
+    </div>
+    <section>
+      <div class="container">
+        <div class="row" style="font-size: 20px;text-align: right;font-weight: bold;border-style: solid;border-radius: 14px;padding: 10px;margin: 0px;margin-top: 11px;background: #e6e2e2;">
+          <div class="col">
+            <div>All active bookings will show in the list below.</div>
+          </div>
+          <div class="col d-flex justify-content-center align-items-end flex-column">
+            <div>
+              <span class="btn btn-outline-danger btn-lg ml-2" (click)="createBooking()">CREATE NEW BOOKING</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="container-fluid">
+      <div class="d-flex flex-row justify-content-center align-items-center border border-primary">
+        <div class="m-1 font-weight-bold h5">FILTERS: </div>
+        <div class="btn btn-info btn-sm m-1" (click)="showAll()">SEE ALL RECORDS</div>
+        <div class="btn btn-primary btn-sm m-1" (click)="showSubmitted()">SEE ALL SUBMITTED</div>
+        <div class="btn btn-success btn-sm m-1" (click)="showGranted()">SEE ALL GRANTED</div>
+        <div class="btn btn-danger btn-sm m-1" (click)="showDenied()">SEE ALL DENIED</div>
+        <div class="btn btn-warning btn-sm m-1">SEE ALL RELEASED</div>
+      </div>
+      <div class="d-flex flex-row justify-content-center align-items-center">
+      <div class="p-2 m-1 font-weight-bold h5 text-center" style="width: 100%;background-color:lightgreen">ALL MAGISTRATE ASSIGNED CASES ARE HIGHLIGHTED IN LIGHT GREEN</div>
+      </div>
+      <p-table #dt1 [value]="activeBookings" [paginator]="true"
+               [rows]="10" sortField="unixDate" sortMode="single" sortOrder="-1"
+               [showCurrentPageReport]="true"
+               [tableStyle]="{ 'min-width': '50rem' }"
+               currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Applications"
+               [globalFilterFields]="['offenderName', 'unixDate', 'judgeName']">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="lastName"></p-columnFilter>
+              <div class="small text-muted font-weight-bold">Last Name Search</div>
+            </th>
+            <th>
+            </th>
+            <th>
+              <p-columnFilter type="text" field="judge"></p-columnFilter>
+              <div class="small text-muted font-weight-bold">Full/Partial Name Search</div>
+            </th>
+            <th>
+            </th>
+            <th class="text-center">
+              <div class="btn btn-outline-danger btn-lg" (click)="clear(dt1)">CLEAR SEARCH</div>
+            </th>
+          </tr>
+          <tr>
+            <th class="text-center">Photo</th>
+            <th class="text-center" pSortableColumn="lastName">Name<p-sortIcon field="lastName"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="unixDate">Booking Date <p-sortIcon field="unixDate"></p-sortIcon></th>
+            <th class="text-center" pSortableColumn="judge">Magistrate <p-sortIcon field="judge"></p-sortIcon></th>
+            <th class="text-center">Status/Comments/Charges</th>
+            <th class="text-center">CONTROLS</th>
+          </tr>
+
+        </ng-template>
+        <ng-template pTemplate="body" let-apps>
+          <tr [style]="apps.judgeID==currentMember.uid?'background-color:lightgreen':''">
+            <td class="text-center">
+              <img *ngIf="!apps.photoURL" class="img-fluid m-2 border border-dark" style="max-width: 100px" src="/assets/img/users/default-user.jpg" loading="lazy" />
+              <img *ngIf="apps.photoURL" class="img-fluid m-2 border border-dark" style="max-width: 100px" [src]="apps.photoURL" (click)="enlargePhoto(apps.photoURL, apps.firstName, apps.lastName)" loading="lazy" />
+              <div *ngIf="apps.photoURL" class="text-center font-weight-bold text-danger" style="font-size:10px">CLICK TO ENLARGE</div>
+            </td>
+            <td class="text-center"><span class="font-weight-bold">{{ apps.lastName }} {{ apps.firstName }} {{ apps.middleName }}<br>DOB: {{apps.dob}}<br>Suretor: {{apps.suretorName?apps.suretorName:'No Suretor Assigned'}}</span>
+            </td>
+            <td class="text-center">{{ convertUnixDate(apps.unixDate) }}<br>{{humanizeDate(apps.unixDate)}}</td>
+            <td *ngIf="apps.judgeName">
+              {{ apps.judgeName }}
+            </td>
+            <td *ngIf="!apps.judgeID||apps.judgeID=='0'" class="text-center"><span class="font-weight-bold text-danger">NO MAGISTRATE ASSIGNED</span></td>
+            <td *ngIf="apps.judge&&apps.judgeID!='0'" class="text-center"><span class="font-weight-bold text-danger">{{apps.judge}}<br><span class="font-weight-bold text-success">{{apps.magistrateEmailSent?'EMAIL NOTIFICATION SENT':''}}</span></span></td>
+            <td style="max-width: 300px">
+              <div class="d-flex justify-content-center align-items-center flex-column">
+                <div class="d-flex justify-content-center align-items-center flex-row flex-wrap">
+                  <span *ngIf="apps.bailStatus=='pending'" class="badge badge-secondary badge-pill m-1" style="font-size: 10px">GATHERING DOCUMENTS</span>
+                  <span *ngIf="apps.bailStatus=='submitted'" class="badge badge-success badge-pill m-1" style="font-size: 10px">SUBMITTED TO MAGISTRATE {{apps.judge}}</span>
+                  <span *ngIf="apps.bailStatus=='approved'" class="badge badge-primary badge-pill m-1" style="font-size: 10px">BAIL APPROVED</span>
+                  <span *ngIf="apps.bailStatus=='denied'" class="badge badge-warning badge-pill m-1" style="font-size: 10px">BAIL DENIED</span>
+                  <span *ngIf="!apps.afisID" class="badge badge-danger badge-pill m-1" style="font-size: 10px">AFIS NOT LINKED</span>
+                  <span *ngIf="apps.afisID" class="badge badge-info badge-pill m-1" style="font-size: 10px">AFIS LINKED</span>
+                </div>
+                <div class="small">{{apps.bookingComments}}</div>
+                <div class="">
+                  <hr style="margin: 5px; padding: 0px; width: 100%; color: black">
+                  <div class="font-weight-bold small">Case No.: {{apps.agencyCase}}</div>
+                  <ol class="small">
+                    <li *ngFor="let c of apps.charges">{{c.countCharge}}</li>
+                  </ol>
+                </div>
+              </div>
+            </td>
+            <td class="text-center">
+              <i class="fa fa-2x fa-edit m-1 text-primary" style="cursor: pointer" (click)="doSelect(apps)"></i>
+              <i *ngIf="currentMember.authAdmin" class="fa fa-2x fa-trash m-1 text-danger" style="cursor: pointer" (click)="doDeleteBooking(apps)"></i>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    </div>
+</section>
+<app-magistrate-booking *ngIf="showBooking" [booking]="selectedBooking" (onExit)="closeHearing($event)"></app-magistrate-booking>

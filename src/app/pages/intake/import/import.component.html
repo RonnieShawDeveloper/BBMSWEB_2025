@@ -1,0 +1,141 @@
+<section>
+  <div class="row">
+    <div class="col-2" style="background: #003976;">
+      <div class="btn btn-primary btn-sm menubtn"
+           style="border-radius: 0px;border-right-style: solid;border-right-color: rgb(110,176,247);background:  #003976;">
+        <span>SEARCH</span></div>
+      <div class="btn btn-primary btn-sm menubtn"
+           style="border-radius: 0px;border-right-style: solid;border-right-color: rgb(110,176,247);background:  #003976;">
+        <span>EXIT</span></div>
+      <div class="btn btn-primary btn-sm menubtn"
+           style="border-radius: 0px;background:  #003976; border-right-style: solid;"><span>HELP</span></div>
+    </div>
+    <div class="col d-xl-flex justify-content-xl-start align-items-xl-center"
+         style="background: #003976;font-weight: bold;"><span
+      style="color: rgb(255,255,255);">DEFENDANT INTAKE SYSTEM</span></div>
+  </div>
+  <div class="row mb-2">
+    <div class="col p-3 rounded rounded-lg h5">
+      This form is used to create a new record in the BBMS system. The data below is pulled from the AFIS system. Please review the data and make any necessary changes. Once you are satisfied with the data, click the "Create New Defendant Record" button to create the new record in the BBMS system.
+    </div>
+  </div>
+  <div class="row" style="margin-right: 0px;margin-left: 0px;">
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">First Name</span></div><input [(ngModel)]="selectedAfis.fName" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Middle Name</span></div><input [(ngModel)]="selectedAfis.mName" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Last Name</span></div><input [(ngModel)]="selectedAfis.lName" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 5px;margin-bottom: 5px;margin-right: 0px;margin-left: 0px;">
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Address</span></div><input [(ngModel)]="selectedAfis.address1" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Suite, Apt, Description</span></div><input [(ngModel)]="selectedAfis.address2" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-right: 0px;margin-left: 0px;">
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Locality</span></div><input [(ngModel)]="selectedAfis.locality" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Island</span></div><input [(ngModel)]="selectedAfis.island" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Country</span></div><input [(ngModel)]="selectedAfis.country" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 5px;margin-bottom: 5px;">
+    <div class="col-2">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Height</span></div><input [(ngModel)]="selectedAfis.height" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Weight</span></div><input [(ngModel)]="selectedAfis.weight" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Alias(s)</span></div><input [(ngModel)]="selectedAfis.alias" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 5px;margin-bottom: 5px;">
+    <div class="col-3">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Sex</span></div><select [(ngModel)]="selectedAfis.sex" class="form-control">
+        <optgroup label="Select a Sex">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </optgroup>
+      </select>
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Race</span></div><select [(ngModel)]="selectedAfis.race" class="form-control">
+        <optgroup label="Select a Race">
+          <option value="Black">Black</option>
+          <option value="White">White</option>
+          <option value="Asian">Asian</option>
+          <option value="Hispanic">Hispanic</option>
+          <option value="Other">Other</option>
+        </optgroup>
+      </select>
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Hair Color</span></div><input [(ngModel)]="selectedAfis.hair" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Eye Color</span></div><input [(ngModel)]="selectedAfis.eyes" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col d-flex justify-content-center align-items-center">
+      <button class="btn btn-warning" type="button" style="margin: 2px;" (click)="doCancel()">CANCEL</button>
+      <button class="btn btn-success" type="button" style="margin: 2px;" (click)="doImport()">IMPORT RECORD</button>
+    </div>
+  </div>
+</section>

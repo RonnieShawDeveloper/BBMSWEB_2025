@@ -1,0 +1,45 @@
+<div @fade class="container" style="background: #02136c;border-top-left-radius: 10px;border-top-right-radius: 10px;border: 1px solid rgb(2,19,108);padding-bottom: 5px;margin-top: 10px;">
+  <div class="row">
+    <div class="col">
+      <p style="text-align: center;font-weight: bold;color: rgb(255,255,255);font-size: 18px;margin-bottom: 0px;">PLEADING FOR&nbsp; ATTORNEY OF RECORD IN BAIL MATTERS</p>
+    </div>
+  </div>
+  <div style="padding-bottom: 10px;background: #fefefe;margin-bottom: 4px;padding-right: 5px;padding-left: 5px;">
+    <div class="row" style="padding-top: 10px;padding-bottom: 0px;">
+      <div class="col-5">
+        <label class="form-label" style="margin-bottom: 0px;font-size: 12px;font-weight: bold;margin-left: 5px;">DEFENDANTS LAST NAME</label>
+        <input [(ngModel)]="lastName" type="text" class="form-control">
+      </div>
+      <div class="col-5">
+        <label class="form-label" style="margin-bottom: 0px;font-size: 12px;font-weight: bold;margin-left: 5px;">DEFENDANTS DATE OF BIRTH</label>
+        <input [(ngModel)]="dob" class="form-control" type="date">
+      </div>
+      <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center">
+        <button class="btn btn-success btn-sm" type="button" style="width: 100%;" (click)="searchDefendants()">SEARCH</button>
+      </div>
+    </div>
+    <div @fade *ngIf="selectedDefendant.lName" class="row" style="margin-top: 8px;">
+      <div class="col-12 text-center small text-danger">
+        <p style="margin-bottom: 0px;">Defendant Found: {{selectedDefendant.fName}} {{selectedDefendant.mName}} {{selectedDefendant.lName}} - Motion will be filed in newest open booking!</p>
+      </div>
+    </div>
+    <div @fade *ngIf="selectedDefendant.lName" class="row">
+      <div class="col d-xl-flex justify-content-xl-center">
+        <div style="width: 8in;border-width: 1px;border-style: solid;background: #f9f8f3;padding: .5in;">
+          <p style="text-align: left;font-weight: bold;">COMMON WEALTH OF THE BAHAMAS<br>IN THE SUPREME COURT<br>Criminal Division<br>BETWEEN</p>
+          <p style="font-weight: bold;text-align: center;margin-bottom: 0px;">{{selectedDefendant.fName.toUpperCase()}} {{selectedDefendant.mName.toUpperCase()}} {{selectedDefendant.lName.toUpperCase()}}</p>
+          <p style="text-align: center;margin-right: -259px;font-size: 13px;">Applicant</p>
+          <p style="font-weight: bold;text-align: center;margin-bottom: 0px;">AND <br>THE ATTORNEY GENERAL</p>
+          <p style="text-align: center;margin-right: -259px;font-size: 13px;">Respondent</p>
+          <p style="font-weight: bold;text-align: center;margin-bottom: 0px;margin-top: 14px;font-size: 20px;">PLEADING FOR</p>
+          <p style="font-weight: bold;text-align: center;font-size: 20px;">ATTORNEY OF RECORD</p>
+          <p><b>COMES NOW,</b> {{attoney.name}}, and requests this Honorable Court to recognize said Counsel as the Attorney of Record in all Bail Matters that come before this court.</p>
+          <p style="text-align: right;"><b>{{attoney.name}}</b></p>
+          <div style="text-align: right; color: red; font-size: 11px; line-height: 10px">Digitally Signed through<br>the Bail Management System</div>
+          <div class="btn btn-sm btn-warning m-1" (click)="doCancelMotion()">CANCEL PLEADING</div>
+          <div class="btn btn-sm btn-success m-1">SUBMIT PLEADING</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

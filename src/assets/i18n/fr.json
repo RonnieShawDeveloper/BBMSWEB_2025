@@ -1,0 +1,12 @@
+{   
+  "LOGIN": "S'identifier", 
+  "LOGOUT": "Se déconnecter",
+  "REGISTER": "Enregistrement",
+  "ADMIN_NAV": {  
+    "DASHBOARD": "Tableau de bord",
+    "PAGES": "Des pages",
+    "BLANK": "Vide",
+    "ERROR": "Erreur", 
+    "EXTERNAL_LINK": "Lien Externe" 
+  }
+}

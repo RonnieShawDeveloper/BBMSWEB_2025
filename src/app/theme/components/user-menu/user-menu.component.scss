@@ -1,0 +1,25 @@
+.dropdown-menu .user-menu {
+    width: 240px;
+    padding: 0;
+    .user-img{
+        width: 100px;
+    }
+    .dropdown-item{
+        color: #666 !important;
+    }
+
+}
+.rollover:hover{
+  background-color: white;
+  color: black;
+  cursor: pointer;
+}
+.rollover {
+  background-color: transparent;
+  color: white;
+  cursor: pointer;
+}
+
+.picture-icon {
+  cursor: pointer;
+}

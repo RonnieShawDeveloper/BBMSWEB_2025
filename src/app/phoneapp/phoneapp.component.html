@@ -1,0 +1,11 @@
+<section class="container-fluid">
+  <div class="row" style="color: var(--white);background: var(--blue);text-align: center;font-weight: bold;">
+    <div class="col"><span>MAGISTRATE PHOTO APP</span></div>
+  </div>
+  <div id="photocanvas" class="d-flex flex-column justify-content-center align-items-center">
+    <div class="font-weight-bold text-center m-1 small"><b>Name:</b> {{booking.lastName}}, {{booking.firstName}} <b>DOB:</b> {{booking.dob}}</div>
+    <video #cameraFeed autoplay></video>
+    <canvas #snapshotCanvas style="display: none;"></canvas>
+    <button id="snappicbutton" class="btn btn-sm btn-success m-2" (click)="takeSnapshot()">Take Photo</button>
+  </div>
+</section>

@@ -1,0 +1,188 @@
+<section *ngIf="!showUpdateScreen">
+<div class="row alert alert-danger" style="margin: 0px;border-radius: 14px;border: 2px solid var(--red);">
+  <div class="col-2"><i class="fa fa-exclamation-circle d-xl-flex justify-content-xl-center align-items-xl-center" style="font-size: 77px;border-color: var(--red);color: var(--red);"></i></div>
+  <div class="col d-xl-flex align-items-xl-center"><span style="font-weight: bold;">NOTE: The Defendant MUST be fingerprinted and enrolled into the JET AFIS system before they can be imported into the BBMS platform. The AFIS provides a unique ID number that is used to track the Defendant through all court proceedings and with KIOSK check-ins. </span></div>
+</div>
+<div class="row" style="margin-top: 13px;">
+  <div class="col" style="padding-left: 25px;background: #f2eded;"><span>Enter the Defendants Last Name and Date of Birth in the fields to the right and hit submit to search the AFIS for the Defendant. If the Defendant is found, you will be able to Import his AFIS record into the BBMS.</span></div>
+  <div class="col" style="padding-right: 25px;">
+    <div class="input-group">
+      <div class="input-group-prepend"><span class="input-group-text">Last Name</span></div><input [(ngModel)]="lastName" class="form-control" type="text" />
+      <div class="input-group-append"></div>
+    </div>
+    <div class="input-group" style="margin-top: 6px;">
+      <div class="input-group-prepend"><span class="input-group-text">Date of Birth</span></div><input [(ngModel)]="dob" class="form-control" type="date" />
+      <div class="input-group-append"><button class="btn btn-success" type="button" (click)="doSearch()">Search!</button></div>
+    </div>
+  </div>
+</div>
+<!--Table to hold results-->
+<div *ngIf="allAfisResults.length >=1" class="mt-2 mb-2">
+  <div class="table-responsive">
+    <span class="text-danger font-weight-bold">The following are all of the times this defendant has been Fingerprinted. Please select the record that represents the most current data. You will have the opportunity to edit and update this data prior to importing. The newest record is show first</span>
+    <table class="table border border-dark mt-2">
+      <thead>
+      <tr>
+        <th style="width: 25%;">Name</th>
+        <th style="width: 100%;">Record Info</th>
+        <th class="d-flex justify-content-center align-items-center" style="min-width: 100px;">SELECT</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let record of allAfisResults">
+        <td class="">
+          <b>Date Fingerprinted:</b><br>{{record.datetime}}<br>
+          <b>AFIS Record: </b> {{record.index}}<br>
+        </td>
+        <td class="">
+          <b>Address:</b> {{record.address1+' '+record.address2+' '+record.locality+', '+record.island}}<br>
+          <b>Reason:</b> {{record.comment}}<br>
+          <b>Location Fingerprinted:</b> {{record.location}} <b>by </b> {{record.officer}}<br>
+          <b>Race:</b> {{record.race}} <b>Sex:</b> {{record.sex}} <b>Weight:</b> {{record.weight}} <b>Eye Color:</b> {{record.eyes}} <b>Hair Color</b> {{record.hair}}
+        </td>
+        <td class="d-flex justify-content-center align-items-center"><button class="btn btn-success btn-sm" type="button"(click)="doImport(record)">IMPORT</button></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+<section *ngIf="showUpdateScreen">
+  <div class="row m-2 alert alert-danger border border-dark text-center" *ngIf="existInBBMS">
+    <div class="col p-3 rounded rounded-lg ">
+      <div class="h3">WARNING</div>
+      <span class="h5">THIS DEFENDANT ALREADY EXISTS IN THE BBMS SYSTEM. THE EXISTING RECORD WILL ONLY BE UPDATED</span>
+    </div>
+  </div>
+  <div class="row m-2 alert alert-danger border border-dark text-center" *ngIf="existInBBMS">
+    <div class="col p-3 rounded rounded-lg ">
+      <div class="h3">WARNING</div>
+      <span class="h5">THIS DEFENDANT HAS AN OPEN BOOKING IN THE BBMS SYSTEM</span>
+    </div>
+  </div>
+  <div class="row mb-2">
+    <div class="col p-3 rounded rounded-lg h5">
+      This form is used to create a new record in the BBMS system. The data below is pulled from the AFIS system. Please review the data and make any necessary changes. Once you are satisfied with the data, click the "Create New Defendant Record" button to create the new record in the BBMS system.
+    </div>
+  </div>
+  <div class="row" style="margin-right: 0px;margin-left: 0px;">
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">First Name</span></div><input [(ngModel)]="selectedAfis.fName" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Middle Name</span></div><input [(ngModel)]="selectedAfis.mName" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Last Name</span></div><input [(ngModel)]="selectedAfis.lName" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 5px;margin-bottom: 5px;margin-right: 0px;margin-left: 0px;">
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Address</span></div><input [(ngModel)]="selectedAfis.address1" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Suite, Apt, Description</span></div><input [(ngModel)]="selectedAfis.address2" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-right: 0px;margin-left: 0px;">
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Locality</span></div><input [(ngModel)]="selectedAfis.locality" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Island</span></div><input [(ngModel)]="selectedAfis.island" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Country</span></div><input [(ngModel)]="selectedAfis.country" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 5px;margin-bottom: 5px;">
+    <div class="col-2">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Height</span></div><input [(ngModel)]="selectedAfis.height" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Weight</span></div><input [(ngModel)]="selectedAfis.weight" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Alias(s)</span></div><input [(ngModel)]="selectedAfis.alias" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 5px;margin-bottom: 5px;">
+    <div class="col-3">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Sex</span></div><select [(ngModel)]="selectedAfis.sex" class="form-control">
+        <optgroup label="Select a Sex">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </optgroup>
+      </select>
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Race</span></div><select [(ngModel)]="selectedAfis.race" class="form-control">
+        <optgroup label="Select a Race">
+          <option value="Black">Black</option>
+          <option value="White">White</option>
+          <option value="Asian">Asian</option>
+          <option value="Hispanic">Hispanic</option>
+          <option value="Other">Other</option>
+        </optgroup>
+      </select>
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Hair Color</span></div><input [(ngModel)]="selectedAfis.hair" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Eye Color</span></div><input [(ngModel)]="selectedAfis.eyes" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col d-xl-flex justify-content-xl-center align-items-xl-center">
+      <button class="btn btn-warning" type="button" style="margin: 5px;" (click)="doCancel()">CANCEL</button>
+      <button *ngIf="existInBBMS" class="btn btn-success" type="button" style="margin: 5px;">UPDATE Defendant Record</button>
+      <button *ngIf="!existInBBMS" class="btn btn-success" type="button" style="margin: 5px;">Create NEW Defendant Record</button>
+    </div>
+  </div>
+</section>

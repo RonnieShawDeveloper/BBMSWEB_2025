@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "bbms-1283c"
+  },
+  "targets": {
+    "bbms-1283c": {
+      "hosting": {
+        "bbmsweb": [
+          "bbmsweb"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

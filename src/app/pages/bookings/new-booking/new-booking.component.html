@@ -1,0 +1,308 @@
+<div class="container rounded shadow shadow-sm p-1">
+  <div class="border border-dark rounded">
+  <div *ngIf="newBooking.classification!='magistrate-bail-hearing'" class="text-danger h1 text-center border-dark border-bottom p-1">Create New Booking</div>
+    <div *ngIf="newBooking.classification=='magistrate-bail-hearing'" class="text-danger h1 text-center border-dark border-bottom p-1">MAGISTRATE BAIL HEARING</div>
+  <div class="text-center my-2 font-weight-bold text-primary">This wizard is used to create a new booking for this Defendant.</div>
+
+    <div *ngIf="page1">
+  <div class="row rounded m-1" style="background-color: #e8e8e8">
+    <div class="col-3">
+      <div class="form-group text-left">
+        <label for="bookDate" class="font-weight-bold">Booking Date</label>
+        <input [(ngModel)]="newBooking.bookDate"  type="date" id="bookDate" class="form-control">
+        <div class="small text-muted">Defaults to today's date</div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="form-group text-left">
+        <label for="bookTime" class="font-weight-bold">Booking Time</label>
+        <input [(ngModel)]="newBooking.bookTime"  type="time" id="bookTime" class="form-control">
+        <div class="small text-muted">Defaults to Current Time</div>
+      </div>
+    </div>
+    <div class="col-6 text-left">
+      <label for="classification" class="font-weight-bold">Custody Type</label>
+      <select  [(ngModel)]="newBooking.classification" class="custom-select" id="classification">
+        <option value="magistrate-bail-hearing">Magistrate Bail Hearing</option>
+        <option value="remand-custody">Remand Custody BDOCS</option>
+        <option value="flight-risk">Flight Risk</option>
+        <option value="public-safety">Public Safety</option>
+        <option value="obstruction-of-justice">Obstruction of Justice</option>
+        <option value="previous-failure-to-appear">Previous Failure to Appear</option>
+        <option value="seriousness-of-charges">Seriousness of Charges</option>
+        <option value="repeat-offender">Repeat Offender</option>
+        <option value="no-fixed-address">No Fixed Address</option>
+        <option value="danger-to-self">Danger to Self</option>
+        <option value="noncompliance-with-court-orders">Noncompliance with Court Orders</option>
+        <option value="victim-witness-intimidation">Victim or Witness Intimidation</option>
+        <option value="pending-investigation">Pending Investigation</option>
+        <option value="bail-unaffordability">Bail Unaffordability</option>
+        <option value="national-security-concerns">National Security Concerns</option>
+        <option value="probation-parole-violation">Probation or Parole Violation</option>
+        <option value="contempt-of-court">Contempt of Court</option>
+      </select>
+      <div class="small text-muted">Select the current Custody Classification Level</div>
+    </div>
+  </div>
+  <div class="row rounded m-1" style="background-color: #e8e8e8">
+    <div class="col-3">
+      <div class="form-group text-left">
+        <label for="grn" class="font-weight-bold">General Register Number</label>
+        <input  [(ngModel)]="newBooking.genRegisterNumber" type="text" id="grn" class="form-control">
+        <div class="small text-muted">General Register Number</div>
+      </div>
+    </div>
+    <div class="col-3 text-left">
+      <label for="marriageStat" class="font-weight-bold">Marriage Status</label>
+      <select [(ngModel)]="newBooking.maritialStatus" class="custom-select" id="marriageStat">
+        <option>Single</option>
+        <option>Married</option>
+        <option>Divorced</option>
+        <option>Widowed</option>
+        <option>Other</option>
+      </select>
+      <div class="small text-muted">Select Marriage Status during this booking</div>
+    </div>
+    <div class="col-3">
+      <div class="form-group text-left">
+        <label for="children" class="font-weight-bold">Number of Children</label>
+        <input [(ngModel)]="newBooking.children" type="number" id="children" class="form-control">
+        <div class="small text-muted">Number of Children</div>
+      </div>
+    </div>
+    <div class="col-3 text-left">
+      <label for="occ" class="font-weight-bold">Trade/Occupation</label>
+      <select  [(ngModel)]="newBooking.occupation" class="custom-select" id="occ">
+        <option selected>Unknown</option>
+        <option selected>Unlisted</option>
+        <option *ngFor="let o of trades">{{o}}</option>
+      </select>
+      <div class="small text-muted">Select Current Trade/Occupation</div>
+    </div>
+  </div>
+      <div *ngIf="openBooking" class="bg-danger border border-dark shadow shadow-sm m-3 p-3 h3 text-center text-white">
+        <b>WARNING!!</b> THIS DEFENDANT HAS A CURRENTLY OPEN BOOKING! DO NOT CREATE A NEW BOOKING UNLESS PREVIOUS BOOKING HAS BEEN CLOSED!
+      </div>
+  <div class="clearfix mb-2 mx-1">
+    <div class="btn btn-success float-right m-1" (click)="page1 = false; page2 = true">NEXT</div>
+    <div class="btn btn-warning float-right m-1" (click)="cancel()">CANCEL</div>
+  </div>
+  <div class="m-1 border border-dark rounded bg-info pb-2">
+    <div class="font-weight-bold text-center h5">LIST OF PRIOR CHARGES FOR DEFENDANT</div>
+    <div class="small text-white text-center">Use this list to help determine Security Level Classification</div>
+    <div class="text-left" style="overflow-y: scroll; overflow-x: hidden; height: 400px">
+    <div *ngFor="let c of counts" class="m-1 border border-dark rounded p-1" style="background-color: #e8e8e8">
+      <div class="row">
+        <div class="col-6">
+          <div class=""><b>Charge:</b> {{c.countCharge}}</div>
+          <div class="">{{c.countComment}}</div>
+        </div>
+        <div class="col-6">
+          <div class=""><b>Charging Document:</b> {{c.chargeDocNumber}}<br><b>Date:</b> {{convertTime(c.countDate)}}
+          <span *ngIf="countAge(c.countDate) < 30" class="badge badge-danger">UNDER 30 DAYS</span>
+            <span *ngIf="countAge(c.countDate) >= 30 && countAge(c.countDate) < 180 " class="badge badge-warning">UNDER 180 DAYS</span>
+            <span *ngIf="countAge(c.countDate) >= 180 && countAge(c.countDate) < 360 " class="badge badge-primary">UNDER 1 YEAR</span>
+            <span *ngIf="countAge(c.countDate) >= 360" class="badge badge-success">OVER 1 YEAR</span>
+            <span *ngIf="c.isSexcrime" class="badge badge-danger mx-1">SEX CRIME</span>
+            <span *ngIf="c.isViolent" class="badge badge-danger mx-1">VIOLENT CRIME</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+  </div> <!-- End Page 1 -->
+    <div *ngIf="page2">
+      <fieldset class="border border-dark rounded p-1 mx-1 mb-1" style="background-color: #e8e8e8">
+        <legend class="text-left border border-dark rounded" style="width: auto; padding: 0 10px; background-color: #e8e8e8">Family Member Information (Optional)</legend>
+        <div class="row m-1 text-left">
+          <div class="col-3">
+            <div class="form-group">
+              <label for="famName1" class="font-weight-bold">Family Member Name</label>
+              <input [(ngModel)]="newBooking.famMembName1" type="text" id="famName1" class="form-control">
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label for="add1" class="font-weight-bold">Address</label>
+              <input [(ngModel)]="newBooking.famMembAdd1" type="text" id="add1" class="form-control">
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="form-group">
+              <label for="religion1" class="font-weight-bold">Religion</label><br>
+              <select name="religion1" id="religion1" [(ngModel)]="newBooking.famMembReligion1">
+                <option value="">Select a religion</option>
+                <option value="christianity">Christianity</option>
+                <option value="islam">Islam</option>
+                <option value="hinduism">Hinduism</option>
+                <option value="buddhism">Buddhism</option>
+                <option value="judaism">Judaism</option>
+                <option value="sikhism">Sikhism</option>
+                <option value="taoism">Taoism</option>
+                <option value="confucianism">Confucianism</option>
+                <option value="shinto">Shinto</option>
+                <option value="jainism">Jainism</option>
+                <option value="zoroastrianism">Zoroastrianism</option>
+                <option value="bahaism">Baha'ism</option>
+                <option value="atheism">Atheism</option>
+                <option value="agnosticism">Agnosticism</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+        <div class="row m-1 text-left">
+          <div class="col-3">
+            <div class="form-group">
+              <label for="famName2" class="font-weight-bold">Family Member Name</label>
+              <input [(ngModel)]="newBooking.famMembName2" type="text" id="famName2" class="form-control">
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label for="add2" class="font-weight-bold">Address</label>
+              <input [(ngModel)]="newBooking.famMembAdd2" type="text" id="add2" class="form-control">
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="form-group">
+              <label for="religion2" class="font-weight-bold">Religion</label><br>
+              <select name="religion2" id="religion2" [(ngModel)]="newBooking.famMembReligion2">
+                <option value="">Select a religion</option>
+                <option value="christianity">Christianity</option>
+                <option value="islam">Islam</option>
+                <option value="hinduism">Hinduism</option>
+                <option value="buddhism">Buddhism</option>
+                <option value="judaism">Judaism</option>
+                <option value="sikhism">Sikhism</option>
+                <option value="taoism">Taoism</option>
+                <option value="confucianism">Confucianism</option>
+                <option value="shinto">Shinto</option>
+                <option value="jainism">Jainism</option>
+                <option value="zoroastrianism">Zoroastrianism</option>
+                <option value="bahaism">Baha'ism</option>
+                <option value="atheism">Atheism</option>
+                <option value="agnosticism">Agnosticism</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+        <div class="row m-1 text-left">
+          <div class="col-3">
+            <div class="form-group">
+              <label for="famName3" class="font-weight-bold">Family Member Name</label>
+              <input [(ngModel)]="newBooking.famMembName3" type="text" id="famName3" class="form-control">
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label for="add3" class="font-weight-bold">Address</label>
+              <input [(ngModel)]="newBooking.famMembAdd3" type="text" id="add3" class="form-control">
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="form-group">
+              <label for="religion3" class="font-weight-bold">Religion</label><br>
+              <select name="religion3" id="religion3" [(ngModel)]="newBooking.famMembReligion3">
+                <option value="">Select a religion</option>
+                <option value="christianity">Christianity</option>
+                <option value="islam">Islam</option>
+                <option value="hinduism">Hinduism</option>
+                <option value="buddhism">Buddhism</option>
+                <option value="judaism">Judaism</option>
+                <option value="sikhism">Sikhism</option>
+                <option value="taoism">Taoism</option>
+                <option value="confucianism">Confucianism</option>
+                <option value="shinto">Shinto</option>
+                <option value="jainism">Jainism</option>
+                <option value="zoroastrianism">Zoroastrianism</option>
+                <option value="bahaism">Baha'ism</option>
+                <option value="atheism">Atheism</option>
+                <option value="agnosticism">Agnosticism</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+      <fieldset class="border border-dark rounded p-1 mx-1 mb-1"  style="background-color: #e8e8e8">
+        <legend class="text-left border border-dark rounded" style="width: auto; padding: 0 10px; background-color: #e8e8e8">Employer Information</legend>
+        <div class="row m-1 text-left">
+          <div class="col-4">
+            <div class="form-group">
+              <label for="employerName" class="font-weight-bold">Employer Name</label>
+              <input [(ngModel)]="newBooking.empName" type="text" class="form-control" id="employerName">
+            </div>
+          </div>
+          <div class="col-8">
+            <div class="form-group">
+              <label for="employerAddress" class="font-weight-bold">Employer Address</label>
+              <input [(ngModel)]="newBooking.empAddress" type="text" class="form-control" id="employerAddress">
+            </div>
+          </div>
+        </div>
+        <div class="row m-1 text-left">
+          <div class="col-4">
+            <div class="form-group">
+              <label for="supName" class="font-weight-bold">Supervisors Name</label>
+              <input [(ngModel)]="newBooking.empSup" type="text" class="form-control" id="supName">
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="form-group">
+              <label for="supPhone" class="font-weight-bold">Supervisors Phone Number</label>
+              <input [(ngModel)]="newBooking.empSupPhone" type="text" class="form-control" id="supPhone">
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="form-group">
+              <label for="empPosition" class="font-weight-bold">Employee's Position</label>
+              <input [(ngModel)]="newBooking.empPosition" type="text" class="form-control" id="empPosition">
+            </div>
+          </div>
+        </div>
+      </fieldset>
+      <div class="clearfix mb-2 mx-1">
+        <div class="btn btn-success float-right m-1" (click)="page2 = false; page3 = true">NEXT</div>
+        <div class="btn btn-primary float-right m-1" (click)="page2 = false; page1 = true">BACK</div>
+        <div class="btn btn-warning float-right m-1" (click)="cancel()">CANCEL</div>
+      </div>
+    </div><!-- End of page 2 -->
+    <div *ngIf="page3">
+    <fieldset class="border border-dark rounded p-1 mx-1 mb-1" style="background-color: #e8e8e8">
+      <legend class="text-left border border-dark rounded" style="width: auto; padding: 0 10px; background-color: #e8e8e8">Additional Information</legend>
+      <div class="row m-1 text-left">
+        <div class="col-12">
+          <div class="form-group">
+            <label for="comment" class="font-weight-bold">Comments for this booking</label>
+            <textarea [(ngModel)]="newBooking.comments" id="comment" rows="4" style="width: 100%"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="row m-1 text-left">
+        <div class="col-4">
+          <div class="form-group">
+            <label for="housing" class="font-weight-bold">Housing Cell or Block</label>
+            <input [(ngModel)]="newBooking.housingLoc" type="text" class="form-control" id="housing">
+          </div>
+        </div>
+        <div class="col-8">
+          <div class="form-group">
+            <label for="gangs" class="font-weight-bold">Known Gang Affiliations</label>
+            <input [(ngModel)]="newBooking.gangAffil" type="text" class="form-control" id="gangs">
+          </div>
+        </div>
+      </div>
+    </fieldset>
+    <div class="clearfix mb-2 mx-1">
+      <div class="btn btn-success float-right m-1" (click)="createBooking()">CREATE BOOKING</div>
+      <div class="btn btn-primary float-right m-1" (click)="page2 = true; page3 = false">BACK</div>
+      <div class="btn btn-warning float-right m-1" (click)="cancel()">CANCEL</div>
+    </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,25 @@
+<section class="d-xl-flex flex-column justify-content-center align-items-center">
+  <div class="row" style="width: 8.5in;">
+    <div class="col-10" style="text-align: left;"><span style="font-weight: bold;font-size: 25px;">ACTIVE BAIL APPLICATION REPORT</span></div>
+    <div class="col-2" style="text-align: right;"><button class="btn btn-primary btn-sm no-print" type="button" (click)="doExit()">EXIT</button></div>
+  </div>
+  <div class="row" style="width: 8.5in;">
+    <div class="col" style="text-align: center;"><span style="font-weight: bold;">CRIMINAL REGISTRY</span></div>
+  </div>
+  <div class="row" style="width: 8.5in;">
+    <div class="col" style="text-align: left;"><span>Report Date {{reportDate}}</span></div>
+  </div>
+  <div style="width: 8.5in;">
+    <div class="col" style="text-align: left;margin-top: 20px"><span class="font-weight-bold">Sorted by Last Name</span></div>
+  </div>
+  <div class="row" style="width: 8.5in;background: #e3e5e6">
+    <div class="col d-flex align-items-center"><span>Defendants Name</span></div>
+    <div class="col d-flex align-items-center"><span>Application Date</span></div>
+    <div class="col"><span>Hearing Date<br />Judge Assigned</span></div>
+  </div>
+  <div class="row border-bottom border-dark" *ngFor="let h of hearings" style="width: 8.5in;">
+    <div class="col d-flex align-items-center"><span>{{h.offenderName}}</span></div>
+    <div class="col d-flex align-items-center"><span>{{convertUnixDate(h.unixDate)}}</span></div>
+    <div class="col"><span>{{convertUnixDate(h.hearingDateUnix)}}<br />{{h.judgeName?h.judgeName:'JUDGE NOT SET'}}</span></div>
+  </div>
+</section>

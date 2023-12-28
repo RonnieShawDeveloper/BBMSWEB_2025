@@ -1,0 +1,48 @@
+<section>
+  <div class="container">
+    <div class="row">
+      <div class="col-12 text-center">
+        <h1>BBMS PHONE CHECK-INS</h1>
+      </div>
+    </div>
+    <div class="row font-weight-bold text-center" style="background-color: lightgrey; margin-bottom: 5px">
+      <div class="col-2">
+        Picture
+      </div>
+      <div class="col-2">
+        Name
+      </div>
+        <div class="col-6">
+          Check-in Information
+        </div>
+        <div class="col-2">
+          VIEW MAP
+        </div>
+    </div>
+    <div *ngFor="let c of phoneCheckins" class="row font-weight-bold border border-dark mb-1">
+      <div class="col-2">
+        <img src="{{c.photo}}" alt="picture" class="img-thumbnail">
+      </div>
+      <div class="col-2 d-flex flex-column justify-content-center align-items-center">
+        <span class="h4 font-weight-bold">{{c.fName}} {{c.lName}}</span>
+        <span>DOB: {{c.dob}}</span>
+        <span *ngIf="c.BBMSID" class="badge badge-sm badge-pill badge-success small m-1">VERIFIED BBMS ID<br>{{c.BBMSID}}</span>
+        <span *ngIf="c.AFISID" class="badge badge-sm badge-pill badge-success small m-1">VERIFIED AFIS ID<br>{{c.AFISID}}</span>
+      </div>
+        <div class="col-6 d-flex flex-column justify-content-center align-items-center">
+          <span><b>CHECK-IN DATE/TIME:</b> {{c.datetime}}</span>
+          <span *ngIf="c.magistrate" class="bg-success text-white p-2 px-5 rounded-lg">MAGISTRATE COURT BAIL</span>
+          <span *ngIf="c.supreme" class="bg-success text-white p-2 px-5 rounded-lg">SUPREME COURT BAIL</span>
+          <span class="mt-2"><b>ADDRESS:</b> {{c.address1}} {{c.address2}}</span>
+          <span><b>LOCALITY:</b> {{c.city}} <b>ISLAND:</b> {{c.state}}</span>
+          <span class="mt-2 mb-2"><b>PHONE:</b> {{c.phone}}</span>
+          <span class="my-3 p-2 border border-danger" style="background-color: lightpink; border-radius: 10px;"><b>Check-in Location:</b> {{c.policestation}} - <b>Distance:</b> {{c.distance}}</span>
+          <span *ngIf="!c.BBMSID" class="p-2 rounded bg-danger text-white text-center">NO BBMS RECORD FOUND</span>
+          <span *ngIf="c.BBMSID" class="p-2 rounded bg-success text-dark text-center">BBMS RECORD FOUND</span>
+        </div>
+        <div class="col-2 d-flex flex-column justify-content-center align-items-center">
+          <div class="btn btn-sm btn-success" (click)="doMap(c)">VIEW ON MAP</div>
+        </div>
+    </div>
+  </div>
+</section>

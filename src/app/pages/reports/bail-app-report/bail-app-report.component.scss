@@ -1,0 +1,7 @@
+// Create a media query for print
+@media print {
+  // Hide the print button
+  .no-print {
+    display: none;
+  }
+}

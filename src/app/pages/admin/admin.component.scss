@@ -1,0 +1,32 @@
+// Center 'adminDiv' in the middle of the page
+.adminDiv {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 28px;
+  font-weight: bold;
+  color: red
+}
+
+.form-group {
+  position: relative;
+}
+
+.form-group label {
+  position: absolute;
+  top: 1px;
+  left: 10px;
+  font-size: 1.5em;
+}
+.form-group input:focus + label, form-group input:not(:placeholder-shown) + label {
+  font-size: 0.7em
+}
+
+.form-control {
+  padding-left: 10px; /* adjust as needed */
+  padding-top: 10px;
+}
+.badge {
+  cursor: pointer;
+}

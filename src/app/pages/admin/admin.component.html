@@ -1,0 +1,73 @@
+<div class="container-fluid">
+<p-table #dt1 [value]="allMembers" styleClass="p-datatable-striped"
+         [paginator]="true"
+         [rows]="10"
+         [showCurrentPageReport]="true"
+         [tableStyle]="{ 'min-width': '50rem' }"
+         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+         [rowsPerPageOptions]="[10, 25, 50]"
+         [globalFilterFields]="['lName', 'email', 'fName']">
+  <ng-template pTemplate="caption">
+    <div class="d-flex flex-row my-3">
+      <div class="btn btn-outline-danger" (click)="clear(dt1)"><i class="fa fa-stop-circle"></i> CLEAR FILTERS</div>
+      <span class="p-input-icon-right ml-auto">
+                <input id="searchBox" pInputText class="form-control" type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')" placeholder="Search Name/Email" />
+            </span>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="header">
+    <tr>
+      <th pSortableColumn="lName">Last, First Middle <p-sortIcon field="lName"></p-sortIcon></th>
+      <th pSortableColumn="email">Email Address <p-sortIcon field="email"></p-sortIcon></th>
+      <th>Roles (Click to Assign or Remove)</th>
+      <th>Status</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-member>
+    <tr>
+      <td [style]="getWarnings(member)"><div class="small text-muted font-weight-bold">Registered Name</div>{{ member.lName}}, {{ member.fName}} {{ member.mName}}<br>
+        <div class="small text-muted font-weight-bold">Screen Name</div>{{member.name}}</td>
+      <td><span style="font-size: 11px">{{ member.email }}</span><br>
+        <span *ngIf="member.emailVerified" class="badge badge-pill badge-success small p-1 m-1">Email Verified</span>
+        <span *ngIf="!member.emailVerified" class="badge badge-pill badge-danger small p-1 m-1">Email Not Verified</span>
+      </td>
+      <td>
+        <div style="background-color: lightgrey; padding-top:2px; padding-bottom: 2px">
+          <span *ngIf="member.authAdmin" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('admin', member)">Admin</span>
+          <span *ngIf="!member.authAdmin" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('admin', member)">Admin</span>
+          <span *ngIf="member.authJudge" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('judge', member)">Judge</span>
+          <span *ngIf="!member.authJudge" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('judge', member)">Judge</span>
+          <span *ngIf="member.authJudgeClerk" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('judgeClerk', member)">Judicial Clerk</span>
+          <span *ngIf="!member.authJudgeClerk" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('judgeClerk', member)">Judicial Clerk</span>
+          <span *ngIf="member.authMagistrate" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('magistrate', member)">Magistrate</span>
+          <span *ngIf="!member.authMagistrate" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('magistrate', member)">Magistrate</span>
+          <span *ngIf="member.authMagistrateClerk" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('magistrateClerk', member)">Magistrate Clerk</span>
+          <span *ngIf="!member.authMagistrateClerk" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('magistrateClerk', member)">Magistrate Clerk</span>
+          <span *ngIf="member.authPrivAttorney" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('private', member)">Private Attorney</span>
+          <span *ngIf="!member.authPrivAttorney" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('private', member)">Private Attorney</span>
+          <span *ngIf="member.authAttorney" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('dpp', member)">DPP Office</span>
+          <span *ngIf="!member.authAttorney" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('dpp', member)">DPP Office</span>
+          <span *ngIf="member.authRegistrar" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('registrar', member)">Registrar/Deputy</span>
+          <span *ngIf="!member.authRegistrar" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('registrar', member)">Registrar/Deputy</span>
+          <span *ngIf="member.authRegistrarClerk" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('registrarClerk', member)">Registrar Staff</span>
+          <span *ngIf="!member.authRegistrarClerk" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('registrarClerk', member)">Registrar Staff</span>
+        </div>
+        <div class="small text-muted"><b>Position:</b> {{member.position}} | <b>Requested:</b> {{member.requested}}</div>
+        <div class="small text-muted"><b>Comments:</b> {{member.comments}}<br>
+          <b>Account Created:</b> {{localTime(member.memberSince)}} | <b>Last Login:</b> {{localTime(member.lastLogin)}} | <span *ngIf="checkTime(member.lastLogin)" class="bg-warning text-white small p-1 rounded">LOGGED IN TODAY</span>
+        </div>
+      </td>
+      <td>
+        <select (change)="doStatusChange($event, member)" class="custom-select" [value]="member.status" [style]="getStyle(member.status)">
+          <option value="New">NEW MEMBER</option>
+          <option value="Approved">ACTIVE</option>
+          <option value="Disapproved">INACTIVE</option>
+        </select>
+
+      </td>
+
+    </tr>
+  </ng-template>
+</p-table>
+</div>

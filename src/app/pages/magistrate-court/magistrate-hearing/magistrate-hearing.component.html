@@ -1,0 +1,393 @@
+<section>
+  <section style="position: relative; border-style: solid;border-color: var(--red);border-radius: 15px;overflow: hidden;">
+    <div class="row">
+      <div class="col d-xl-flex justify-content-xl-center align-items-xl-center">
+        <div class="alert alert-success" role="alert" style="margin-left: 10px;">
+          <div class="row">
+            <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center"><i class="fa fa-exclamation-triangle" style="font-size: 58px;"></i></div>
+            <div class="col" style="text-align: center;"><span style="line-height: 16px;letter-spacing: 0px;"><strong>This is the Defendant Information that is currently on record. This information was provided when the Defendant was booked on the current charges.</strong></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center" style="background: #f9ebeb;padding: 9px;padding-right: 24px;"><img id="mainImage" class="img-fluid" /></div>
+      <div class="col" style="background: #f9ebeb;padding: 9px;padding-right: 24px;">
+        <div class="row no-gutters">
+          <div class="col-2" style="text-align: right;padding-right: 5px;"><span style="font-weight: bold;font-size: 10px;">NAME:</span></div>
+          <div class="col"><span>{{offender.lName}}, {{offender.fName}} {{offender.mName}}</span></div>
+        </div>
+        <div class="row no-gutters">
+          <div class="col-2" style="text-align: right;padding-right: 5px;"><span style="font-weight: bold;font-size: 10px;">ADDRESS:</span></div>
+          <div class="col"><span>{{offender.addLine1}} {{offender.addLine2}} {{offender.city}} {{offender.state}}</span></div>
+        </div>
+        <div class="row no-gutters">
+          <div class="col-2" style="text-align: right;padding-right: 5px;"><span style="font-weight: bold;font-size: 10px;">DOCUMENTS:</span></div>
+          <div class="col">
+            <button class="btn btn-info btn-sm" type="button" style="padding: 0px;padding-right: 1px;padding-left: 1px;margin: 3px;font-size: 10px;" (click)="doViewCharges()">PREVIOUS CHARGES</button>
+            <button class="btn btn-warning btn-sm" type="button" style="padding: 0px;padding-right: 1px;padding-left: 1px;margin: 3px;font-size: 10px;" (click)="doMotions()">MOTIONS/EVENTS</button>
+            <button class="btn btn-success btn-sm" type="button" style="padding: 0px;padding-right: 1px;padding-left: 1px;margin: 3px;font-size: 10px;" (click)="doBailApplication()">BAIL APPLICATION</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="btn btn-danger btn-sm" style="position:absolute; top: 10px; right: 10px" (click)="doCancel($event)">CANCEL</div>
+  </section>
+  <div class="d-flex row justify-content-start align-items-center bg-info text-white h4 font-weight-bold shadow shadow-sm mt-2">
+    <div class="col-12">
+      <div>BAIL MANAGEMENT CONTROLS</div>
+    </div>
+  </div>
+  <p-tabView>
+    <p-tabPanel header="GRANT BAIL">
+      <div class="d-flex row justify-content-start align-items-center bg-success text-white h4 font-weight-bold shadow shadow-sm">
+        <div class="col-12">
+          <div style="font-size: 12px">GRANT BAIL INSTRUCTIONS</div>
+        </div>
+      </div>
+      <p-tabView [(activeIndex)]="grantedTabIndex">
+        <p-tabPanel header="CHECK-IN LOCATION">
+          <section style="border-style: solid;border-color: var(--red);border-radius: 15px;">
+            <div class="row">
+              <div class="col d-xl-flex justify-content-xl-center align-items-xl-center">
+                <div class="alert alert-warning" role="alert" style="margin-left: 10px;">
+                  <div class="row">
+                    <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center"><i class="fa fa-exclamation-triangle" style="font-size: 58px;"></i></div>
+                    <div class="col"><span style="line-height: 16px;letter-spacing: 0px;"><strong>Please select the Police Station that will be used for check-in&#39;s by the Defendant. You may select multiple stations if you wish</strong></span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col" id="locationChecks">
+                <div class="form-check"><input (click)="getPoliceStationsNames()"  id="any" class="form-check-input" type="checkbox" value="any" /><label class="form-check-label" for="any">Any Police Station with a Kiosk (Default)</label></div>
+                <span style="font-weight: bold;">Kiosks Located on New Providence</span>
+                <div class="form-check"><input (click)="getPoliceStationsNames()" id="central" class="form-check-input" type="checkbox" value="central" /><label class="form-check-label" for="central">Central Police Station</label></div>
+                <div class="form-check"><input (click)="getPoliceStationsNames()"  id="southbeach" class="form-check-input" type="checkbox" value="southbeach" /><label class="form-check-label" for="southbeach">South Beach Police Station</label></div>
+                <div class="form-check"><input (click)="getPoliceStationsNames()"  id="elizabeth" class="form-check-input" type="checkbox" value="elizabeth" /><label class="form-check-label" for="elizabeth">Elizabeth Police Station</label></div>
+                <div class="form-check"><input (click)="getPoliceStationsNames()"  id="carmichael" class="form-check-input" type="checkbox" value="carmichael" /><label class="form-check-label" for="carmichael">Carmichael Police Station</label></div>
+                <div class="form-check"><input (click)="getPoliceStationsNames()"  id="grove" class="form-check-input" type="checkbox" value="grove" /><label class="form-check-label" for="grove">Grove Police Station</label></div>
+                <span style="font-weight: bold;">Kiosks Located on Grand Bahamas</span>
+                <div class="form-check"><input (click)="getPoliceStationsNames()" id="freeport" class="form-check-input" type="checkbox" value="freeport" /><label class="form-check-label" for="freeport">Freeport Police Station</label></div>
+              </div>
+            </div>
+          </section>
+          <div class="h5 text-danger mt-2">Currently Selected Location: {{locations}}</div>
+          <div class="d-flex justify-content-center align-items-center alert alert-success text-dark mt-4">
+            <div class="btn btn-sm btn-info m-1" (click)="grantedTabIndex>=1?grantedTabIndex = grantedTabIndex-1:grantedTabIndex">BACK</div>
+            <div class="btn btn-sm btn-primary m-1" (click)="grantedTabIndex<=5?grantedTabIndex = grantedTabIndex+1:grantedTabIndex">NEXT</div>
+          </div>
+        </p-tabPanel>
+        <p-tabPanel header="CHECK-IN DAYS & TIME">
+          <section style="border-style: solid;border-color: var(--red);border-radius: 15px;overflow: hidden;">
+            <div class="row">
+              <div class="col d-xl-flex justify-content-xl-center align-items-xl-center">
+                <div class="alert alert-warning" role="alert" style="margin-left: 10px;">
+                  <div class="row">
+                    <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center"><i class="fa fa-exclamation-triangle" style="font-size: 58px;"></i></div>
+                    <div class="col"><span style="line-height: 16px;letter-spacing: 0px;"><strong>Please select the Check-in Day(s) of the week and the time the check-in must occur by</strong></span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col" style="background: #f9ebeb;"><span style="font-weight: bold;">Check-In Days (Select all that Apply)</span>
+                <div class="form-check"><input [(ngModel)]="hearing.sundayChecked" id="formCheck-1" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-1">Sunday</label></div>
+                <div class="form-check"><input [(ngModel)]="hearing.mondayChecked" id="formCheck-2" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-2">Monday</label></div>
+                <div class="form-check"><input [(ngModel)]="hearing.tuesdayChecked" id="formCheck-7" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-7">Tuesday</label></div>
+                <div class="form-check"><input [(ngModel)]="hearing.wednesdayChecked" id="formCheck-6" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-6">Wednesday</label></div>
+                <div class="form-check"><input [(ngModel)]="hearing.thursdayChecked" id="formCheck-5" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-5">Thursday</label></div>
+                <div class="form-check"><input [(ngModel)]="hearing.fridayChecked" id="formCheck-4" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-4">Friday</label></div>
+                <div class="form-check"><input [(ngModel)]="hearing.saturdayChecked" id="formCheck-3" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-3">Saturday</label></div>
+              </div>
+              <div class="col" style="background: #ddf8cd;"><span style="font-weight: bold;">Must check-in BEFORE (Select 1 Only)</span>
+                <div class="form-check"><input [(ngModel)]="hearing.threepmChecked" id="formCheck-9" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-9">3pm</label></div>
+                <div class="form-check"><input [(ngModel)]="hearing.fourpmChecked" id="formCheck-10" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-10">4pm</label></div>
+                <div class="form-check"><input [(ngModel)]="hearing.fivepmChecked" id="formCheck-11" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-11">5pm</label></div>
+                <div class="form-check"><input [(ngModel)]="hearing.sixpmChecked" id="formCheck-12" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-12">6pm</label></div>
+                <div class="form-check"><input [(ngModel)]="hearing.sevenpmChecked" id="formCheck-13" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-13">7pm</label></div>
+                <div class="form-check"><input [(ngModel)]="hearing.eightpmChecked" id="formCheck-14" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-14">8pm</label></div>
+                <div class="form-check"><input [(ngModel)]="hearing.ninepmChecked" id="formCheck-15" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-15">9pm</label></div>
+                <div class="form-check"><input [(ngModel)]="hearing.tenpmChecked" id="formCheck-16" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-16">10pm</label></div>
+              </div>
+            </div>
+          </section>
+          <div class="d-flex justify-content-center align-items-center alert alert-success text-dark mt-4">
+            <div class="btn btn-sm btn-info m-1" (click)="grantedTabIndex>=1?grantedTabIndex = grantedTabIndex-1:grantedTabIndex">BACK</div>
+            <div class="btn btn-sm btn-primary m-1" (click)="grantedTabIndex<=5?grantedTabIndex = grantedTabIndex+1:grantedTabIndex">NEXT</div>
+          </div>
+        </p-tabPanel>
+        <p-tabPanel header="SURETY INFORMATION">
+          <section style="border-style: solid;border-color: var(--red);border-radius: 15px;overflow: hidden;">
+            <div class="row">
+              <div class="col d-xl-flex justify-content-xl-center align-items-xl-center">
+                <div class="alert alert-warning" role="alert" style="margin-left: 10px;">
+                  <div class="row">
+                    <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center"><i class="fa fa-exclamation-triangle" style="font-size: 58px;"></i></div>
+                    <div class="col"><span style="line-height: 16px;letter-spacing: 0px;">
+                      <strong>Please provide information to the Criminal Registry regarding Suretor/Surety Requirements.<br><br>If the Defendant is to be released
+                      on their own recognizance (ROR) then check the check-box and provide instructions to the Criminal Registrar n the text box.</strong></span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col d-flex align-items-center justify-content-center flex-column" style="background: #f9ebeb;padding: 9px;padding-right: 24px;">
+                <textarea [(ngModel)]="hearing.suretyReq" class="form-control" rows="5"></textarea>
+                <div class="form-group m-2 d-flex flex-row">
+                  <!-- Create a checkbox for being released on own recognizance -->
+                  <input type="checkbox" class="form-check-input" id="formCheck-20" style="scale: 1.5" [(ngModel)]="hearing.releaseOnRecognizance" />
+                  <label class="form-check-label font-weight-bold" for="formCheck-20">Check to Release on Own Recognizance - Provide Instructions Above</label>
+                </div>
+              </div>
+            </div>
+          </section>
+          <div class="d-flex justify-content-center align-items-center alert alert-success text-dark mt-4">
+            <div class="btn btn-sm btn-info m-1" (click)="grantedTabIndex>=1?grantedTabIndex = grantedTabIndex-1:grantedTabIndex">BACK</div>
+            <div class="btn btn-sm btn-primary m-1" (click)="grantedTabIndex<=5?grantedTabIndex = grantedTabIndex+1:grantedTabIndex">NEXT</div>
+          </div>
+        </p-tabPanel>
+        <p-tabPanel header="WRITTEN CONDITIONS">
+          <section style="border-style: solid;border-color: var(--red);border-radius: 15px;overflow: hidden;">
+            <div class="row">
+              <div class="col d-xl-flex justify-content-xl-center align-items-xl-center">
+                <div class="alert alert-warning" role="alert" style="margin-left: 10px;">
+                  <div class="row">
+                    <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center"><i class="fa fa-exclamation-triangle" style="font-size: 58px;"></i></div>
+                    <div class="col">
+                      <span style="line-height: 16px;letter-spacing: 0px;">
+                      <strong>Please provide instructions to the Criminal Registry regarding conditions that must be kept by the Defendant while on bond</strong>
+                    </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col d-flex align-items-center justify-content-center flex-column" style="background: #f9ebeb;padding: 9px;padding-right: 24px;">
+                <textarea [(ngModel)]="hearing.additionalConditions" class="form-control" rows="5"></textarea>
+                <div class="form-group m-2 d-flex flex-row">
+                  <span class="font-weight-bold">Provide additional written conditions in text box above</span>
+                </div>
+              </div>
+            </div>
+          </section>
+          <div class="d-flex justify-content-center align-items-center alert alert-success text-dark mt-4">
+            <div class="btn btn-sm btn-info m-1" (click)="grantedTabIndex>=1?grantedTabIndex = grantedTabIndex-1:grantedTabIndex">BACK</div>
+            <div class="btn btn-sm btn-primary m-1" (click)="grantedTabIndex<=5?grantedTabIndex = grantedTabIndex+1:grantedTabIndex">NEXT</div>
+          </div>
+        </p-tabPanel>
+        <p-tabPanel header="ADDITIONAL CONDITIONS">
+          <section style="border-style: solid;border-color: var(--red);border-radius: 15px;overflow: hidden;">
+            <div class="row">
+              <div class="col d-xl-flex justify-content-xl-center align-items-xl-center">
+                <div class="alert alert-warning" role="alert" style="margin-left: 10px;">
+                  <div class="row">
+                    <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center"><i class="fa fa-exclamation-triangle" style="font-size: 58px;"></i></div>
+                    <div class="col">
+                      <span style="line-height: 16px;letter-spacing: 0px;">
+                        <strong>Place a check next to any of these additional conditions that must be met as a condition of Bond</strong>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col" style="background: #f9ebeb;padding: 9px;padding-right: 24px;">
+                <input [(ngModel)]="hearing.surrenderPassportChecked" type="checkbox" class="custom-checkbox">&nbsp; <label>Must Surrender Passport to Criminal Registry</label><br>
+                <input [(ngModel)]="hearing.elecMonitorChecked" type="checkbox" class="custom-checkbox">&nbsp; <label>Must be placed on Electronic Monitoring before release on Bond</label>
+              </div>
+            </div>
+          </section>
+          <div class="d-flex justify-content-center align-items-center alert alert-success text-dark mt-4">
+            <div class="btn btn-sm btn-info m-1" (click)="grantedTabIndex>=1?grantedTabIndex = grantedTabIndex-1:grantedTabIndex">BACK</div>
+            <div class="btn btn-sm btn-primary m-1" (click)="grantedTabIndex<=5?grantedTabIndex = grantedTabIndex+1:grantedTabIndex">NEXT</div>
+          </div>
+        </p-tabPanel>
+        <p-tabPanel header="PRIVATE JUDICIAL COMMENTS">
+          <section style="border-style: solid;border-color: var(--red);border-radius: 15px;overflow: hidden;">
+            <div class="row">
+              <div class="col d-xl-flex justify-content-xl-center align-items-xl-center">
+                <div class="alert alert-warning" role="alert" style="margin-left: 10px;">
+                  <div class="row">
+                    <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center"><i class="fa fa-exclamation-triangle" style="font-size: 58px;"></i></div>
+                    <div class="col">
+                      <span style="line-height: 16px;letter-spacing: 0px;">
+                      <strong>Please provide any documentation that will only be seen by the Criminal Registry Staff or other Justices. These are private notes.</strong>
+                    </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col" style="background: #f9ebeb;padding: 9px;padding-right: 24px;">
+                <textarea [(ngModel)]="hearing.judicialNotes" class="form-control" rows="5"></textarea>
+              </div>
+            </div>
+          </section>
+          <div class="d-flex justify-content-center align-items-center alert alert-success text-dark mt-4">
+            <div class="btn btn-sm btn-info m-1" (click)="grantedTabIndex>=1?grantedTabIndex = grantedTabIndex-1:grantedTabIndex">BACK</div>
+            <div class="btn btn-sm btn-primary m-1" (click)="grantedTabIndex<=5?grantedTabIndex = grantedTabIndex+1:grantedTabIndex">NEXT</div>
+          </div>
+        </p-tabPanel>
+        <p-tabPanel header="REVIEW">
+          <div class="bg-white rounded border border-dark text-dark h4 text-center">VERIFY RELEASE ORDER</div>
+          <div class="border border-dark shadow shadow-sm p-3" style="background-color: #ededed; width: 8.5in; min-height: 11in; margin-right: 50%; margin-left: 50%; transform: translateX(-50%)">
+            <div class="text-left font-weight-bold">
+              IN THE SUPREME COURT<BR>
+              COMMONWEALTH OF THE BAHAMAS<br>
+              CRIMINAL DIVISION
+            </div>
+            <div class="row mt-3">
+              <div class="col-6">
+                <div>
+                  <div class="font-weight-bold">DEFENDANT</div>
+                  {{offender.lName}}, {{offender.fName}} {{offender.mName}}<br>
+                  {{offender.addLine1}} {{offender.addLine2}}<br>
+                  {{offender.city}} {{offender.state}} {{offender.zip}}</div>
+              </div>
+              <!--              <div class="col-6 text-left">-->
+              <!--                <div class="font-weight-bold">CHARGES</div>-->
+              <!--                <div *ngFor="let c of allCounts">-->
+              <!--                  <div *ngIf="c.bookingID == selectedBooking.id">{{c.chargeDocNumber}} - {{c.countCharge}}</div>-->
+              <!--                </div>-->
+              <!--              </div>-->
+            </div>
+            <div class="text-center font-weight-bold h3 mt-3">RELEASE ORDER - ORDER GRANTING BAIL</div>
+            <div class="p-3">
+              The above named individual came before this court on this {{getNow()}} for a bail hearing
+              <span *ngIf="hearing.attorneyName">and is represented by {{hearing.attorneyName}}, a private attorney</span>
+              <span *ngIf="!hearing.attorneyName">and was not represented by a private attorney</span>.
+              The following are conditions of which the Defendant must meet to be released on bail and the conditions the Defendant
+              must adhere to while on bail. If these conditions are not met, the Defendant shall remain in the custody of the Bahamas Department
+              of Corrections. If any condition is broken while on bail, the defendant will be remanded to the custody of the Bahamas Department of Corrections.
+            </div>
+            <div class="px-3 py-1">
+              <div class="font-weight-bold h4">SURETY CONDITIONS</div>
+              <div class="">{{hearing.suretyReq}}</div>
+            </div>
+            <div class="px-3 py-1">
+              <div class="font-weight-bold h4">KIOSK CHECK-IN REQUIREMENTS</div>
+              <div class="">Upon release, the Defendant <b>must check-in at {{locations}}</b>
+                and use the biometric kiosk. If the biometric kiosk is not available, the Defendant must check-in with an officer who will
+                electronically submit the check-in to the bail management system.
+                <div class="font-weight-bold mt-1">CHECK IN DAYS AND TIME</div>
+                The Defendant must check in on the following days before
+                <span *ngIf="hearing.threepmChecked">3 PM:</span>
+                <span *ngIf="hearing.fourpmChecked">4 PM:</span>
+                <span *ngIf="hearing.fivepmChecked">5 PM:</span>
+                <span *ngIf="hearing.sixpmChecked">6 PM:</span>
+                <span *ngIf="hearing.sevenpmChecked">7 PM:</span>
+                <span *ngIf="hearing.eightpmChecked">8 PM:</span>
+                <span *ngIf="hearing.ninepmChecked">9 PM:</span>
+                <span *ngIf="hearing.tenpmChecked">10 PM:</span>
+                <br>
+                <ul>
+                  <li *ngIf="hearing.sundayChecked">Every Sunday</li>
+                  <li *ngIf="hearing.mondayChecked">Every Monday</li>
+                  <li *ngIf="hearing.tuesdayChecked">Every Tuesday</li>
+                  <li *ngIf="hearing.wednesdayChecked">Every Wednesday</li>
+                  <li *ngIf="hearing.thursdayChecked">Every Thursday</li>
+                  <li *ngIf="hearing.fridayChecked">Every Friday</li>
+                  <li *ngIf="hearing.saturdayChecked">Every Saturday</li>
+                </ul>
+              </div>
+              <div class="h3 font-weight-bold mt-1">ADDITIONAL REQUIREMENTS</div>
+              The following additional requirements must also be met by the Defendant:<br>
+              <div *ngIf="hearing.surrenderPassportChecked" class="text-danger font-weight-bold">THE DEFENDANT MUST SURRENDER HIS/HER PASSPORT.</div>
+              <div *ngIf="hearing.elecMonitorChecked" class="text-danger font-weight-bold">THE DEFENDANT WILL BE PLACED ON ELECTRONIC MONITORING AND MUST ADHERE TO ALL RULES FOR THIS PURPOSE.</div>
+              <div class="">{{hearing.additionalConditions}}</div>
+            </div>
+            <div class="row mt-4">
+              <div class="col-6">
+                <div class="d-flex flex-column justify-content-center align-content-center" style="height: 100%">
+
+                  THIS DOCUMENT WILL BE ELECTRONICALLY SIGNED UPON SUBMITTION TO THE REGISTRAR OF THE SUPREME COURT
+                  <div class="btn btn-success btn-sm" (click)="doSubmitOrder()">SUBMIT TO REGISTRAR</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-center align-items-center alert alert-success text-dark mt-4">
+            <div class="btn btn-sm btn-info m-1" (click)="grantedTabIndex>=1?grantedTabIndex = grantedTabIndex-1:grantedTabIndex">BACK</div>
+          </div>
+        </p-tabPanel>
+      </p-tabView>
+    </p-tabPanel>
+    <p-tabPanel header="DENY BAIL">
+      <div class="d-flex row justify-content-start align-items-center text-white h4 font-weight-bold shadow shadow-sm">
+        <div class="col-12">
+          <div class="bg-danger pl-1" style="font-size: 12px">DENY BAIL INSTRUCTIONS</div>
+          <section style="border-width: 1px;border-style: solid;border-radius: 10px;">
+            <div class="row">
+              <div class="col d-xl-flex justify-content-xl-center align-items-xl-center" style="padding-top: 13px;padding-left: 30px;">
+                <div class="alert alert-warning" role="alert" style="border-style: solid;border-color: rgb(64,48,2);">
+                  <div class="row">
+                    <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center"><i class="fa fa-exclamation-triangle" style="font-size: 47px;"></i></div>
+                    <div class="col-10"><span><strong>By submitting this form, you will Deny bail for this Defendant. However, the Booking will be left open so the Defendant can appy for bail again in the future.</strong></span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col" style="padding-right: 30px;padding-top: 14px;background: #fbe9e9;"><textarea [(ngModel)]="hearing.comment" class="form-control" placeholder="Please provide reason for denying bail here" rows="4"></textarea>
+                <div class="row" style="padding-top: 10px;padding-bottom: 17px;">
+                  <div class="col d-xl-flex justify-content-center align-items-center">
+                    <button class="btn btn-warning" type="button" (click)="doDenyBail()">DENY BAIL</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel header="HOLD RULING">
+      <div class="d-flex row justify-content-start align-items-center bg-warning text-white h4 font-weight-bold shadow shadow-sm">
+        <div class="col-12">
+          <div style="font-size: 12px">HOLD RULING INSTRUCTIONS</div>
+        </div>
+      </div>
+    </p-tabPanel>
+
+  </p-tabView>
+</section>
+<section *ngIf="showMotions">
+  <div style="background-color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); overflow-y: scroll; border: 2px solid var(--red);border-radius: 15px;margin: 3px; width: 600px; height: 600px">
+    <div class="bg-primary text-white h4 text-center clearfix p-2">
+      <span class="float-left">MOTIONS, DOCUMENTS AND EVENTS</span>
+      <span class="float-right btn btn-sm btn-danger" (click)="showMotions=false">X</span>
+    </div>
+    <div *ngFor="let event of bookingEventsArray">
+      <div class="row" *ngIf="event.type=='bailApp'">
+        <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center"><i class="fa fa-file-pdf-o" style="font-size: 37px;color: var(--red);"></i></div>
+        <div class="col">
+          <div>
+            <div><span style="font-weight: bold;">BAIL APPLICATION</span></div><span style="font-size: 12px;">Date Filed: {{getReadableDate(event.unixDate)}}</span>
+          </div>
+          <div><span>{{event.description}}</span></div>
+          <div><button class="btn btn-success" type="button" style="font-size: 12px;padding: 0px;" (click)="doViewDocument(event.link)">VIEW DOCUMENT</button></div>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="event.type=='pdf'">
+        <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center"><i class="fa fa-file-pdf-o" style="font-size: 37px;color: darkorange;"></i></div>
+        <div class="col">
+          <div>
+            <div><span style="font-weight: bold;">PDF DOCUMENT{{event.title?': '+event.title.toUpperCase():''}}</span></div><span style="font-size: 12px;">Date Filed: {{getReadableDate(event.unixDate)}}</span>
+          </div>
+          <div><span>{{event.description}}</span></div>
+          <div><button class="btn btn-success" type="button" style="font-size: 12px;padding: 0px;" (click)="doViewDocument(event.link)">VIEW DOCUMENT</button></div>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="event.type=='granted'">
+        <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center"><i class="fa p-checkbox" style="font-size: 37px;color: green;"></i></div>
+        <div class="col">
+          <div>
+            <div><span style="font-weight: bold;">NOTE{{event.title?': '+event.title.toUpperCase():''}}</span></div><span style="font-size: 12px;">Date Filed: {{getReadableDate(event.unixDate)}}</span>
+          </div>
+          <div><span>{{event.description}}</span></div>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="event.type=='dpp_affidavit'">
+        <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center"><i class="fa fa-file-pdf-o" style="font-size: 37px;color: red;"></i></div>
+        <div class="col">
+          <div>
+            <div><span style="font-weight: bold;">{{event.title?event.title.toUpperCase():'DPP AFFIDAVIT'}}</span></div><span style="font-size: 12px;">Date Filed: {{getReadableDate(event.unixDate)}}</span>
+          </div>
+          <div><span>{{event.description}}</span></div>
+          <div><button class="btn btn-success" type="button" style="font-size: 12px;padding: 0px;" (click)="doViewDocument(event.link)">VIEW DOCUMENT</button></div>
+        </div>
+      </div>
+      <hr>
+    </div>
+  </div>
+
+</section>

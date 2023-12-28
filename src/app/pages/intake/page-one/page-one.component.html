@@ -1,0 +1,68 @@
+<section *ngIf="showMainScreen">
+  <div class="row">
+    <div class="col-2" style="background: #003976;">
+      <div class="btn btn-primary btn-sm menubtn"
+           style="border-radius: 0px;border-right-style: solid;border-right-color: rgb(110,176,247);background:  #003976;color: yellow; font-weight: bold">
+        <span>SEARCH</span></div>
+      <div class="btn btn-primary btn-sm menubtn" (click)="doExit()"
+           style="border-radius: 0px;border-right-style: solid;border-right-color: rgb(110,176,247);background:  #003976;">
+        <span>EXIT</span></div>
+      <div class="btn btn-primary btn-sm menubtn" (click)="doHelp()"
+           style="border-radius: 0px;background:  #003976; border-right-style: solid;"><span>HELP</span></div>
+    </div>
+    <div class="col d-xl-flex justify-content-xl-start align-items-xl-center"
+         style="background: #003976;font-weight: bold;"><span
+      style="color: rgb(255,255,255);">DEFENDANT INTAKE SYSTEM</span></div>
+  </div>
+  <div class="row" style="margin-top: 12px;">
+    <div class="col"><span>Search for the Defendant by Last Name and Date of Birth. The results will show all known records in both the AFIS and the BBMS and records can be imported and updated through this portal.</span>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 13px;">
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Last Name</span></div>
+        <input [(ngModel)]="lastName" class="form-control" type="text"/>
+        <div class="input-group-append"></div>
+      </div>
+      <small class="form-text text-muted">Last Name is Required</small>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Date of Birth</span></div>
+        <input [(ngModel)]="dob" class="form-control" type="date"/>
+        <div class="input-group-append">
+          <button class="btn btn-success" type="button" (click)="doAFISSearch()">SEARCH</button>
+        </div>
+      </div>
+      <small class="form-text text-muted">Date of Birth Is Required</small>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 13px;">
+    <div class="col"><span style="font-weight: bold;">AFIS SEARCH RESULTS</span></div>
+  </div>
+  <hr style="margin: 0px;"/>
+  <div class="row font-weight-bold" style="background: #dcdbdb;">
+    <div class="col"><span>Full Name / Date of Fingerprinting</span></div>
+    <div class="col-2" style="border-right: 1px solid rgb(255,255,255);border-left: 1px solid rgb(255,255,255);"><span>Date of Birth</span>
+    </div>
+    <div class="col"><span>Address</span></div>
+    <div class="col-2 text-center" style="border-left: 1px solid rgb(255,255,255);"><span>BBMS STATUS</span></div>
+  </div>
+  <div class="row my-1" style="background: lightcyan" *ngFor="let afis of allAfisResults">
+    <div class="col d-flex justify-content-start align-items-center"><span>{{afis.lName}}, {{afis.fName}} {{afis.mName}} / {{afis.datetime}} </span></div>
+    <div class="col-2 d-flex justify-content-start align-items-center" style="border-right: 1px solid rgb(255,255,255);border-left: 1px solid rgb(255,255,255);">
+      <span>{{afis.dob}}</span></div>
+    <div class="col"><span>{{afis.address1}} {{afis.address2}}<br>{{afis.locality}} {{afis.island}}</span></div>
+    <div class="col-2 d-flex justify-content-center align-items-center" style="border-left: 1px solid rgb(255,255,255);">
+      <div *ngIf="afis.bbms=='YES'" class="btn btn-sm btn-success">RECORD FOUND</div>
+      <div *ngIf="afis.bbms=='NO'" class="btn btn-danger btn-sm" (click)="doImport(afis)">IMPORT RECORD</div>
+    </div>
+  </div>
+  <!--  Show a warning if there are no records found -->
+  <div class="row mt-2" *ngIf="allAfisResults.length==0">
+    <div class="col text-center text-danger"><span style="font-weight: bold;">NO RECORDS FOUND</span></div>
+  </div>
+</section>
+<app-import *ngIf="showDefendantUpdateForm" (complete)="doCloseUpdate($event)"
+            [selectedAfis]="selectedAfis"></app-import>

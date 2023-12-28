@@ -1,0 +1,120 @@
+<section>
+  <div class="p-3 rounded-lg bg-gray text-white"><b>Updating record for</b> {{selectedDefendant.lName}} {{selectedDefendant.fName}} {{selectedDefendant.mName}} | <b>AFIS Number:</b> {{selectedDefendant.spn}}</div>
+  <div class="text-danger font-weight-bold mt-2 mb-2">Please update the record to reflelct the Defendants current information:</div>
+  <div class="row" style="margin-right: 0px;margin-left: 0px;">
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">First Name</span></div><input [(ngModel)]="selectedDefendant.fName" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Middle Name</span></div><input [(ngModel)]="selectedDefendant.mName" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Last Name</span></div><input [(ngModel)]="selectedDefendant.lName" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 5px;margin-bottom: 5px;margin-right: 0px;margin-left: 0px;">
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Address</span></div><input [(ngModel)]="selectedDefendant.address1" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Suite, Apt, Description</span></div><input [(ngModel)]="selectedDefendant.address2" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-right: 0px;margin-left: 0px;">
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Locality</span></div><input [(ngModel)]="selectedDefendant.locality" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Island</span></div><input [(ngModel)]="selectedDefendant.state" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Country</span></div><input [(ngModel)]="selectedDefendant.zip" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 5px;margin-bottom: 5px;">
+    <div class="col-2">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Height</span></div><input [(ngModel)]="selectedDefendant.height" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Weight</span></div><input [(ngModel)]="selectedDefendant.weight" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Alias(s)</span></div><input [(ngModel)]="selectedDefendant.aka" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-right: 0px;margin-left: 0px;margin-top: 5px;margin-bottom: 5px;">
+    <div class="col-3">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Sex</span></div><select [(ngModel)]="selectedDefendant.sex" class="form-control">
+        <optgroup label="Select a Sex">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </optgroup>
+      </select>
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Race</span></div><select [(ngModel)]="selectedDefendant.race" class="form-control">
+        <optgroup label="Select a Race">
+          <option value="Black">Black</option>
+          <option value="White">White</option>
+          <option value="Asian">Asian</option>
+          <option value="Hispanic">Hispanic</option>
+          <option value="Other">Other</option>
+        </optgroup>
+      </select>
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Hair Color</span></div><input [(ngModel)]="selectedDefendant.hair_color" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="input-group">
+        <div class="input-group-prepend"><span class="input-group-text">Eye Color</span></div><input [(ngModel)]="selectedDefendant.eyes" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col d-xl-flex justify-content-xl-center align-items-xl-center"><button class="btn btn-warning" type="button" style="margin: 5px;" (click)="doCancel()">Leave Record Like It Is</button><button class="btn btn-success" type="button" style="margin: 5px;" (click)="doUpdate()">Update with New Information</button></div>
+  </div>
+</section>

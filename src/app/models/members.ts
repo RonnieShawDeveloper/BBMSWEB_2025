@@ -1,0 +1,34 @@
+export interface Members {
+  id?: string;
+  uid?: string;
+  email?: string;
+  password?: string;
+  emailVerified?: boolean;
+  emailMismatch?: boolean;
+  status?: string;
+  requested?: string;
+  fName?: string;
+  mName?: string;
+  lName?: string;
+  name?: string;
+  dob?: string;
+  spn?: string;
+  authClerk?: boolean;
+  authRegistrar?: boolean;
+  authRegistrarClerk?: boolean;
+  authJudge?: boolean;
+  authJudgeClerk?: boolean;
+  authAttorney?: boolean;
+  authPrivAttorney?: boolean;
+  authMagistrate?: boolean
+  authMagistrateClerk?: boolean;
+  authAdmin?: boolean;
+  address?: string;
+  workPhone?: string;
+  cellPhone?: string;
+  comments?: string;
+  position?: string;
+  memberSince?: string;
+  lastLogin?: string;
+  photoURL?: string;
+  }

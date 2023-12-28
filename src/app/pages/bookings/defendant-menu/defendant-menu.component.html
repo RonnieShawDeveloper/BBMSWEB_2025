@@ -1,0 +1,267 @@
+<section *ngIf="showDefendantMenu">
+  <div class="row" style="background: blue;">
+    <div class="col-7" style="text-align: right;"><span style="color: white;font-weight: bold;font-size: 25px;">BOOKING VIEWER</span></div>
+    <div class="col d-xl-flex justify-content-xl-end align-items-xl-center" style="text-align: right;padding-right: 20px;">
+      <button class="btn btn-danger btn-sm" type="button" (click)="closeMenu()">Exit</button>
+    </div>
+  </div>
+  <div class="row no-gutters"
+       style="border-width: 1px;border-style: solid;border-radius: 10px;margin: 5px;background: lightcyan">
+    <div class="col-3 d-flex justify-content-end align-items-center"><span
+      style="font-weight: bold;">BOOKING CONTROLS</span></div>
+    <div class="col d-flex justify-content-center align-items-center">
+      <button class="btn btn-success btn-sm" type="button" style="margin: 5px;" (click)="doEditRecord()">EDIT RECORD
+      </button>
+      <button class="btn btn-warning btn-sm" type="button" style="margin: 5px;" (click)="doAddBooking()">ADD BOOKING</button>
+      <button class="btn btn-info btn-sm" type="button" style="margin: 5px;">UPDATE PHOTO</button>
+      <button class="btn btn-danger btn-sm" type="button" style="margin: 5px;" (click)="closeMenu()">EXIT</button>
+    </div>
+  </div>
+  <fieldset id="userInfo" style="border-width: 2px;border-style: solid;border-radius: 10px;padding-bottom: 8px;">
+    <legend
+      style="font-size: 16px;font-weight: bold;width: auto;margin-left: 17px;padding: 6px;border-width: 2px;border-style: solid;border-radius: 10px;">
+      Defendant Information
+    </legend>
+    <div class="row no-gutters" style="margin: 2px;">
+      <div class="col-3 pl-1" id="mainImage">
+        <img class="img-fluid p-1 shadow shadow-lg" id="webImage" (click)="openImage(defendant.mainPhoto)" style="border: 3px solid orange; border-radius: 10px" [src]="defendant.mainPhoto" loading="lazy"/>
+        <div class="row no-gutters">
+          <div class="col-12 text-center">
+            <button class="btn btn-info btn-sm" type="button" style="margin: 5px;" (click)="updatePhoto()">UPDATE PHOTO</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col mx-1">
+
+        <div class="row no-gutters m-2">
+          <div class="col mx-1">
+            <div class="input-group">
+              <div class="input-group-prepend"><span class="input-group-text redBack">Last</span></div>
+              <input [(ngModel)]="defendant.lName" class="form-control" type="text"/>
+              <div class="input-group-append"></div>
+            </div>
+          </div>
+          <div class="col mx-1">
+            <div class="input-group">
+              <div class="input-group-prepend"><span class="input-group-text redBack">First</span></div>
+              <input [(ngModel)]="defendant.fName" class="form-control" type="text"/>
+              <div class="input-group-append"></div>
+            </div>
+          </div>
+          <div class="col mx-1">
+            <div class="input-group">
+              <div class="input-group-prepend"><span class="input-group-text redBack">Middle</span></div>
+              <input [(ngModel)]="defendant.mName" class="form-control" type="text"/>
+              <div class="input-group-append"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row no-gutters m-2">
+          <div class="col mx-1">
+            <div class="input-group">
+              <div class="input-group-prepend"><span class="input-group-text blueBack">Address</span></div>
+              <input [(ngModel)]="defendant.addLine1" class="form-control" type="text"/>
+              <div class="input-group-append"></div>
+            </div>
+          </div>
+          <div class="col mx-1">
+            <div class="input-group">
+              <div class="input-group-prepend"><span class="input-group-text blueBack">Apt, Etc.</span></div>
+              <input [(ngModel)]="defendant.addLine2" class="form-control" type="text"/>
+              <div class="input-group-append"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row no-gutters m-2">
+          <div class="col mx-1">
+            <div class="input-group">
+              <div class="input-group-prepend"><span class="input-group-text blueBack">Locality</span></div>
+              <input [(ngModel)]="defendant.city" class="form-control" type="text"/>
+              <div class="input-group-append"></div>
+            </div>
+          </div>
+          <div class="col mx-1">
+            <div class="input-group">
+              <div class="input-group-prepend"><span class="input-group-text blueBack">Island</span></div>
+              <input [(ngModel)]="defendant.state" class="form-control" type="text"/>
+              <div class="input-group-append"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row no-gutters m-2">
+          <div class="col mx-1">
+            <div class="input-group">
+              <div class="input-group-prepend"><span class="input-group-text orangeBack">Sex</span></div>
+              <input [(ngModel)]="defendant.gender" class="form-control" type="text"/>
+              <div class="input-group-append"></div>
+            </div>
+          </div>
+          <div class="col mx-1">
+            <div class="input-group">
+              <div class="input-group-prepend"><span class="input-group-text orangeBack">Race</span></div>
+              <input [(ngModel)]="defendant.race" class="form-control" type="text"/>
+              <div class="input-group-append"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row no-gutters m-2">
+          <div class="col mx-1">
+            <div class="input-group">
+              <div class="input-group-prepend"><span class="input-group-text orangeBack">Height (ft'in")</span></div>
+              <input [(ngModel)]="defendant.height" class="form-control" type="text"/>
+              <div class="input-group-append"></div>
+            </div>
+          </div>
+          <div class="col mx-1">
+            <div class="input-group">
+              <div class="input-group-prepend"><span class="input-group-text orangeBack">Weight (lbs)</span></div>
+              <input [(ngModel)]="defendant.weight" class="form-control" type="text"/>
+              <div class="input-group-append"></div>
+            </div>
+          </div>
+          <div class="col mx-1">
+            <div class="input-group">
+              <div class="input-group-prepend"><span class="input-group-text orangeBack">Eye Color</span></div>
+              <input [(ngModel)]="defendant.eyeColor" class="form-control" type="text"/>
+              <div class="input-group-append"></div>
+            </div>
+          </div>
+          <div class="col mx-1">
+            <div class="input-group">
+              <div class="input-group-prepend"><span class="input-group-text orangeBack">Hair Color</span></div>
+              <input [(ngModel)]="defendant.hairColor" class="form-control" type="text"/>
+              <div class="input-group-append"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <section>
+      <div class="row no-gutters m-2">
+        <div class="col mx-1">
+          <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text greenBack">Cell Number</span></div>
+            <input [(ngModel)]="defendant.phone" class="form-control" type="text"/>
+            <div class="input-group-append"></div>
+          </div>
+        </div>
+        <div class="col mx-1">
+          <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text orangeBack">Home Number</span></div>
+            <input [(ngModel)]="defendant.homePhone" class="form-control" type="text"/>
+            <div class="input-group-append"></div>
+          </div>
+        </div>
+        <div class="col mx-1">
+          <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text greenBack">Email</span></div>
+            <input [(ngModel)]="defendant.email" class="form-control" type="text"/>
+            <div class="input-group-append"></div>
+          </div>
+        </div>
+      </div>
+      <div class="row no-gutters m-2">
+        <div class="col mx-1">
+          <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text orangeBack">Complexion</span></div>
+            <input [(ngModel)]="defendant.complex" class="form-control" type="text"/>
+            <div class="input-group-append"></div>
+          </div>
+        </div>
+        <div class="col mx-1">
+          <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text orangeBack">Build</span></div>
+            <input [(ngModel)]="defendant.build" class="form-control" type="text"/>
+            <div class="input-group-append"></div>
+          </div>
+        </div>
+        <div class="col mx-1">
+          <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text greenBack">NIB</span></div>
+            <input [(ngModel)]="defendant.nib" class="form-control" type="text"/>
+            <div class="input-group-append"></div>
+          </div>
+        </div>
+      </div>
+      <div class="row no-gutters m-2">
+        <div class="col mx-1">
+          <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text greenBack">Comments</span></div>
+            <textarea [(ngModel)]="defendant.profileNotes" class="form-control" rows="5"></textarea>
+            <div class="input-group-append"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="row no-gutters" *ngIf="editmenu">
+      <div class="col-3 offset-9 d-flex align-content-center justify-content-center">
+        <div class="btn-sm btn btn-danger m-1" (click)="cancelEdit()">CANCEL</div>
+        <div class="btn-sm btn btn-success m-1" (click)="doUpdateRecord()">UPDATE</div>
+      </div>
+    </div>
+  </fieldset>
+  <fieldset style="border-width: 2px;border-style: solid;border-radius: 10px;padding-bottom: 8px;margin-top: 5px;">
+    <legend
+      style="font-size: 16px;font-weight: bold;width: auto;margin-left: 17px;padding: 6px;border-width: 2px;border-style: solid;border-radius: 10px;">
+      BOOKINGS
+    </legend>
+    <span class="m-2 ml-5 font-weight-bold text-danger">The Newest Booking is Shown First:</span>
+    <div class="">
+      <p-timeline [value]="events" styleClass="" style="flex: auto">
+        <ng-template pTemplate="marker" let-event>
+            <span class="custom-marker shadow-2 h3 text-danger">
+                <i [ngClass]="event.icon"></i>
+            </span>
+        </ng-template>
+        <ng-template pTemplate="content" let-event>
+          <p-card [header]="event.status"
+                  [subheader]="'Booked on: '+dateFromUnixTime(event.bookDate)"
+                  [styleClass]="'mt-2 border border-dark'">
+            <div class="row rounded rounded-top" style="background-color: lightgrey">
+              <div class="col-2 border border-white d-flex justify-content-center align-content-center">
+                <span *ngIf="event.bookingStatus=='Open'" class="font-weight-bold text-danger h4 text-center">OPEN BOOKING</span>
+                <span *ngIf="event.bookingStatus==''|| event.bookingStatus==undefined || event.bookingStatus==null || event.bookingStatus=='Closed'" class="font-weight-bold text-success text-center h4">CLOSED BOOKING</span>
+              </div>
+              <div class="col-3 border border-white">
+                <span
+                  class=""><b>Bail App Submitted:</b><br>{{event.bailAppPending ? 'Yes on ' + dateFromUnixTime(event.bailAppSubmitedDate) : 'No Application Submitted'}}</span>
+              </div>
+              <div class="col-3 border border-white">
+                <span
+                  class=""><b>ATTORNEY:</b><br>{{event.attorneyName == null || event.attorneyName == undefined || event.attorneyName == '' ? 'No Attorney Found' : event.attorneyName}}</span>
+              </div>
+              <div class="col-4 border border-white">
+                <span class=""><b>General Registration Number: </b><br>{{event.genRegisterNumber}}</span>
+              </div>
+            </div>
+            <div class="row rounded rounded-bottom" style="background-color: lightgrey">
+              <div class="col border border-white">
+                <span *ngIf="event.hasOwnProperty('judgeAssigned')"
+                      class=""><b>Assigned Judge:</b><br>{{event.judgeAssigned}}
+                  on {{dateFromUnixTime(event.judgeAssignedDate)}}</span>
+                <span *ngIf="!event.hasOwnProperty('judgeAssigned')" class=""><b>Assigned Judge:</b><br>NO JUDGE ASSIGNED</span>
+              </div>
+              <div class="col border border-white">
+                <span class=""><b>Next Hearing:</b><br>{{event.hearingAssignDate}}</span>
+              </div>
+              <div class="col border border-white">
+                <span class=""><b>Last Hearing:</b><br>{{dateFromUnixTime(event.lastBailHearingDate)}}</span>
+              </div>
+            </div>
+            <div class="btn btn-success btn-sm m-1" style="margin-top: 5px;" (click)="showBooking(event)">View Booking</div>
+            <div class="btn btn-danger btn-sm m-1" style="margin-top: 5px;" (click)="deleteBooking(event)">Delete Booking</div>
+          </p-card>
+        </ng-template>
+        <ng-template pTemplate="opposite" let-event>
+        </ng-template>
+      </p-timeline>
+    </div>
+
+  </fieldset>
+</section>
+<app-new-booking *ngIf="showNewBookingWizard" (cancelMe)="doCloseBookingWizard()" (showBookings)="doCloseBookingWizard()"  [offenderID]="defendant.id"></app-new-booking>

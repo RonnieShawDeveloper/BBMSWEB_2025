@@ -1,0 +1,198 @@
+<div class="d-flex justify-content-center align-items-center w-100 h-100 login-container"
+     style="background-image: url('/assets/img/app/hero-banner-left.jpg'); background-position: center; background-size: cover" >
+</div>
+<div class="container bg-white rounded border border-dark shadow-sm shadow p-2" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)">
+  <div @fade class="h3">NEW MEMBER SIGNUP</div>
+  <hr>
+  <div class="text-left">
+    <div class="text-center font-weight-bold"><p>Welcome to the Bahamas Bail Management System<br>All BBMS Staff must complete this form to gain access!</p></div>
+    <!-- Screen One -->
+    <div @fade *ngIf="screenOne">
+      <div class="m-2 border border-dark rounded">
+        <div class="d-flex justify-content-center align-items-center">
+          <div class="rounded-circle bg-warning text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">1</div>------------
+          <div class="rounded-circle bg-info text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">2</div>------------
+          <div class="rounded-circle bg-info text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">3</div>------------
+          <div class="rounded-circle bg-info text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">4</div>
+        </div>
+        <div class="text-center mt-4">
+          <!-- STEP ONE -->
+
+          <div class="h3">First, Lets get some information and set up your account</div>
+          <div class="d-flex justify-content-center align-items-center text-left">
+            <div class="d-inline-block">
+
+              <div class="form-group d-inline-block">
+                <label class="font-weight-bold" for="firstName">First Name</label>
+                <input [(ngModel)]="newMember.fName" type="text" id="firstName" class="form-control" style="width: 300px" (focusin)="clearInput($event)" (change)="capitalize($event)" required>
+              </div>
+              <div class="form-group d-inline-block mx-3">
+                <label class="font-weight-bold" for="middleName">Middle Name</label>
+                <input [(ngModel)]="newMember.mName" type="text" id="middleName" class="form-control" (focusin)="clearInput($event)" (change)="capitalize($event)">
+              </div>
+              <div class="form-group d-inline-block">
+                <label class="font-weight-bold" for="lastName">Last Name</label>
+                <input [(ngModel)]="newMember.lName" type="text" id="lastName" class="form-control" style="width: 300px" (focusin)="clearInput($event)" (change)="capitalize($event)" required>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-center align-items-center text-left" style="width: 100%">
+            <div class="d-inline-block">
+              <div class="form-group d-inline-block">
+                <label class="font-weight-bold" for="emailAddress">Email Address (Will Be Verified)</label>
+                <input [(ngModel)]="newMember.email" type="text" id="emailAddress" class="form-control" style="width: 430px" (change)="checkEmail()" (focusin)="resetEmail()" required>
+                <div class="small text-muted">Your email address will be your user id</div>
+              </div>
+              <div class="form-group d-inline-block mx-3">
+                <label class="font-weight-bold" for="password">Password</label>
+                <input [(ngModel)]="newMember.password" type="password" id="password" class="form-control" style="width: 300px" (focusin)="clearPass()" required>
+                <div class="small text-muted">Please create a strong password</div>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-center align-items-center text-left" style="width: 100%">
+            <div class="d-inline-block">
+              <div class="form-group d-inline-block">
+                <label class="font-weight-bold" for="phoneNumber">Phone Number (###-###-####)</label>
+                <input [(ngModel)]="newMember.cellPhone" type="tel" id="phoneNumber" class="form-control" style="width: 430px" (focusin)="clearCell()" (focusout)="checkCell()" required>
+                <div class="small text-muted">Your cell may be phone is used for 3-Factor authentication</div>
+              </div>
+              <div class="form-group d-inline-block mx-3">
+                <label class="font-weight-bold" for="password">Re-Enter Password</label>
+                <input [(ngModel)]="passCheck" type="password" id="password2" class="form-control" style="width: 300px" (focusin)="clearPass()" (focusout)="checkPass()" required>
+                <div class="small text-muted">For verification, Please re-enter your password</div>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-center align-items-center text-left" style="width: 100%">
+            <div class="d-inline-block">
+              <div class="btn btn-warning m-1" (click)="doCancel()">CANCEL</div>
+              <div class="btn btn-primary m-1" (click)="clearForm()">CLEAR FORM</div>
+              <div class="btn btn-success m-1" (click)="submitpage1()">CONTINUE</div>
+            </div>
+          </div>
+          <div class="text-center font-weight-bold small text-danger py-2">All data is encrypted using End To End Encryption (E2EE) Technology. This system uses 3-factor Authentication for access.</div>
+        </div>
+      </div>
+    </div> <!-- End Screen One -->
+    <!-- Screen Two -->
+    <div @fade *ngIf="screenTwo">
+      <div class="m-2 border border-dark rounded">
+        <div class="d-flex justify-content-center align-items-center">
+          <div class="rounded-circle bg-success text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">1</div>------------
+          <div class="rounded-circle bg-warning text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">2</div>------------
+          <div class="rounded-circle bg-info text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">3</div>------------
+          <div class="rounded-circle bg-info text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">4</div>
+        </div>
+        <div class="text-left mt-4">
+          <div class="h3 text-center">Next, Tell us about your job so we can assign you to the correct section</div>
+          <div class="row m-1 border border-info rounded p-2">
+            <div class="col-6 border border-dark rounded p-2 d-flex justify-content-center align-items-center flex-column" style="background-color: lightyellow ">
+              <div class="font-weight-bold">Please select the department you are associated with:</div>
+              <div class="form-group">
+                <select [(ngModel)]="newMember.requested" class="custom-select" id="position">
+                  <option value="prison">BDOCS / Intake Staff</option>
+                  <option value="magistrate">Magistrate</option>
+                  <option value="magistrate_registrar">Magistrate Court Registrar</option>
+                  <option value="magistrate_registrar_clerk">Magistrate Court Registrar Clerk</option>
+                  <option value="supreme_registrar">Criminal Court Registrar</option>
+                  <option value="supreme_registrar_clerk">Criminal Court Registrar Staff</option>
+                  <option value="supreme_judge">Supreme Court Justice</option>
+                  <option value="supreme_judge_Assistant">Supreme Court Judicial Assistant</option>
+                  <option value="public_attorney">Department of Public Prosecution</option>
+                  <option value="private_attorney">Private Attorney / Public Defender</option>
+                  <option value="other">Other Association (Explain in Job Title)</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-6 border border-dark rounded">
+              <div class="form-group">
+                <label for="supervisor" class="font-weight-bold">Supervisor Name and Phone Number</label>
+                <input [(ngModel)]="newMember.workPhone" type="text" id="supervisor" class="form-control">
+              </div>
+              <div class="form-group">
+                <label for="jobtitle" class="font-weight-bold">Job Title</label>
+                <input [(ngModel)]="newMember.position" type="text" id="jobtitle" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <div class="row m-1">
+            <div class="col-12">
+              <div class="border border-dark rounded p-2">
+                <p>Please provide a comment for the administrators explaining why you are requesting access to the BBMS
+                  system and any addition information the administrators may need to verify your request</p>
+                <label for="commentBox" class="font-weight-bold">Comment</label>
+                <div class="input-group">
+                  <textarea [(ngModel)]="newMember.comments" rows="6" class="form-control" id="commentBox"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-center align-items-center text-left" style="width: 100%">
+            <div class="d-inline-block">
+              <div class="btn btn-warning m-1" (click)="doCancel()">CANCEL</div>
+              <div class="btn btn-success m-1" (click)="submitpage2()">CONTINUE</div>
+            </div>
+          </div>
+          <div class="text-center font-weight-bold small text-danger py-2">All data is encrypted using End To End Encryption (E2EE) Technology. This system uses 3-factor Authentication for access.</div>
+        </div>
+      </div>
+    </div> <!-- End Screen Two -->
+    <!-- Screen Three -->
+    <div @fade *ngIf="screenThree" class="border-dark border rounded">
+      <div class="d-flex justify-content-center align-items-center">
+        <div class="rounded-circle bg-success text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">1</div>------------
+        <div class="rounded-circle bg-success text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">2</div>------------
+        <div class="rounded-circle bg-warning text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">3</div>------------
+        <div class="rounded-circle bg-info text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">4</div>
+      </div>
+      <div class="h2 m-1 mt-2 mb-2">Information Review:</div>
+      <div class="row m-1">
+        <div class="col-6 d-flex flex-column justify-content-center align-items-center">
+          <div class="font-weight-bold text-danger text-center h4">
+            Please confirm the information in the box to the right is correct. When you submit this form, you must verify your
+            email address within 24 hours or this request for access will be void and will need to be resubmitted.
+          </div>
+        </div>
+        <div class="col-6 border border-dark rounded p-3">
+          <b>Name:</b> {{newMember.fName}} {{newMember.mName}} {{newMember.lName}}<br>
+          <b>Email:</b> {{newMember.email}}<br>
+          <b>Cell Phone:</b> {{newMember.cellPhone}}<br>
+          <b>Department:</b> {{checkPosition()}}<br>
+          <b>Position:</b> {{newMember.position}}<br>
+          <b>Supervisor:</b> {{newMember.workPhone}}<br>
+          <b>Comment:</b> {{newMember.comments}}<br>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center align-items-center text-left" style="width: 100%">
+        <div class="d-inline-block">
+          <div class="btn btn-warning m-1" (click)="doCancel()">CANCEL</div>
+          <div class="btn btn-success m-1" (click)="submitpage3()">SUBMIT REQUEST</div>
+        </div>
+      </div>
+      <div class="text-center font-weight-bold small text-danger py-2">All data is encrypted using End To End Encryption (E2EE) Technology. This system uses 3-factor Authentication for access.</div>
+
+    </div> <!-- End Screen Three -->
+    <!-- Begin Screen Four -->
+
+    <div @fade *ngIf="screenFour" class="border-dark border rounded">
+      <div class="d-flex justify-content-center align-items-center">
+        <div class="rounded-circle bg-success text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">1</div>------------
+        <div class="rounded-circle bg-success text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">2</div>------------
+        <div class="rounded-circle bg-success text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">3</div>------------
+        <div class="rounded-circle bg-warning text-white px-3 m-2 border border-dark shadow shadow-sm h1" style="width: 50px; height: 50px">4</div>
+      </div>
+      <div class="h2 m-1 mt-2 mb-2 text-center">VERIFICATION EMAIL SENT! </div>
+      <div class="font-weight-bold text-center text-danger h3 p-5">We have sent a verification email to {{newMember.email}}.<br>You must click the link inside of this
+        email within 24 hours or your request for access will be void and you will need to resubmit this form!</div>
+
+      <div class="d-flex justify-content-center align-items-center text-left" style="width: 100%">
+        <div class="d-inline-block">
+          <div class="btn btn-success m-1" (click)="doCancel()">RETURN TO LOGIN FORM</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

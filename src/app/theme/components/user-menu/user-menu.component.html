@@ -1,0 +1,42 @@
+<div class="dropdown d-inline-block" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+  <a class="rollover dropdown-toggle no-caret pl-2 pr-2 border border-white mr-1" style="border-radius: 8px"
+     id="user-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <i class="fa fa-user-o" aria-hidden="true"></i> USER MENU
+  </a>
+
+  <div class="dropdown-menu dropdown-menu-right rounded-0 mt-3 p-0 box-shadow" aria-labelledby="user-menu">
+    <div class="user-menu">
+      <div class="user-info text-center p-3">
+        <img src="assets/img/users/default-user.jpg" alt="user-img" class="user-img rounded-circle"
+             style="border: 8px solid white">
+        <div class="picture-icon text-warning"
+             style="font-size: 22px; position: relative; margin-top: -30px; margin-right: -80px"
+             (click)="doTakePicture()"><i class="fa fa-camera"></i>
+        </div>
+          <span class="text-white">{{member.lName}}, {{member.fName}} {{member.mName}}</span><br>
+          <div style="font-size: 10px">
+          {{member.email}}<br>
+          Phone: {{member.cellPhone}}<br>
+          Last Login: {{member.lastLogin}} Member Since: {{member.memberSince}}<br>
+          <div class="font-weight-bold text-white mt-2">AUTHORIZATIONS/ROLES</div>
+          <ul class="">
+            <li *ngIf="member.authAdmin" class="text-danger font-weight-bold">Administrator</li>
+            <li *ngIf="member.authRegistrar" class="text-white">Criminal Registry</li>
+            <li *ngIf="member.authPrivAttorney" class="text-white">Private Attorney</li>
+            <li *ngIf="member.authAttorney" class="text-white">Prosecutor / DPP Office</li>
+            <li *ngIf="member.authJudge" class="text-white">Supreme Court Justice</li>
+            <li *ngIf="member.authMagistrate" class="text-white">Magistrate</li>
+            <li *ngIf="member.authClerk" class="text-white">BDOCS Intake Staff</li>
+            <li *ngIf="member.authRegistrarClerk" class="text-white">Criminal Registry Staff</li>
+            <li *ngIf="member.authJudgeClerk" class="text-white">Supreme Court Judicial Assistant</li>
+          </ul>
+        </div>
+      </div>
+      <a class="dropdown-item" routerLink="profile"><i class="fa fa-user mr-2"></i>Profile</a>
+      <a class="dropdown-item" routerLink="settings"><i class="fa fa-cog mr-2"></i>Settings</a>
+      <a class="dropdown-item" routerLink="/"><i class="fa fa-lock mr-2"></i>Lock screen</a>
+      <a class="dropdown-item mb-1" routerLink="/login"><i class="fa fa-power-off mr-2"></i>Log out</a>
+
+    </div>
+  </div>
+</div>

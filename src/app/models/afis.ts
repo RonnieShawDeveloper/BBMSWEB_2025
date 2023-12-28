@@ -1,0 +1,31 @@
+export interface Afis {
+  index?: number;
+  id?: string;
+  fName?: string;
+  mName?: string;
+  lName?: string;
+  spn?: string;
+  dob?: string;
+  afis?: string;
+  officer?: string;
+  location?: string;
+  comment?: string;
+  datetime?: string;
+  address1?: string;
+  address2?: string;
+  locality?: string;
+  island?: string;
+  country?: string;
+  alias?: string;
+  citizenship?: string;
+  sex?: string;
+  race?: string;
+  height?: string;
+  weight?: string;
+  pob?: string;
+  eyes?: string;
+  hair?: string;
+  lat?: string;
+  long?: string;
+  bbms?: string;
+}
