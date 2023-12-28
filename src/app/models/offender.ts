@@ -52,4 +52,5 @@ export interface Offender {
   attorneyName?: string;
   attorneyID?: string;
   attorneyAdded?: string;
+  attorneyApplication?: boolean;
 }
