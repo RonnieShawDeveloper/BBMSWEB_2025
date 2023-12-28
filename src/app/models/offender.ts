@@ -49,8 +49,17 @@ export interface Offender {
   passport?: string;
   assignedJudge?: string;
   lastBailHearingDate?: string;
-  attorneyName?: string;
-  attorneyID?: string;
-  attorneyAdded?: string;
-  attorneyApplicationUploaded?: boolean;
+  attorneyName?: string; // The assigned Attorney Name to this offender
+  attorneyRecord?: attorneyRecord[]; // The Assigned Attorneys
+  attorneyAppRecordID?: string; // Database ID from attyApplications for this record
 }
+export interface attorneyRecord {
+  firebaseID?: string;
+  lastName?: string;
+  firstName?: string;
+  address?: string;
+  phone1?: string;
+  phone2?: string;
+  barNumber?: string;
+}
+
