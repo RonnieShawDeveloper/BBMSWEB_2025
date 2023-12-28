@@ -1,3 +1,5 @@
+// NOTE: You will need to create a Firebase Account for testing. Once created, copy your information into the firebaseConfig object.
+// The environmental variables shown here will not allow you to test code, as they are for the live system. Once you change your config, do not push this file
 export const environment = {
   production: true,
   firebaseConfig: {
