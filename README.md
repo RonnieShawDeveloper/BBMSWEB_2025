@@ -1,7 +1,13 @@
 ## Bahamas Bail Management System
-Started April 15, 2023 Angular 15.0.2
+This revision/Repo started December 28, 2023 Angular 17
 
-Developed by Senior Software Architect Ronnie Shaw and his team of developers.
+Angular Version 17 updated December 2023
+
+This project is built on Typescript/Javascript on the Angular framework. The project is connected to and hosted through Firebase.
+
+You must have NPM/Node JS installed on your machine, as well as the Angular CLI before implementing this repo. 
+
+If you have any questions about this repo, please contact Ronnie Shaw, CTO, Justice Technologies
 
 (c)2023 Justice Technology Corp, Inc. All Rights Reserved.
 
