@@ -50,6 +50,8 @@ export interface Offender {
   assignedJudge?: string;
   lastBailHearingDate?: string;
   attorneyName?: string; // The assigned Attorney Name to this offender
+  attorneyID?: string;
+  attorneyAdded?: string;
   attorneyRecord?: attorneyRecord[]; // The Assigned Attorneys
   attorneyAppRecordID?: string; // Database ID from attyApplications for this record
 }

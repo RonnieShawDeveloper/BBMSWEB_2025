@@ -120,12 +120,12 @@ export class DocheckinComponent implements OnInit, AfterViewInit, AfterContentIn
             }
               // If the user is not within .25 miles of a police station, show an error
               swal.fire({
-                  title: 'Error',
-                  text: 'You must be at an AUTHORIZED police station to check-in. Currently, the Closest Authorized Station to your location is ' + closestStation + ' which is approximately ' + closest.toFixed(2) + ' miles away.',
+                  title: 'Not at an Authorized Location',
+                  text: 'Currently, the Closest Authorized Station to your location is ' + closestStation + ' which is approximately ' + closest.toFixed(2) + ' miles away.',
                   icon: 'error',
                   confirmButtonText: 'OK'
               }).then((result) => {
-                this.exitCheckin();
+                this.continueCheckin();
               });
           }
       }
@@ -183,7 +183,7 @@ export class DocheckinComponent implements OnInit, AfterViewInit, AfterContentIn
       });
     }
 
-    // Chack that day is not greater than 31
+    // Check that day is not greater than 31
     if (this.day > 31) {
       swal.fire({
         title: 'Error',
