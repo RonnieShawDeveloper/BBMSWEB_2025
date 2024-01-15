@@ -45,7 +45,10 @@
           <div class="col-2 d-flex justify-content-center align-items-center" style="border: 1px solid rgb(69,70,71);">
             <img class="img-fluid m-2 border border-dark" [src]="def.mainPhoto" loading="lazy" /></div>
           <div class="col-3 d-flex justify-content-start align-items-center" style="border: 1px solid rgb(69,70,71);">
-            <span>{{def.lName+', ' +def.fName+' '+def.mName }}</span>
+            <div>
+              {{def.lName+', ' +def.fName+' '+def.mName }}<br>
+              DOB: {{def.dob}}
+            </div>
           </div>
           <div class="col-3 d-flex justify-content-start align-items-center" style="border: 1px solid rgb(69,70,71);">
             <span>{{def.addLine1}}<br>{{def.addLine2}}<br>{{def.city}} {{def.state}} {{def.zip}}</span>

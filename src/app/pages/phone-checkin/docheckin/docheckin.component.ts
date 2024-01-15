@@ -125,7 +125,9 @@ export class DocheckinComponent implements OnInit, AfterViewInit, AfterContentIn
                   icon: 'error',
                   confirmButtonText: 'OK'
               }).then((result) => {
-                this.continueCheckin();
+                if(result.isConfirmed) {
+                  this.continueCheckin();
+                }
               });
           }
       }
