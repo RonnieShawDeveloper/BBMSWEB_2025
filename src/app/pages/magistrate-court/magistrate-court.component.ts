@@ -10,6 +10,7 @@ import {Count} from "../../models/count";
 import * as moment from "moment/moment";
 import {Table} from "primeng/table";
 import {Members} from "../../models/members";
+import {KioskLogs} from "../../models/kiosk-logs";
 @Component({
   selector: 'app-magistrate-court',
   templateUrl: './magistrate-court.component.html',
@@ -34,7 +35,8 @@ export class MagistrateCourtComponent implements OnInit, OnDestroy {
   initiated = false;
 
   subscriptions: any[] = [];
-
+  KioskLogs: KioskLogs[] = [];
+  lateChecks: Booking[] = [];
   constructor(private af: AngularFirestore, private router: Router) {
 
   }
@@ -52,6 +54,47 @@ export class MagistrateCourtComponent implements OnInit, OnDestroy {
 
     // Get the current member from localstorage and store it in the currentMember variable
     this.currentMember = JSON.parse(localStorage.getItem('member') || '{}');
+
+    // Get the Unix Timestamp in milliseconds for 1 month ago
+    const oneMonthAgo = new Date().getTime() - 2592000000;
+    // Get all entries from Firstore database called "kioskLogs" where "title" is equal to "AFIS ID" and the "unix" is greater than the Unix Timestamp for 1 month ago
+    this.subscriptions.push(this.af.collection('kioskLogs', ref => ref
+      .where('title', '==', 'AFIS ID'))
+      .valueChanges().subscribe((data: KioskLogs[]) => {
+      this.KioskLogs = data;
+      // Loop through the kioskLogs array and remove any record from the kioskLogs array older than 1 month using the unix field as the timestamp in milliseconds
+      for (let i = 0; i < this.KioskLogs.length; i++) {
+        if (parseInt(this.KioskLogs[i].unix) < oneMonthAgo) {
+          this.KioskLogs.splice(i, 1);
+        }
+      }
+      // Sort the kioskLogs array by the unix field showing the newest entries first
+      this.KioskLogs.sort((a, b) => (parseInt(a.unix) > parseInt(b.unix)) ? -1 : 1);
+      // Loop through each activeBooking and send it to the getLastCheckin function to get the last checkin date and time
+      for (let i = 0; i < this.activeBookings.length; i++) {
+        this.getLastCheckin(this.activeBookings[i]);
+      }
+      }));
+
+  }
+
+  getLastCheckin(offender: Booking): string {
+    if(offender.afisID == undefined || offender.afisID == null) {
+      return 'AFIS NOT LINKED';
+    }
+    // loop through the kioskLogs array and get the last 10 characters of the description field and check to see if it equals the afisID
+    for (let i = 0; i < this.KioskLogs.length; i++) {
+      if (this.KioskLogs[i].description.slice(-10) == offender.afisID) {
+        offender.lateCheckin = false;
+        // Check if the unix date is more than 7 days ago and if so, set "late" to true
+        if (parseInt(this.KioskLogs[i].unix) < new Date().getTime() - 604800000) {
+          offender.lateCheckin = true;
+          this.lateChecks.push(offender);
+        }
+        return this.humanizeDate(this.KioskLogs[i].unix)+" ("+this.KioskLogs[i].datetime + ") at " + this.KioskLogs[i].location;
+      }
+    }
+    return 'NO CHECKIN FOUND';
   }
 
   enlargePhoto(photoURL: string, fName: string, lName: string) {
@@ -97,6 +140,19 @@ export class MagistrateCourtComponent implements OnInit, OnDestroy {
   }
   showDenied() {
     this.activeBookings = this.copyBookings.filter(b => b.bailStatus == 'denied');
+  }
+  showNassau() {
+    this.activeBookings = this.copyBookings.filter(b => b.court == 'Nassau');
+  }
+  showGrandBahamas() {
+    this.activeBookings = this.copyBookings.filter(b => b.court == 'Grand Bahama');
+  }
+  showAbaco() {
+    this.activeBookings = this.copyBookings.filter(b => b.court == 'Abaco');
+  }
+
+  showLate() {
+    this.activeBookings = this.lateChecks;
   }
 
   doDeleteBooking(booking: Booking) {
