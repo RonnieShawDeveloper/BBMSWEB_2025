@@ -111,6 +111,31 @@
           </fieldset>
         </div>
       </div>
+
+      <fieldset class="mt-2" style="background-color:yellow; border: 1px solid rgb(0,0,0);border-radius: 10px;padding-left: 0px;padding-right: 18px;padding-bottom: 15px;">
+        <legend style="background-color:yellow; width: auto;margin-left: 10px;border: 1px solid rgb(0,0,0);border-radius: 10px;font-size: 16px;font-weight: bold;padding: 5px;color: var(--blue);">Court of Jurisdiction</legend>
+        <div class="row" style="padding: 5px;">
+          <div class="col-5 d-flex flex-column">
+            <span style="font-weight: bold;color: var(--red);">Please select the Court that has Jurisdiction over this matter</span>
+            <span>This is used to assign a Bail Hearing to the proper judge who has jurisdiction over this matter.</span></div>
+          <div class="col">
+            <div class="d-flex flex-row justify-content-center">
+              <div class="form-check" style="margin-right: 10px;margin-left: 10px;">
+                <input (change)="courtChanged($event)" [checked]="activeBooking.court=='Nassau'" value="Nassau" id="formCheck-10" class="form-check-input" type="checkbox" />
+                <label class="form-check-label" for="formCheck-1">Nassau</label>
+              </div>
+              <div class="form-check" style="margin-right: 10px;margin-left: 10px;">
+                <input (change)="courtChanged($event)" [checked]="activeBooking.court=='Grand Bahamas'" value="Grand Bahamas" id="formCheck-30" class="form-check-input" type="checkbox" />
+                <label class="form-check-label" for="formCheck-3">Grand Bahamas</label>
+              </div>
+              <div class="form-check" style="margin-right: 10px;margin-left: 10px;">
+                <input (change)="courtChanged($event)" [checked]="activeBooking.court=='Abaco'" value="Abaco" id="formCheck-20" class="form-check-input" type="checkbox" />
+                <label class="form-check-label" for="formCheck-2">Abaco</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
     </div>
   </div>
 
@@ -219,20 +244,25 @@
           <div class="col"><span><b>Documents and Status Entries</b></span>
             <ul id="documents">
               <li *ngFor="let doc of bookingEvents">
-                <span *ngIf="doc.type=='newBooking'" class="text-primary">{{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
-                <div *ngIf="doc.type== 'newBooking' " class="small text-muted">{{doc.description}}</div>
-                <span *ngIf="doc.type=='removeSuretor'" class="text-primary">{{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
-                <div *ngIf="doc.type== 'removeSuretor' " class="small text-muted">{{doc.description}}</div>
-                <span *ngIf="doc.type=='attachSuretor'" class="text-primary">{{doc.title}} on {{convertUnixDate(doc.unixDate)}} <i *ngIf="currentMember.authAdmin" class="fa fa-trash" style="cursor: pointer" (click)="removeSuretor(doc.id)"></i></span>
-                <div *ngIf="doc.type== 'attachSuretor' " class="small text-muted">{{doc.description}}</div>
-                <span *ngIf="doc.type=='submitMagistrate'" class="text-primary">{{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
-                <div *ngIf="doc.type== 'submitMagistrate' " class="small text-muted">{{doc.description}}</div>
-                <span *ngIf="doc.type=='approveSurtor' && doc.approved" class="text-success font-weight-bold">{{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
-                <span *ngIf="doc.type=='approveSurtor' && doc.denied" class="text-danger font-weight-bold">{{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
-                <div *ngIf="doc.type== 'approveSurtor' " class="small text-muted">{{doc.description}}</div>
-                <span *ngIf="doc.type=='pdf'"><i class="fa fa-file-pdf-o text-danger font-weight-bold"></i> {{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
-                <span *ngIf="doc.type=='pdf'" class="badge badge-pill badge-success m-1" style="cursor: pointer" (click)="openPDF(doc.link)">VIEW</span>
-                <span *ngIf="doc.type=='pdf' && currentMember.authAdmin" class="badge badge-pill badge-danger m-1" style="cursor: pointer" (click)="deletePDF(doc.link, doc.id)"><i class="fa fa-trash"></i></span></li>
+                <div *ngIf="doc.type != '' || doc.type != null">
+                  <span *ngIf="doc.type=='newBooking'" class="text-primary">{{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
+                  <div *ngIf="doc.type== 'newBooking' " class="small text-muted">{{doc.description}}</div>
+                  <span *ngIf="doc.type=='removeSuretor'" class="text-primary">{{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
+                  <div *ngIf="doc.type== 'removeSuretor' " class="small text-muted">{{doc.description}}</div>
+                  <span *ngIf="doc.type=='attachSuretor'" class="text-primary">{{doc.title}} on {{convertUnixDate(doc.unixDate)}} <i *ngIf="currentMember.authAdmin" class="fa fa-trash" style="cursor: pointer" (click)="removeSuretor(doc.id)"></i></span>
+                  <div *ngIf="doc.type== 'attachSuretor' " class="small text-muted">{{doc.description}}</div>
+                  <span *ngIf="doc.type=='submitMagistrate'" class="text-primary">{{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
+                  <div *ngIf="doc.type== 'submitMagistrate' " class="small text-muted">{{doc.description}}</div>
+                  <span *ngIf="doc.type=='approveSurtor' && doc.approved" class="text-success font-weight-bold">{{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
+                  <span *ngIf="doc.type=='approveSurtor' && !doc.approved" class="text-danger font-weight-bold">{{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
+                  <div *ngIf="doc.type== 'approveSurtor' " class="small text-muted">{{doc.description}}</div>
+                  <span *ngIf="doc.type=='pdf'"><i class="fa fa-file-pdf-o text-danger font-weight-bold"></i> {{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
+                  <span *ngIf="doc.type=='pdf'" class="badge badge-pill badge-success m-1" style="cursor: pointer" (click)="openPDF(doc.link)">VIEW</span>
+                  <span *ngIf="doc.type=='pdf' && currentMember.authAdmin" class="badge badge-pill badge-danger m-1" style="cursor: pointer" (click)="deletePDF(doc.link, doc.id)"><i class="fa fa-trash"></i></span>
+                  <span *ngIf="doc.type=='linkOffender'" class="text-primary">Offender has been Linked to AFIS on {{convertUnixDate(doc.unixDate)}}</span>
+                </div>
+              </li>
+
             </ul>
           </div>
         </div>
