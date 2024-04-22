@@ -1,0 +1,84 @@
+<section *ngIf="showPaymentPage == false" class="container-fluid">
+  <div class="row" style="background: var(--blue);">
+    <div class="col text-left" style="text-align: center;"><span style="font-weight: bold;color: var(--light);font-size: 24px;">CLIENT MANAGEMENT</span></div>
+    <div class="col d-flex justify-content-end align-items-center" style="text-align: right;"><button class="btn btn-danger btn-sm" type="button" (click)="closePage()">CLOSE</button></div>
+  </div>
+  <div class="row container-fluid" style="padding-bottom: 10px;">
+    <div class="col">
+      <fieldset style="border-width: 1px;border-style: solid;border-radius: 10px;padding: 5px;margin-top: 6px;">
+        <legend style="font-size: 14px;border-width: 1px;border-style: solid;border-radius: 10px;width: auto;margin-left: 6px;padding: 3px;font-weight: bold;">Client Information</legend>
+        <div class="row">
+          <div class="col-3 d-flex justify-content-center align-items-center">
+            <img alt="Offender Image" src="{{client.mainPhoto}}" class="img-fluid border border-danger"/>
+          </div>
+          <div class="col d-flex flex-column">
+            <div class="d-flex flex-row justify-content-start align-items-center my-1">
+              <input [(ngModel)]="client.lName" class="form-control form-control-sm" type="text" style="margin-right: 2px;" readonly disabled />
+              <input [(ngModel)]="client.fName" class="form-control form-control-sm" type="text" style="margin-right: 2px;" readonly disabled />
+              <input [(ngModel)]="client.mName" class="form-control form-control-sm" type="text" style="margin-right: 2px; width: 30px;" readonly disabled />
+            </div>
+            <div class="d-flex flex-row justify-content-start align-items-center my-1">
+              <input [(ngModel)]="client.addLine1" class="form-control form-control-sm" type="text" style="margin-right: 2px;" readonly disabled />
+            </div>
+            <div class="d-flex flex-row justify-content-start align-items-center my-1">
+              <input [(ngModel)]="client.addLine2" class="form-control form-control-sm" type="text" style="margin-right: 2px;" readonly disabled />
+            </div>
+            <div class="d-flex flex-row justify-content-start align-items-center my-1">
+              <input [(ngModel)]="client.city" class="form-control form-control-sm" type="text" style="margin-right: 2px;" readonly disabled />
+              <input [(ngModel)]="client.state" class="form-control form-control-sm" type="text" style="margin-right: 2px;" readonly disabled />
+              <input [(ngModel)]="client.zip" class="form-control form-control-sm" type="text" style="margin-right: 2px; width: 80px;" readonly disabled />
+            </div>
+          </div>
+        </div>
+      </fieldset>
+      <fieldset style="border-width: 1px;border-style: solid;border-radius: 10px;padding: 5px;margin-top: 6px;min-height: 300px;">
+        <legend style="font-size: 14px;border-width: 1px;border-style: solid;border-radius: 10px;width: auto;margin-left: 6px;padding: 3px;font-weight: bold;">Open Cases</legend>
+        <div class="row m-0" style="font-size: 12px;font-weight: bold;border-width: 1px;border-style: solid;">
+          <div class="col-3 d-flex justify-content-start align-items-center"><span>Date</span></div>
+          <div class="col d-flex justify-content-start align-items-center"><span>Case Info</span></div>
+          <div class="col-3 text-center d-flex justify-content-center align-items-center"><span>Controls</span></div>
+        </div>
+      </fieldset>
+      <fieldset style="border-width: 1px;border-style: solid;border-radius: 10px;padding: 5px;margin-top: 6px;min-height: 300px;">
+        <legend style="font-size: 14px;border-width: 1px;border-style: solid;border-radius: 10px;width: auto;margin-left: 6px;padding: 3px;font-weight: bold;">Closed Cases</legend>
+        <div class="row m-0" style="font-size: 12px;font-weight: bold;border-width: 1px;border-style: solid;">
+          <div class="col-3 d-flex justify-content-start align-items-center"><span>Date</span></div>
+          <div class="col d-flex justify-content-start align-items-center"><span>Case Info</span></div>
+          <div class="col-3 text-center d-flex justify-content-center align-items-center"><span>Controls</span></div>
+        </div>
+      </fieldset>
+    </div>
+    <div class="col">
+      <fieldset style="border-width: 1px;border-style: solid;border-radius: 10px;padding: 5px;margin-top: 6px;min-height: 300px;">
+        <legend style="font-size: 14px;border-width: 1px;border-style: solid;border-radius: 10px;width: auto;margin-left: 6px;padding: 3px;font-weight: bold;">Bail Applications<i class="fa fa-plus-square text-danger" data-toggle="tooltip" style="margin-left: 5px;" title="Submit New Bail Application" (click)="doShowPaymentPage()"></i></legend>
+        <div class="row m-0" style="font-weight: bold;font-size: 12px;border-width: 1px;border-style: solid;">
+          <div class="col-3 d-flex justify-content-start align-items-center"><span>Date</span></div>
+          <div class="col d-flex justify-content-start align-items-center"><span>Comment</span></div>
+          <div class="col-3 text-center d-flex justify-content-center align-items-center"><span>Status</span></div>
+        </div>
+        <div *ngIf="showBailApplication" class="row mx-0 my-1" style="font-weight: bold;font-size: 12px;border-width: 1px;border-style: solid;">
+          <div class="col-3 d-flex justify-content-start align-items-center"><span>{{getCurrentDate()}}</span></div>
+          <div class="col d-flex justify-content-start align-items-center small">
+            Bail Application Submitted <div class="badge badge-danger badge-pill m-1">No Judge Assigned</div><div class="badge badge-danger badge-pill m-1">No Hearing Date</div>
+          </div>
+          <div class="col-3 text-center d-flex justify-content-center align-items-center small">
+            <span class="text-danger">PENDING</span>
+            <div class="badge badge-success badge-pill m-1">PAYMENT RECEIVED</div>
+          </div>
+        </div>
+      </fieldset>
+      <fieldset style="border-width: 1px;border-style: solid;border-radius: 10px;padding: 5px;margin-top: 6px;height: initial;min-height: 300px;">
+        <legend style="font-size: 14px;border-width: 1px;border-style: solid;border-radius: 10px;width: auto;margin-left: 6px;padding: 3px;font-weight: bold;">Motions and Pleadings<i class="fa fa-plus-square text-danger" data-toggle="tooltip" style="margin-left: 5px;" title="Submit New Motion"></i></legend>
+        <div class="row m-0" style="font-weight: bold;font-size: 12px;border-width: 1px;border-style: solid;">
+          <div class="col-3 d-flex justify-content-start align-items-center"><span>Date</span></div>
+          <div class="col d-flex justify-content-start align-items-center"><span>Description</span></div>
+          <div class="col-3 text-center d-flex justify-content-center align-items-center"><span>Controls</span></div>
+        </div>
+      </fieldset>
+      <fieldset style="border-width: 1px;border-style: solid;border-radius: 10px;padding: 5px;margin-top: 6px;min-height: 300px;">
+        <legend style="font-size: 14px;border-width: 1px;border-style: solid;border-radius: 10px;width: auto;margin-left: 6px;padding: 3px;font-weight: bold;">Case Notes<i class="fa fa-plus-square text-danger" data-toggle="tooltip" style="margin-left: 5px;" title="Submit New Case Note"></i></legend><textarea class="form-control" readonly style="font-size: 12px;" rows="10" disabled></textarea>
+      </fieldset>
+    </div>
+  </div>
+</section>
+<app-get-payment-page *ngIf="showPaymentPage == true" (closePage)="closePaymentPage($event)"></app-get-payment-page>

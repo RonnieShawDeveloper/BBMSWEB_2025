@@ -28,6 +28,8 @@ export class HeaderComponent implements OnInit {
   public settings: Settings;
   public menuItems:Array<any>;
   member: Members = localStorage.getItem('member') ? JSON.parse(localStorage.getItem('member')) : null;
+
+
   constructor(private authService: AuthService, public appSettings:AppSettings, public menuService:MenuService) {
       this.settings = this.appSettings.settings;
       this.menuItems = this.menuService.getHorizontalMenuItems();

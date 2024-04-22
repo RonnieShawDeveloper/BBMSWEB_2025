@@ -9,6 +9,11 @@ import {AngularFirestore, AngularFirestoreCollection} from "@angular/fire/compat
 import Swal from "sweetalert2";
 import { FirebaseError } from '@firebase/util';
 
+/**
+ * AuthService is a service that provides authentication functionality.
+ * It uses Firebase for authentication and Firestore for storing user data.
+ * It also uses SweetAlert2 for displaying alerts.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -19,16 +24,33 @@ export class AuthService {
 
   // Firebase Collection
   memberCollection: AngularFirestoreCollection<Members>;
+
+  /**
+   * AuthService constructor
+   * @param {AngularFirestore} afs - AngularFirestore instance
+   * @param {AngularFireAuth} afAuth - AngularFireAuth instance
+   * @param {Router} router - Router instance
+   */
   constructor(private afs: AngularFirestore, private afAuth: AngularFireAuth, private router: Router) {
     this.user$ = afAuth.authState;
     this.checkAuthExpiration();
     this.memberCollection = afs.collection('members');
   }
+
+  /**
+   * Checks if the user is logged in
+   * @returns {Observable<boolean>} - Observable that emits true if the user is logged in, false otherwise
+   */
   isLoggedIn() {
     return this.user$.pipe(map(user => !!user));
   }
 
-  // Create a login function that takes an email and password and returns a promise
+  /**
+   * Logs in a user with the given email and password
+   * @param {string} email - The email of the user
+   * @param {string} password - The password of the user
+   * @returns {Promise<void>} - A promise that resolves when the login is successful and rejects when there is an error
+   */
   async login(email: string, password: string): Promise<void> {
     return this.afAuth.signInWithEmailAndPassword(email, password)
       .then((user) => {
@@ -176,6 +198,12 @@ export class AuthService {
       });
   }
 
+
+  /**
+   * Gets a single member with the given id
+   * @param {string} id - The id of the member
+   * @returns {Observable<Members[]>} - An observable that emits the member data
+   */
   getSingleMember(id: string) {
     this.singleMember = this.afs.collection('members', res => res.where('uid', '==', id)).snapshotChanges().pipe(
       map( changes => {
@@ -188,11 +216,17 @@ export class AuthService {
     );
     return this.singleMember;
   }
-
+  /**
+   * Updates a member record in Firestore
+   * @param {Members} currentMember - The member data to update
+   */
   updateMemberRecord(currentMember) {
     this.memberCollection.doc(currentMember.id).update(currentMember);
   }
-
+  /**
+   * Saves a new member to Firestore
+   * @param {Members} member - The member data to save
+   */
   saveNewMember(member: Members) {
 
     // Check the member collection and see if a record with this email address already exists
@@ -234,6 +268,12 @@ export class AuthService {
 
   }
 
+  /**
+   * Registers a new user with the given email and password
+   * @param {string} email - The email of the user
+   * @param {string} password - The password of the user
+   * @returns {Promise<any>} - A promise that resolves with the user data when the registration is successful and rejects when there is an error
+   */
   register(email: string, password: string) {
     return new Promise((resolve, reject) => {
       this.afAuth.createUserWithEmailAndPassword(email, password)
@@ -244,7 +284,10 @@ export class AuthService {
     });
   }
 
-  // Create a Signout function that returns a promise
+  /**
+   * Logs out the current user
+   * @returns {Promise<void>} - A promise that resolves when the logout is successful and rejects when there is an error
+   */
   logout(): Promise<void> {
     return this.afAuth.signOut()
       .then(() => {
@@ -255,6 +298,10 @@ export class AuthService {
         console.log(error);
       });
   }
+
+  /**
+   * Saves the authentication expiration date to localStorage
+   */
   private saveAuthExpiration() {
     const expirationDate = new Date();
     expirationDate.setHours(expirationDate.getHours() + 9); // Tests the expiration for 9 hours
@@ -262,6 +309,9 @@ export class AuthService {
     localStorage.setItem('authExpiration', expirationDate.toISOString());
   }
 
+  /**
+   * Checks if the authentication has expired and logs out the user if it has
+   */
   private checkAuthExpiration() {
     const expirationString = localStorage.getItem('authExpiration');
     if (expirationString) {
@@ -277,7 +327,11 @@ export class AuthService {
     }
   }
 
-  // Create a password reset function that takes an email and returns a promise
+  /**
+   * Sends a password reset email to the given email
+   * @param {string} email - The email to send the password reset email to
+   * @returns {Promise<boolean>} - A promise that resolves with true when the email is sent successfully and false when there is an error
+   */
   resetPassword(email: string): Promise<boolean> {
     return this.afAuth.sendPasswordResetEmail(email)
       .then(() => {

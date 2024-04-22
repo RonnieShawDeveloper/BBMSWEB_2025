@@ -61,7 +61,6 @@ export class DefendantMenuComponent implements OnInit, AfterViewInit {
         // @ts-ignore
         return b.bookDate - a.bookDate;
       });
-      console.log('Events', this.events);
     });
 
 
@@ -74,7 +73,6 @@ export class DefendantMenuComponent implements OnInit, AfterViewInit {
           ...photo.payload.doc.data()
         } as Photos;
       });
-      console.log('Defendant Photos', this.defendantPhotos);
     });
 
   }
@@ -196,15 +194,10 @@ export class DefendantMenuComponent implements OnInit, AfterViewInit {
 
         // Using the webcamCanvasData, create a blob and upload it to the firebase storage into the folder 'mainPhotos' and name the photo using the unix timestamp. Once the photo is uploaded, get the download url and add store it in the mainPhotoUrl string
         const blob = this.dataURLtoBlob(webcamCanvasData);
-        // Create a canvas element and add it to the modal
         const date = new Date().getTime();
-        // Create a canvas element and add it to the modal
         const file = new File([blob], this.defendant.id + '-' + date + '-mainPhoto.png', {type: 'image/png'});
-        // Create a canvas element and add it to the modal
         const filePath = 'mainPhotos/' + this.defendant.id + '-' + date + '-mainPhoto.png';
-        // Create a canvas element and add it to the modal
         const fileRef = this.storage.ref(filePath);
-        // Create a canvas element and add it to the modal
         const task = this.storage.upload(filePath, file);
 
         // Check to see if the currentImage contains the string 'default-user.jpg'
@@ -232,32 +225,19 @@ export class DefendantMenuComponent implements OnInit, AfterViewInit {
             fileRef.getDownloadURL().subscribe((url) => {
               // Add the url to the mainPhotoUrl string
               this.mainPhotoUrl = url;
-              let photo = this.defendantPhotos[0];
-              console.log('Photo', photo);
-              console.log('Photo Url', url);
-              // in the photo object, go through the photos array and find the entry with the mainPhoto property set to true. Once found, set the photoUrl to the url that was just uploaded to firebase
-              if (this.defendantPhotos.length > 0 && this.defendantPhotos[0].photos.length > 0) {
-                console.log('Updating existing photo object');
-                photo.photos.forEach((p) => {
-                  if (p.photoMain) {
-                    p.photoUrl = url;
-                  }
-                });
-              } else {
-                // Create a new photo object and set the photoUrl to the url that was just uploaded to firebase
-                console.log('Creating new photo object');
-                const newPhoto: Photos = {
-                  id: this.af.createId(),
-                  offenderID: this.defendant.spn,
-                  photos: [{
-                    photoUrl: url,
-                    photoMain: true,
-                    photoDate: new Date().getTime().toString(),
-                    photoComment: 'Photo added during booking process'
-                  }]
-                };
-                this.defendantPhotos.push(newPhoto);
-              }
+
+              // Loop through the defendantPhotos.photos array and set mainPhoto to false in every photo object
+              this.defendantPhotos[0].photos.forEach((photo) => {
+                photo.photoMain = false;
+              });
+
+              // Add the new photo url to the defendantPhotos.photos array
+              this.defendantPhotos[0].photos.push({
+                photoUrl: url,
+                photoMain: true,
+                photoDate: new Date().getTime().toString(),
+                photoComment: 'Photo added during booking process'
+              });
 
               // Update the photo object in the database collection called 'photos' with the photo object that was just updated
               this.af.collection('photos').doc(this.defendantPhotos[0].id).set(this.defendantPhotos[0]).then(() => {
@@ -269,6 +249,10 @@ export class DefendantMenuComponent implements OnInit, AfterViewInit {
                   showConfirmButton: false,
                   timer: 1500
                 });
+                  this.defendant.mainPhoto = url;
+                  // update the defendant object in the database collection called 'users' with the defendant object that was just updated
+                  this.af.collection('users').doc(this.defendant.id).set(this.defendant).then(() => {
+                  });
               }).catch((error) => {
                 // Create a Swal alert to let the user know that the photo was not successfully uploaded
                 Swal.fire({

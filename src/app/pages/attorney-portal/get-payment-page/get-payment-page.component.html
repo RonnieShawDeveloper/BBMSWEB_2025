@@ -1,0 +1,57 @@
+<section class="container-fluid">
+  <div class="row" style="background: var(--blue);text-align: center;font-weight: bold;font-size: 23px;color: var(--light);">
+    <div class="col"><span>BAIL APPLICATION AND PAYMENT PORTAL</span></div>
+  </div>
+  <div class="row" style="margin-top: 14px;border-bottom: 1px solid var(--blue);">
+    <div class="col text-center d-flex justify-content-center align-items-center"><span>Please select the Bail Application using the File Dialog found to the right. The bail application must be in a PDF format and fully completed to be excepted.</span></div>
+    <div class="col d-flex justify-content-center align-items-center"><input type="file" accept="application/pdf" /></div>
+  </div>
+  <div class="row" style="margin-top: 20px;">
+    <div class="col">
+      <div class="text-center">
+        <div style="position: relative; width: 348px; margin-left:50%; transform: translateX(-174px)">
+          <img alt="credit card image" src="/assets/img/app/creditcard.jpg" width="348" />
+          <img *ngIf="cardType=='Amex'" alt="credit card image" style="position: absolute; top: 0; right: 0; width: 128px" src="/assets/img/app/amex.png"/>
+          <img *ngIf="cardType=='Mastercard'" alt="credit card image" style="position: absolute; top: 0; right: 0; width: 128px" src="/assets/img/app/mastercard_logo.png"/>
+          <img *ngIf="cardType=='Visa'" alt="credit card image" style="position: absolute; top: 0; right: 0; width: 128px" src="/assets/img/app/visa_logo.png"/>
+          <img *ngIf="cardType=='Discover'" alt="credit card image" style="position: absolute; top: 0; right: 0; width: 128px" src="/assets/img/app/discover_logo.png"/>
+          <div style="position: absolute; top: 120px; left: 20px; color: white; letter-spacing: 3px; font-size: 18px">
+            <span>{{formatedcardnumber}}</span>
+          </div>
+          <div style="position: absolute; top: 140px; left: 20px; color: white; letter-spacing: 3px; font-size: 18px">
+            <span>EXP: {{expiration_date}}</span>&nbsp;&nbsp;<span>CVC: {{cvc_code}}</span>
+          </div>
+          <div style="position: absolute; top: 180px; left: 20px; color: white; letter-spacing: 3px; font-size: 13px">
+            <span>{{member.fName}} {{member.lName}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col d-flex flex-column justify-content-center">
+      <div class="input-group" style="margin-top: 3px;">
+        <div class="input-group-prepend"><span class="input-group-text" style="width: 191px;">Credit Card Number</span></div>
+        <input [(ngModel)]="credit_card_number" (focusout)="getCardType()" (keyup)="doNumberKeyup()" class="form-control" type="text" />
+        <div class="input-group-append ml-2">{{cardType}}</div>
+      </div>
+      <div class="input-group" style="margin-top: 3px;">
+        <div class="input-group-prepend"><span class="input-group-text" style="width: 191px">Expiration Date MM/YY</span></div>
+        <input id="exp_date" [(ngModel)]="expiration_date" (focusout)="check_expiration_date()" class="form-control" type="text" placeholder="MM/YY" />
+        <div class="input-group-append"></div>
+      </div>
+      <div class="input-group" style="margin-top: 3px;">
+        <div class="input-group-prepend"><span class="input-group-text" style="width: 191px;">CVC Code</span></div>
+        <input id="cvc_code" [(ngModel)]="cvc_code" (focusout)="check_cvc_code()" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+      <div class="input-group" style="margin-top: 3px;">
+        <div class="input-group-prepend"><span class="input-group-text" style="width: 191px;">Zip Code (If Applicable)</span></div>
+        <input id="zip_code" [(ngModel)]="zip_code" (focusout)="check_zip_code()" class="form-control" type="text" />
+        <div class="input-group-append"></div>
+      </div>
+      <div class="d-flex flex-row">
+      <button class="btn btn-danger m-1" type="button" style="margin-top: 9px;" (click)="doCancel()">CANCEL</button>
+      <button class="btn btn-success m-1" type="button" style="margin-top: 9px;" (click)="doSubmitPayment()">SUBMIT PAYMENT AND APPLICATION</button>
+      </div>
+    </div>
+  </div>
+</section>
