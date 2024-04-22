@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { PhoneCheckinRoutingModule } from './phone-checkin-routing.module';
 import { PhoneCheckinComponent } from './phone-checkin.component';
 import { DocheckinComponent } from './docheckin/docheckin.component';
-import {GoogleMapsModule} from "@angular/google-maps";
 import {FormsModule} from "@angular/forms";
 
 
@@ -16,7 +15,6 @@ import {FormsModule} from "@angular/forms";
   imports: [
     CommonModule,
     PhoneCheckinRoutingModule,
-    GoogleMapsModule,
     FormsModule
   ]
 })

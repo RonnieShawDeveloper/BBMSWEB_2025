@@ -1,57 +1,68 @@
-<section>
+<section *ngIf="searchPage">
+  <div style="font-weight: bold;text-align: center;font-size: 19px;background: var(--blue);color: var(--warning);"><span style="font-size: 24px;">PRIVATE ATTORNEY BAIL MANAGEMENT PORTAL</span></div>
+  <div style="font-weight: bold;text-align: center;font-size: 13px;"><span>BAHAMAS BAIL MANAGEMENT SYSTEM</span></div>
   <div class="row">
     <div class="col">
-      <fieldset class="container-fluid" style="border: 1px solid gray; border-radius: 8px">
-        <legend style="margin-left: 0px;font-weight: bold; border: 1px solid gray; border-radius: 8px; width: auto; padding:4px">Add Client</legend>
-        <div class="text-danger font-weight-bold p-2 h5">You must have the Clients Last Name and Date of Birth to add them.</div>
-        <div class="input-group">
-          <div class="input-group-prepend"><span class="input-group-text" style="width: 116px;">Last Name</span></div>
-          <input [(ngModel)]="lastName" class="form-control" type="text" />
+      <fieldset style="border-width: 1px;border-style: solid;border-radius: 10px;padding: 4px;min-height: 400px;">
+        <legend style="font-size: 12px;width: auto;margin-left: 4px;border-width: 1px;border-style: solid;border-radius: 10px;padding: 4px;font-weight: bold;">Add Offender</legend>
+        <div style="font-size: 10px;line-height: 11px;font-weight: bold;color: var(--red);"><span>To become the Attorney of Record for Bail proceedings, start by locating the Offender in the BBMS system by entering a Last Name and Date of Birth and hitting Go!</span></div>
+        <div style="font-weight: bold;font-size: 13px;"><span>Offender Search</span></div>
+        <div class="row" style="margin-top: 8px;">
+          <div class="col">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Last Name</span>
+              </div>
+              <input [(ngModel)]="lastName" class="form-control" type="text" />
+              <div class="input-group-append"></div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">DOB</span>
+              </div>
+              <input [(ngModel)]="dob" class="form-control" type="date" />
+              <div class="input-group-append"><button class="btn btn-success btn-small" type="button" (click)="searchOffenders()">Go!</button></div>
+            </div>
+          </div>
         </div>
-        <div class="input-group" style="margin-bottom: 10px;">
-          <div class="input-group-prepend"><span class="input-group-text" style="width: 116px;">Date of Birth</span></div>
-          <input [(ngModel)]="dob" class="form-control" type="date" />
-          <div class="input-group-append"><button class="btn btn-success" type="button" (click)="getDefendant()">Search!</button></div>
-        </div>
-        <div class="small text-muted text-danger font-weight-bold p-2 text-center">When adding a Client, the courts will be noticed that you are representing this client in all bail matters.</div>
-      </fieldset>
-      <fieldset class="container-fluid" style="margin-top: 5px;padding-bottom: 10px;border: 1px solid gray; border-radius: 8px">
-        <legend style="margin-left: 0px;font-weight: bold; border: 1px solid gray; border-radius: 8px; width: auto; padding:4px">Current Clients</legend>
-        <div class="row" style="margin-right: 0px;margin-left: 0px;border: 3px solid rgb(179,179,179);border-right-style: solid;border-left-color: rgb(179, 179, 179);background: #eaeaea;">
-          <div class="col-3 text-center" style="font-weight: bold;"><span>Image</span></div>
-          <div class="col" style="border-right: 1px solid rgb(179,179,179);border-left: 1px solid rgb(179,179,179);"><span style="font-weight: bold;">Name/DOB</span></div>
-          <div class="col-2" style="text-align: center;"><span style="font-weight: bold;">Controls</span></div>
-        </div>
-        <div class="row" style="border: 1px solid rgb(179,179,179);border-right-style: solid;border-left-color: rgb(179, 179, 179);margin-right: 0px;margin-left: 0px;">
-          <div class="col-3 text-center" style="font-weight: bold;"><img class="img-fluid" src="/assets/img/users/user.jpg" style="border-style: solid;border-color: var(--red);margin: 5px;" /></div>
-          <div class="col d-xl-flex justify-content-xl-center align-items-xl-center" style="border-right: 1px solid rgb(179,179,179);border-left: 1px solid rgb(179,179,179);"><span style="font-weight: bold;">Public, John</span></div>
-          <div class="col-2 d-xl-flex justify-content-xl-center align-items-xl-center" style="text-align: center;"><button class="btn btn-warning btn-sm" type="button">Select</button></div>
+        <div style="margin-top: 6px;font-weight: bold;font-size: 12px;"><span>Search Results:</span></div>
+        <div *ngFor="let offender of searchData" class="row m-1 pb-2 border-bottom border-dark">
+          <div class="col-3" style="font-size: 12px">
+            {{offender.lName}}, {{offender.fName}} {{offender.mName}}
+            <div *ngIf="offender.attorneyID" style="font-size: 10px;color: var(--red);">Current Attorney: {{offender.attorneyName}}</div>
+          </div>
+          <div class="col-7" style="font-size: 12px; line-height: 12px">
+            {{offender.addLine1}} {{offender.addLine2}}<br>{{offender.city}} {{offender.state}}
+          </div>
+          <div class="col-2 text-right">
+            <div class="btn btn-sm btn-warning" (click)="doSelectAdd(offender)">SELECT</div>
+          </div>
         </div>
       </fieldset>
     </div>
     <div class="col">
-      <fieldset class="container-fluid" style="margin-top: 5px;padding-bottom: 10px;border: 1px solid gray; border-radius: 8px">
-        <legend style="margin-left: 0px;font-weight: bold; border: 1px solid gray; border-radius: 8px; width: auto; padding:4px">Recent Activity and Alerts</legend>
-        <ul style="margin: 10px; margin-left: 20px">
-          <li>Application Submitted for Public, John Q - Payment Successful</li>
-          <li>Court Date Updated for Public, John Q - 2023-12-29 10:00 AM</li>
-          <li>Judge Assigned for Public, John Q. - Justice Bernard Turner </li>
-          <li>Other Info, Etc</li>
-        </ul>
-      </fieldset>
-      <fieldset class="container-fluid" style="margin-top: 5px;padding-bottom: 10px;border: 1px solid gray; border-radius: 8px">
-        <legend style="margin-left: 0px;font-weight: bold; border: 1px solid gray; border-radius: 8px; width: auto; padding:4px">Court Calendar</legend>
-        <div class="row" style="border: 1px solid rgb(179,179,179);border-right-style: solid;border-left-color: rgb(179, 179, 179);margin-right: 0px;margin-left: 0px;">
-          <div class="col-3 text-center" style="font-weight: bold;"><span>Image</span></div>
-          <div class="col" style="border-right: 1px solid rgb(179,179,179);border-left: 1px solid rgb(179,179,179);"><span style="font-weight: bold;">Name/DOB</span></div>
-          <div class="col-4" style="text-align: center;"><span style="font-weight: bold;">Date/Time</span></div>
-        </div>
-        <div class="row" style="border: 1px solid rgb(179,179,179);border-right-style: solid;border-left-color: rgb(179, 179, 179);margin-right: 0px;margin-left: 0px;">
-          <div class="col-3 text-center" style="font-weight: bold;"><img class="img-fluid" src="/assets/img/users/user.jpg" style="border-style: solid;border-color: var(--red);margin: 5px;" /></div>
-          <div class="col d-xl-flex justify-content-xl-center align-items-xl-center" style="border-right: 1px solid rgb(179,179,179);border-left: 1px solid rgb(179,179,179);"><span style="font-weight: bold;">Public, John</span></div>
-          <div class="col-4 d-xl-flex justify-content-xl-center align-items-xl-center" style="text-align: center;"><span style="font-size: 13px;font-weight: bold;">2023-12-29 10:00 AM</span></div>
+      <fieldset style="border-width: 1px;border-style: solid;border-radius: 10px;padding: 4px;min-height: 400px;">
+        <legend style="font-size: 12px;width: auto;margin-left: 4px;border-width: 1px;border-style: solid;border-radius: 10px;padding: 4px;font-weight: bold;">Current Clients</legend>
+        <div style="font-size: 10px;line-height: 11px;font-weight: bold;color: var(--red);"><span>The following list of Offenders represent all Offenders that you are currently assigned as the Attorney of Record with the Courts.</span></div>
+        <div style="font-weight: bold;font-size: 13px;"><span>Offenders:</span></div>
+        <div>
+          <div class="row m-0 border border-dark">
+            <div class="col-8 d-flex align-items-center"><span style="font-size: 12px;font-weight: bold;color: var(--red);">Last Name, Frist Name Middle</span></div>
+            <div class="col-2 d-flex justify-content-center align-items-center"><span style="line-height: 12px;font-size: 12px;font-weight: bold;color: var(--red);">DOB</span></div>
+            <div class="col-2 d-flex justify-content-end align-items-center"><span style="font-size: 12px;font-weight: bold;color: var(--red);">MANAGE</span></div>
+          </div>
+          <div *ngFor="let client of activeClients" class="row m-1 pb-1 border-bottom border-dark">
+            <div class="col-8 d-flex align-items-center"><span style="font-size: 12px;font-weight: bold;">{{client.lName}}, {{client.fName}} {{client.mName}}</span></div>
+            <div class="col-2 d-flex align-items-center justify-content-center"><span style="font-size: 12px;">{{client.dob}}</span></div>
+            <div class="col-2 d-flex justify-content-end align-items-center"><button class="btn btn-primary btn-sm" type="button" style="font-size: 12px;" (click)="doSelectClient(client)">SELECT</button></div>
+          </div>
         </div>
       </fieldset>
     </div>
   </div>
+</section>
+<section *ngIf="adminPage">
+  <app-attorney-client-admin [client]="selectedClient" (close)="closeAdmin()"></app-attorney-client-admin>
 </section>

@@ -1,23 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { AttorneyPortalRoutingModule } from './attorney-portal-routing.module';
 import { AttorneyPortalComponent } from './attorney-portal.component';
-import { AttorneyOfRecordComponent } from './attorney-of-record/attorney-of-record.component';
-import { DefAdminComponent } from './def-admin/def-admin.component';
 import {FormsModule} from "@angular/forms";
+import {AttorneyClientAdminComponent} from "./attorney-client-admin/attorney-client-admin.component";
 
 
 @NgModule({
   declarations: [
-    AttorneyPortalComponent,
-    AttorneyOfRecordComponent,
-    DefAdminComponent
+    AttorneyPortalComponent
   ],
   imports: [
     CommonModule,
     AttorneyPortalRoutingModule,
-    FormsModule
+    FormsModule,
+    AttorneyClientAdminComponent
   ]
 })
 export class AttorneyPortalModule { }

@@ -54,6 +54,7 @@ export interface Offender {
   attorneyAdded?: string;
   attorneyRecord?: attorneyRecord[]; // The Assigned Attorneys
   attorneyAppRecordID?: string; // Database ID from attyApplications for this record
+  lateCheckin?: boolean
 }
 export interface attorneyRecord {
   firebaseID?: string;

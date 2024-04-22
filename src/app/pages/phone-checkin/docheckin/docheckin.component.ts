@@ -18,21 +18,21 @@ export class DocheckinComponent implements OnInit, AfterViewInit, AfterContentIn
   lon: string = '0.00';
   geolocation: boolean = true;
   apiLoaded: Observable<boolean>;
-  center: google.maps.LatLngLiteral = {
-    "lat": 0.0,
-    "lng": 0.0
-  };
-  zoom: 10;
-  markerOptions: google.maps.MarkerOptions = {draggable: false};
-  mapOptions: google.maps.MapOptions = {
-    zoomControl: true,
-    scrollwheel: false,
-    disableDoubleClickZoom: true,
-    mapTypeId: 'roadmap',
-    maxZoom: 18,
-    minZoom: 10,
-    gestureHandling: 'none',
-  };
+  // center: google.maps.LatLngLiteral = {
+  //   "lat": 0.0,
+  //   "lng": 0.0
+  // };
+  // zoom: 10;
+  // markerOptions: google.maps.MarkerOptions = {draggable: false};
+  // mapOptions: google.maps.MapOptions = {
+  //   zoomControl: true,
+  //   scrollwheel: false,
+  //   disableDoubleClickZoom: true,
+  //   mapTypeId: 'roadmap',
+  //   maxZoom: 18,
+  //   minZoom: 10,
+  //   gestureHandling: 'none',
+  // };
   BBMSID: string = '';
   AFISID: string = '';
   fName: string = '';
@@ -66,8 +66,9 @@ export class DocheckinComponent implements OnInit, AfterViewInit, AfterContentIn
   getDistanceCheckin() {
     let station = '';
        // Create an object showing AUTHORIZED Police Station name, Lat and Long
+      // 25.0728352,-77.3626624
       let policeStation = [
-          { "name": "Central Police Station Nassau","lat": 25.077521,"lon": -77.339841},
+          { "name": "Central Police Station Nassau","lat": 25.0710906,"lon": -77.3438926},
           { "name": "Elizabeth Estates Police Station Nassau","lat": 25.0367114,"lon": -77.2861464},
           { "name": "Carmichael Road Police Station Nassau","lat": 25.0179632,"lon": -77.3855093},
           { "name": "Southeastern Police Station Nassau","lat": 25.0185498,"lon": -77.3452121},
@@ -82,56 +83,59 @@ export class DocheckinComponent implements OnInit, AfterViewInit, AfterContentIn
           { "name": "Holiday Florida Test Location","lat": 28.1950350,"lon": -82.7399109},
 
       ];
+      this.continueCheckin();
       // Loop through the Police Station array and get the station that is within .25 miles of the user
-      for (let i = 0; i < policeStation.length; i++) {
-          let distance = this.calculateDistance(this.center.lat, this.center.lng, policeStation[i].lat, policeStation[i].lon);
-          if (distance < .25) {
-            station = policeStation[i].name;
-            // If the user is within .25 miles of a police station, continue
-              // Create a swal alert asking if the Defendant is at the station
-              swal.fire({
-                  title: 'Confirm',
-                  text: 'Are you at ' + station + '?',
-                  icon: 'question',
-                  showCancelButton: true,
-                  confirmButtonText: 'Yes',
-                  cancelButtonText: 'No'
-              }).then((result) => {
-                  // If the user confirms they are at the station, continue
-                  if (result.isConfirmed) {
-                    this.distance = distance.toFixed(2);
-                    this.policeStation = station;
-                    // Continue Check-in
-                      this.continueCheckin();
-                  } else {
-                      return;
-                  }
-              });
-          } else {
-            // Determine the closest police station to the user
-            let closest = 1000;
-            let closestStation = '';
-            for (let i = 0; i < policeStation.length; i++) {
-            let distance = this.calculateDistance(this.center.lat, this.center.lng, policeStation[i].lat, policeStation[i].lon);
-              if (distance < closest) {
-                closest = distance;
-                closestStation = policeStation[i].name;
-              }
-            }
-              // If the user is not within .25 miles of a police station, show an error
-              swal.fire({
-                  title: 'Not at an Authorized Location',
-                  text: 'Currently, the Closest Authorized Station to your location is ' + closestStation + ' which is approximately ' + closest.toFixed(2) + ' miles away.',
-                  icon: 'error',
-                  confirmButtonText: 'OK'
-              }).then((result) => {
-                if(result.isConfirmed) {
-                  this.continueCheckin();
-                }
-              });
-          }
-      }
-  }
+  //     for (let i = 0; i < policeStation.length; i++) {
+  //       // Calculate the distance between the user and the police station
+  //       let distance = this.calculateDistance(this.center.lat, this.center.lng, policeStation[i].lat, policeStation[i].lon);
+  //         if (distance < .25) {
+  //           station = policeStation[i].name;
+  //           // If the user is within .25 miles of a police station, continue
+  //             // Create a swal alert asking if the Defendant is at the station
+  //             swal.fire({
+  //                 title: 'Confirm',
+  //                 text: 'Are you at ' + station + '?',
+  //                 icon: 'question',
+  //                 showCancelButton: true,
+  //                 confirmButtonText: 'Yes',
+  //                 cancelButtonText: 'No'
+  //             }).then((result) => {
+  //                 // If the user confirms they are at the station, continue
+  //                 if (result.isConfirmed) {
+  //                   this.distance = distance.toFixed(2);
+  //                   this.policeStation = station;
+  //                   // Continue Check-in
+  //                     this.continueCheckin();
+  //                 } else {
+  //                     return;
+  //                 }
+  //             });
+  //         } else {
+  //           // Defendant is not at an authorized location
+  //           // Determine the closest police station to the user
+  //           let closest = 1000;
+  //           let closestStation = '';
+  //           for (let i = 0; i < policeStation.length; i++) {
+  //           let distance = this.calculateDistance(this.center.lat, this.center.lng, policeStation[i].lat, policeStation[i].lon);
+  //             if (distance < closest) {
+  //               closest = distance;
+  //               closestStation = policeStation[i].name;
+  //             }
+  //           }
+  //             // If the user is not within .25 miles of a police station, show an error
+  //             swal.fire({
+  //                 title: 'Not at an Authorized Location',
+  //                 text: 'Currently, the Closest Authorized Station to your location is ' + closestStation + ' which is approximately ' + closest.toFixed(2) + ' miles away.',
+  //                 icon: 'error',
+  //                 confirmButtonText: 'OK'
+  //             }).then((result) => {
+  //               if(result.isConfirmed) {
+  //                 this.continueCheckin();
+  //               }
+  //             });
+  //         }
+  //     }
+   }
 
   /**
    * Convert degrees to radians
@@ -142,6 +146,8 @@ export class DocheckinComponent implements OnInit, AfterViewInit, AfterContentIn
   }
   /**
    * Convert Latitude and Longitude of the users current location and the lat and long provided to miles using the Haversine formula
+   * @param lat1 is the current latitude of the user
+   * @param lon1 is the current longitude of the user
    * @param lat2 is the latitude of the police station the defendant is currently at
    * @param lon2 is the longitude of the police station the defendant is currently at
    */
@@ -256,7 +262,7 @@ export class DocheckinComponent implements OnInit, AfterViewInit, AfterContentIn
     if (this.year < 1900) {
       swal.fire({
         title: 'Error',
-        text: 'Please enter a valid year',
+        text: 'Please enter a valid 4 digit year',
         icon: 'error',
         confirmButtonText: 'OK'
       }).then(() => {
@@ -517,10 +523,10 @@ export class DocheckinComponent implements OnInit, AfterViewInit, AfterContentIn
       navigator.geolocation.getCurrentPosition((position) => {
         this.lat = position.coords.latitude.toString();
         this.lon = position.coords.longitude.toString();
-        this.center = {
-          "lat": position.coords.latitude,
-          "lng": position.coords.longitude
-        }
+        // this.center = {
+        //   "lat": position.coords.latitude,
+        //   "lng": position.coords.longitude
+        // }
         this.apiLoaded = null;
         this.apiLoaded = this.httpClient.jsonp('https://maps.googleapis.com/maps/api/js?key=AIzaSyAj0NVNgZvAy3iFvAmUIr2szCApUqC4bv0', 'callback')
           .pipe(
@@ -550,10 +556,10 @@ export class DocheckinComponent implements OnInit, AfterViewInit, AfterContentIn
       navigator.geolocation.getCurrentPosition((position) => {
         this.lat = position.coords.latitude.toString();
         this.lon = position.coords.longitude.toString();
-        this.center = {
-          "lat": position.coords.latitude,
-          "lng": position.coords.longitude
-        }
+        // this.center = {
+        //   "lat": position.coords.latitude,
+        //   "lng": position.coords.longitude
+        // }
         this.apiLoaded = this.httpClient.jsonp('https://maps.googleapis.com/maps/api/js?key=AIzaSyAj0NVNgZvAy3iFvAmUIr2szCApUqC4bv0', 'callback')
           .pipe(
             map((d) => {

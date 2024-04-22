@@ -13,23 +13,29 @@ import {Members} from "../../models/members";
 })
 export class AttorneyPortalComponent implements OnDestroy, OnInit {
 
+  searchPage = true
+  adminPage = false
+
   // Create Payment Variables
 
   currentDate:string = '';
   lastName: String = '';
   dob: string = '';
+  searchData: Offender[] = [];
   selectedDefendantToAdd: Offender;
   addDefendantSubscription: Subscription;
+  addCurrentOffenderSubscription: Subscription;
   currentUser: Members;
   activeClients: Offender[] = [];
+  selectedClient: Offender;
 
   constructor(private db: AngularFirestore) {
     this.currentDate = moment().format("YYYY-MM-DD hh:mm A");
     this.currentUser = JSON.parse(localStorage.getItem('member'));
-    console.log('currentUser:',this.currentUser)
+
 
     // Get all Clients that this attorney represents from users collection where attorneyID is equal to currentUser ID
-      this.db.collection('users', ref => ref.where('attorneyID', '==', this.currentUser.id)).valueChanges().subscribe((data: Offender[]) => {
+    this.addCurrentOffenderSubscription = this.db.collection('users', ref => ref.where('attorneyID', '==', this.currentUser.id)).valueChanges().subscribe((data: Offender[]) => {
         this.activeClients = data;
         console.log('active:', this.activeClients);
       });
@@ -44,85 +50,85 @@ export class AttorneyPortalComponent implements OnDestroy, OnInit {
    *
    * @returns {void}
    */
-  getDefendant() {
+  searchOffenders() {
 
-    // Get this.lastName and uppercase the first letter and lowercase the remaining letters
-    this.lastName = this.lastName.charAt(0).toUpperCase() + this.lastName.slice(1).toLowerCase();
-
-    console.log('DOB:', this.dob);
-    // Check this.dob to see if its a valid date in the format of 'yyyy-mm-dd' and if not, create a Swal Dialog telling the user to enter a valid Date of Birth
-    if (!moment(this.dob, 'YYYY-MM-DD', true).isValid()) {
+    // Check that this.lastName and this.dob are not empty and if they are, create a Swal Dialog telling the user to enter a Last Name and Date of Birth
+    if (this.lastName === '' || this.dob === '') {
       Swal.fire({
-        title: 'Invalid Date of Birth',
-        text: 'Please enter a valid Date of Birth!',
+        title: 'Missing Information',
+        text: 'Please enter a Last Name and Date of Birth!',
         icon: 'error'
       });
       return;
     }
 
-    this.addDefendantSubscription = this.db.collection('users', ref => ref.where('lName', '==', this.lastName)).valueChanges().pipe(take(1)).subscribe((data: Offender[]) => {
+    // Get this.lastName and uppercase the first letter and lowercase the remaining letters
+    this.lastName = this.lastName.charAt(0).toUpperCase() + this.lastName.slice(1).toLowerCase();
 
-      if (data.length > 1) {
-        const inputOptions = {};
-        data.forEach((defendant, index) => {
-          inputOptions[index] = `${defendant.fName} ${defendant.mName} ${defendant.lName}`
-        });
-
+    // Get the Defendants from the database where the last name is equal to this.lastName and the date of birth is equal to this.dob
+     this.addDefendantSubscription = this.db.collection('users', ref => ref.where('lName', '==', this.lastName).where('dob', '==', this.dob)).valueChanges().subscribe((data: Offender[]) => {
+      this.searchData = data;
+      // If there are no Defendants with the last name and date of birth, create a Swal Dialog telling the user that there are no Defendants with that last name and date of birth
+      if (this.searchData.length === 0) {
         Swal.fire({
-          title: 'Multiple Defendants Found',
-          text: 'Multiple Defendants where found with that Last name and Date of Birth. Please select your Client:',
-          input: 'select',
-          inputOptions: inputOptions,
-          showCancelButton: true
-        }).then(result => {
-          if (result.isConfirmed) {
-            this.selectedDefendantToAdd = data[result.value];
-            this.selectedDefendantToAdd.attorneyID = this.currentUser.id;
-            this.selectedDefendantToAdd.attorneyName = this.currentUser.name;
-            this.selectedDefendantToAdd.attorneyAdded = this.getCurrentDateTime();
-            console.log('Defendant: ', this.selectedDefendantToAdd);
-            this.attorneyAddedDialog(this.selectedDefendantToAdd);
-          }
-        });
-      } else if (data.length === 1) {
-        this.selectedDefendantToAdd = data[0];
-        this.selectedDefendantToAdd.attorneyID = this.currentUser.id;
-        this.selectedDefendantToAdd.attorneyName = this.currentUser.name;
-        this.selectedDefendantToAdd.attorneyAdded = this.getCurrentDateTime();
-        console.log('Defendant: ', this.selectedDefendantToAdd);
-        this.attorneyAddedDialog(this.selectedDefendantToAdd);
-      } else {
-        Swal.fire({
-          title: 'No records found',
-          text: 'No records were found with that last name and date of birth',
+          title: 'No Defendants Found',
+          text: 'There are no Defendants with that last name and date of birth!',
           icon: 'error'
         });
-        return;
       }
-    })
+    });
+  }
+  doSelectAdd(offender) {
+   // Create a Swal dialog asking the user to affirm adding this offender to their list of clients
+    Swal.fire({
+      title: 'Add Defendant?',
+      text: 'Are you sure you want to add this Defendant to your list of clients? The court administrator will be notified!',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // If the user clicks yes, add the offender to the users collection where the attorneyID is equal to the current user's ID
+        this.db.collection('users').doc(offender.id).update({attorneyID: this.currentUser.id, attorneyName: this.currentUser.fName + ' ' + this.currentUser.lName}).then(() => {
+          Swal.fire({
+            title: 'Defendant Added!',
+            text: 'The Defendant has been added to your list of clients!',
+            icon: 'success'
+          });
+          this.searchData = [];
+          this.lastName = '';
+          this.dob = '';
+        }).catch((error) => {
+          Swal.fire({
+            title: 'Error!',
+            text: 'There was an error adding the Defendant to your list of clients! Please try again later!',
+            icon: 'error'
+          });
+        });
 
+      }
+    });
   }
 
-  attorneyAddedDialog(def: Offender) {
-    // Create a Swal Dialog letting the user know that the Defendant was added as a Client and the courts have been notified. Include the Defendants name and Date of Birth
-    Swal.fire({
-      title: 'Defendant Added',
-      text: `Defendant ${def.fName} ${def.lName} with Date of Birth ${def.dob} has been added as a Client and the courts have been notified.`,
-      icon: 'success'
-    }).then(result => {
-      this.selectedDefendantToAdd = {};
-      this.lastName = '';
-      this.dob = '';
-      return;
-    });
+  doSelectClient(client) {
+    this.selectedClient = client;
+    this.searchPage = false;
+    this.adminPage = true;
   }
 
   ngOnInit(): void {
 
   }
 
-  ngOnDestroy(): void {
+  closeAdmin() {
+    this.searchPage = true;
+    this.adminPage = false;
+  }
 
+  ngOnDestroy(): void {
+    this.addDefendantSubscription.unsubscribe();
+    this.addCurrentOffenderSubscription.unsubscribe();
   }
 
   /**

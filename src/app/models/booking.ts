@@ -5,6 +5,7 @@ export interface Booking {
   linkedOffenderID?: string;
   judgeID?: string;
   courtroom?: string;
+  court?: string;
   afisID?: string;
   offender?: string;
   offenderName?: string;
@@ -142,4 +143,5 @@ export interface Booking {
   bailAmount?: string;
   unlockCode?: string;
   magistrateEmailSent?: boolean;
+  lateCheckin?: boolean;
 }

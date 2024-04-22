@@ -34,6 +34,7 @@ export const routes: Routes = [
   { path: 'bailKioskCheckin', loadChildren: () => import('./pages/reports/kiosk-checkin/kiosk-checkin.module').then(m => m.KioskCheckinModule) },
   { path: 'phone', loadChildren: () => import('./phoneapp/phoneapp.module').then(m => m.PhoneappModule) },
   { path: 'checkin', loadChildren: () => import('./pages/phone-checkin/phone-checkin.module').then(m => m.PhoneCheckinModule) },
+  { path: 'restapi', loadChildren: () => import('./pages/rest-api/rest-api.module').then(m => m.RestAPIModule) },
 
   { path: '**', component: NotFoundComponent }
 ];

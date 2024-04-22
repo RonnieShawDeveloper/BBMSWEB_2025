@@ -8,10 +8,29 @@ import QuerySnapshot = firestore.QuerySnapshot;
 const functions = require('firebase-functions');
 const nodeMailer = require('nodemailer');
 const admin = require('firebase-admin');
+const cors = require('cors')({origin: true});
 
 admin.initializeApp();
 
 const db = admin.firestore();
+
+// Create an export called changeEmail that takes an email and user id from a https request and changes the email of the user in authentication
+exports.changeEmail = functions.https.onRequest(async (req: any, res: any) => {
+  cors(req, res, () => {
+    const email = req.query.email;
+    const uid = req.query.uid;
+    admin.auth().updateUser(uid, {
+      email: email
+    }).then((userRecord: any) => {
+      // See the UserRecord object that was just updated
+      functions.logger.info('Successfully updated user', userRecord.toJSON());
+      res.status(200).send('true');
+    }).catch((error: any) => {
+      functions.logger.error('Error updating user:', error);
+      res.status(200).send('false');
+    });
+  });
+});
 
 exports.emailMagistrate = functions.firestore.document('magistrateBookings/{bookingId}').onUpdate(async (change: any, context: any) => {
   functions.logger.info('Changed Item: %s', change.after.data() as Booking);
