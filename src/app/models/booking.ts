@@ -66,9 +66,14 @@ export interface Booking {
   bailStatus?: string;
   suretorStatus?: string;
   suretorName?: string;
-  surtorAssignDate?: string;
+  suretorAssignDate?: string;
   suretorNIB?: string;
   suretorDOB?: string;
+  suretorStatus2?: string;
+  suretorName2?: string;
+  suretorAssignDate2?: string;
+  suretorNIB2?: string;
+  suretorDOB2?: string;
   conditionsChecked?: string;
   kioskAssigned?: string;
   offenderReleased?: string;
@@ -126,6 +131,7 @@ export interface Booking {
   released?: boolean;
   checkLocation?: string;
   bailstatus?: string;
+  custodyStatus?: string;
   attorneyName?: string;
   aogResp?: boolean;
   aogRespDate?: string;

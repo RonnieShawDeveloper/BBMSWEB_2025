@@ -2,7 +2,7 @@
     <div class="d-flex flex-column w-100">
         <div class="d-flex justify-content-start align-items-center top-navbar">
             <div class="text-white font-weight-bold" style="margin-left: 150px; font-size: 11px; line-height: 11px">
-              <div>{{member.lName}}, {{member.fName}} {{member.mName}}
+              <div>{{member.lName}}, {{member.fName}} {{member.mName}} | <span class="text-warning font-weight-bold">IP ADDRESS: {{ipAddress}}</span> |
                 <span *ngIf="member.authAdmin" class="badge badge-warning badge-pill m-1">ADMIN</span>
                 <span *ngIf="member.authJudge" class="badge badge-success badge-pill m-1">JUSTICE</span>
                 <span *ngIf="member.authJudgeClerk" class="badge badge-success badge-pill m-1">JUDICIAL ASSISTANT</span>
@@ -11,20 +11,34 @@
                 <span *ngIf="member.authClerk" class="badge badge-success badge-pill m-1">INTAKE/BDOCS</span>
                 <span *ngIf="member.authRegistrar" class="badge badge-success badge-pill m-1">CRIMINAL REGISTRY</span>
                 <span *ngIf="member.authRegistrarClerk" class="badge badge-success badge-pill m-1">CRIMINAL REGISTRY STAFF</span>
-                <br><span class="text-warning">Member Since:</span> {{member.memberSince}} <span class="text-warning">Last Login:</span> {{member.lastLogin}}</div>
+                <br>
+                <!-- Show the dates to the logged in user -->
+                <span class="text-warning">Member Since:</span> {{ member.memberSince | date: 'medium' }} 
+                <span class="text-warning">Last Login:</span> {{ member.lastLogin | date: 'medium' }}
+
+              </div>
             </div>
 
             <div class="top-rigth-icons ml-auto">
-                <span class="mb-1 mt-0 mr-1 btn btn-outline-danger btn-sm" style="padding: 0px 2px; font-size: 14px; border-radius: 8px; line-height: 19px" (click)="doCheckForUpdates()" >
-                        <i class="fa fa-gear" aria-hidden="true"></i> CHECK FOR UPDATES
+                <span
+                  *ngIf="updateAvailable"
+                  class="mb-1 mt-0 mr-1 btn btn-danger btn-sm text-white"
+                  style="padding: 0px 2px; font-size: 14px; border-radius: 8px; line-height: 19px"
+                  (click)="reloadPage()"
+                >
+                  <i class="fa fa-refresh fa-spin" aria-hidden="true"></i> UPDATE AVAILABLE - INSTALL UPDATE
                 </span>
                 <span class="hidden-xs-down">
-                    <app-user-menu></app-user-menu>
+                  <app-user-menu></app-user-menu>
                 </span>
-                <span class="mb-1 mt-0 btn btn-outline-warning btn-sm" style="padding: 0px 2px; font-size: 14px; border-radius: 8px; line-height: 19px" (click)="logout()" >
-                        <i class="fa fa-sign-out" aria-hidden="true"></i> LOGOUT
+                <span
+                  class="mb-1 mt-0 btn btn-outline-warning btn-sm"
+                  style="padding: 0px 2px; font-size: 14px; border-radius: 8px; line-height: 19px"
+                  (click)="logout()"
+                >
+                  <i class="fa fa-sign-out" aria-hidden="true"></i> LOGOUT
                 </span>
-            </div>
+              </div>
 
         </div>
 
@@ -34,8 +48,5 @@
             <app-vertical-menu *ngIf="!showHorizontalMenu"  [menuItems]="menuItems"></app-vertical-menu>
 
         </div>
-
-
-
     </div>
 </nav>

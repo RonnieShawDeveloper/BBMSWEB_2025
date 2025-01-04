@@ -13,6 +13,7 @@ export interface Members {
   name?: string;
   dob?: string;
   spn?: string;
+  ipAddress?: string;
   authClerk?: boolean;
   authRegistrar?: boolean;
   authRegistrarClerk?: boolean;

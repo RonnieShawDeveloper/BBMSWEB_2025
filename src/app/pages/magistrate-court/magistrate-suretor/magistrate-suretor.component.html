@@ -1,0 +1,40 @@
+<div class="mb-3" style="background-color: blue">
+  <div class="text-center font-weight-bold text-white" style="font-size: 26px">SURETOR REPORT</div>
+</div>
+<div class="btn btn-success mb-2" (click)="doExit()">EXIT REPORT</div>
+<div class="row m-0 border border-dark">
+  <div class="col-4">
+    <div class="font-weight-bold">Suretor Name / DOB / NIB</div>
+  </div>
+  <div class="col-4">
+    <div class="font-weight-bold">Defendant Name</div>
+  </div>
+  <div class="col-4">
+    <div class="font-weight-bold">Assigned Date</div>
+  </div>
+</div>
+<div *ngFor="let s of suretors">
+  <div *ngIf="checkDuplicate(s.suretorName) == true" class="bg-danger text-white row m-0 border-bottom border-danger">
+    <div class="col-4">
+      <div class="">{{s.suretorName.toUpperCase()}} {{s.suretorDOB}} {{s.suretorNIB}}</div>
+    </div>
+    <div class="col-4">
+      <div class="">{{s.lastName}}, {{s.firstName}} {{s.middleName}} | ID: {{s.id}}</div>
+    </div>
+    <div class="col-4">
+      <div class="">{{s.surtorAssignDate}}</div>
+    </div>
+  </div>
+  <div *ngIf="checkDuplicate(s.suretorName) == false" class="row m-0 border-bottom border-dark">
+    <div class="col-4">
+      <div class="">{{s.suretorName.toUpperCase()}} {{s.suretorDOB}} {{s.suretorNIB}}</div>
+    </div>
+    <div class="col-4">
+      <div class="">{{s.lastName}}, {{s.firstName}} {{s.middleName}} | ID: {{s.id}}</div>
+    </div>
+    <div class="col-4">
+      <div class="">{{s.surtorAssignDate}}</div>
+    </div>
+  </div>
+</div>
+<div class="btn btn-success mb-2" (click)="doExit()">EXIT REPORT</div>

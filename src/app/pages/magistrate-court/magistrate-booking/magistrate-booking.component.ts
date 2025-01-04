@@ -13,6 +13,9 @@ import swal from "sweetalert2";
 import {take} from "rxjs/operators";
 import {Afis} from "../../../models/afis";
 import {HttpClient} from "@angular/common/http";
+import {AngularFireAuth} from "@angular/fire/compat/auth";
+import {getAuth, reauthenticateWithCredential} from "@angular/fire/auth";
+import firebase from "firebase/compat/app";
 
 
 @Component({
@@ -47,7 +50,8 @@ export class MagistrateBookingComponent implements OnInit, OnDestroy, AfterViewI
   subscriptions: any[] = [];
   crimeCodes: { code?: string, value?: string }[] = [];
 
-  constructor(private hs: HelperService, private fs: AngularFirestore, private storage: AngularFireStorage, private http: HttpClient) {
+  user = getAuth().currentUser;
+  constructor(private hs: HelperService,private auth: AngularFireAuth, private fs: AngularFirestore, private storage: AngularFireStorage, private http: HttpClient) {
   }
 
   ngOnInit(): void {
@@ -99,6 +103,7 @@ export class MagistrateBookingComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   ngAfterViewInit(): void {
+    window.scrollTo(0, 0);
     // add an event listener to every input field and listen for a change and set the not saved variable to true
     const inputs = document.querySelectorAll('input');
     for (let i = 0; i < inputs.length; i++) {
@@ -266,69 +271,102 @@ export class MagistrateBookingComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   approveSurtor() {
-    // Create a SWAL dialog asking the user to select approve or deny the Suretor using 2 checkboxes and allow the user to enter a comment using a textarea and then save the booking event to the firestore database called 'BookingEvents' and then provide a SWAL Toast to the user letting them know the booking event was saved successfully
-    Swal.fire({
-      title: 'Approve Suretor',
-      html: '<div class="form-check"><input class="form-check-input" type="checkbox" value="" id="approveSuretor"><label class="form-check-label" for="approveSuretor">Approve Suretor and Documents</label></div>' +
-        '<div class="form-check"><input class="form-check-input" type="checkbox" value="" id="denySuretor"><label class="form-check-label" for="denySuretor">Deny Suretor and Documents</label></div>' +
-        '<div class="form-group"><label for="comment">Comments, Reasoning and Instructions:</label><textarea class="form-control" id="comment" rows="3"></textarea></div>',
+    // Create a swal dialog asking for the users password
+     Swal.fire({
+      title: 'Reauthentication Needed',
+      html: 'This is a Secured Feature, please re-enter your password to continue<br><input type="password" id="password" class="swal2-input" placeholder="Enter your password">',
       showCancelButton: true,
-      confirmButtonText: 'Save',
+      confirmButtonText: 'Reauthenticate',
       showLoaderOnConfirm: true,
+
       preConfirm: () => {
-        // Get the comment from the textarea
-        const comment = (document.getElementById('comment') as HTMLTextAreaElement).value;
-        // Get the approve checkbox value
-        const approve = (document.getElementById('approveSuretor') as HTMLInputElement).checked;
-        // Get the deny checkbox value
-        const deny = (document.getElementById('denySuretor') as HTMLInputElement).checked;
-        // Create a new event ID and set the event ID equal to the new event ID
-        this.eventID = this.fs.createId();
-        // Create a new booking event and set the booking event properties
-        const bookingEvent: BookingEvents = {
-          id: this.eventID,
-          bookingID: this.activeBooking.id,
-          type: 'approveSurtor',
-          offenderName: this.activeBooking.firstName + ' ' + this.activeBooking.lastName,
-          title: approve ? 'Suretor/Documents Approved' : 'Suretor/Documents Denied' + ' by ' + this.currentMember.fName + ' '+ this.currentMember.lName,
-          description: comment,
-          status: 'active',
-          link: '',
-          date: new Date().toDateString(),
-          unixDate: Date.now().toString(),
-          comment: comment,
-          approved: approve,
-          denied: deny,
-        };
-        // Save the booking event to the firestore database called 'BookingEvents' and then provide a SWAL Toast to the user letting them know the booking event was saved successfully
-        this.fs.collection('BookingEvents').doc(this.eventID).set(bookingEvent).then(() => {
+        // Get the password from the input field
+        const password = (document.getElementById('password') as HTMLInputElement).value;
+        return password;
+      }
+    }).then((result) => {
+      if(result.isConfirmed) {
+        console.log('Password', result);
+        // Reauthenticate the user using the email and password
+        reauthenticateWithCredential(this.user, firebase.auth.EmailAuthProvider.credential(this.user.email, result.value)).then(() => {
+          // Create a SWAL dialog asking the user to select approve or deny the Suretor using 2 checkboxes and allow the user to enter a comment using a textarea and then save the booking event to the firestore database called 'BookingEvents' and then provide a SWAL Toast to the user letting them know the booking event was saved successfully
           Swal.fire({
-            title: 'Ruling Submitted',
-            text: 'The Ruling was submitted successfully.',
-            icon: 'success',
-            showConfirmButton: false,
-            timer: 2500,
-            timerProgressBar: true,
-            color: '#000000',
-            iconColor: '#000000',
-            toast: true,
-            position: 'top-end',
-            background: '#00ff00',
+            title: 'Approve Suretor',
+            html: '<div class="form-check"><input class="form-check-input" type="checkbox" value="" id="approveSuretor"><label class="form-check-label" for="approveSuretor">Approve Suretor and Documents</label></div>' +
+              '<div class="form-check"><input class="form-check-input" type="checkbox" value="" id="denySuretor"><label class="form-check-label" for="denySuretor">Deny Suretor and Documents</label></div>' +
+              '<div class="form-group"><label for="comment">Comments, Reasoning and Instructions:</label><textarea class="form-control" id="comment" rows="3"></textarea></div>',
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+              // Get the comment from the textarea
+              const comment = (document.getElementById('comment') as HTMLTextAreaElement).value;
+              // Get the approve checkbox value
+              const approve = (document.getElementById('approveSuretor') as HTMLInputElement).checked;
+              // Get the deny checkbox value
+              const deny = (document.getElementById('denySuretor') as HTMLInputElement).checked;
+              // Create a new event ID and set the event ID equal to the new event ID
+              this.eventID = this.fs.createId();
+              // Create a new booking event and set the booking event properties
+              const bookingEvent: BookingEvents = {
+                id: this.eventID,
+                bookingID: this.activeBooking.id,
+                type: 'approveSurtor',
+                offenderName: this.activeBooking.firstName + ' ' + this.activeBooking.lastName,
+                title: approve ? 'Suretor/Documents Approved' : 'Suretor/Documents Denied',
+                description:  'by Magistrate ' + this.currentMember.name,
+                status: 'active',
+                link: '',
+                date: new Date().toDateString(),
+                unixDate: Date.now().toString(),
+                comment: comment,
+                approved: approve,
+                denied: deny,
+              };
+              // Save the booking event to the firestore database called 'BookingEvents' and then provide a SWAL Toast to the user letting them know the booking event was saved successfully
+              this.fs.collection('BookingEvents').doc(this.eventID).set(bookingEvent).then(() => {
+                Swal.fire({
+                  title: 'Ruling Submitted',
+                  text: 'The Ruling was submitted successfully.',
+                  icon: 'success',
+                  showConfirmButton: false,
+                  timer: 2500,
+                  timerProgressBar: true,
+                  color: '#000000',
+                  iconColor: '#000000',
+                  toast: true,
+                  position: 'top-end',
+                  background: '#00ff00',
+                });
+                this.activeBooking.bailStatus = approve ? 'approved' : 'denied';
+                this.saveupdate();
+              }).catch((error) => {
+                // Create a Swal message letting the user know the booking event was not saved successfully
+                Swal.fire({
+                  title: 'ERROR - Ruling Not Saved',
+                  text: 'The Ruling was not saved successfully.',
+                  icon: 'error',
+                  confirmButtonText: 'OK'
+                });
+              });
+            }
+          }).then((result) => {
+
           });
-          this.activeBooking.bailStatus = approve ? 'approved' : 'denied';
-          this.saveupdate();
         }).catch((error) => {
-          // Create a Swal message letting the user know the booking event was not saved successfully
+          // Create a Swal message letting the user know the password was incorrect
           Swal.fire({
-            title: 'Ruling Not Saved',
-            text: 'The Reling was not saved successfully.',
+            title: 'Password Incorrect',
+            text: 'The password you entered was incorrect.',
             icon: 'error',
             confirmButtonText: 'OK'
           });
+          return;
         });
+      } else {
+        return;
       }
-    }).then((result) => {
-
+      return;
     });
   }
 
@@ -754,94 +792,132 @@ export class MagistrateBookingComponent implements OnInit, OnDestroy, AfterViewI
     });
   }
 
-   doAttchSuretor() {
-    // Open a SWAL dialog and ask the user for the Suretors full name, date of birth and NIB number and then save the info to the magistratebooking and then save the magistratebooking to the firestore database called 'magistrateBookings' where 'id' is equal to the booking id and provide a SWAL Toast to the user letting them know the booking was saved successfully
-    Swal.fire({
-      title: 'Attach Suretor',
-      html: '<div class="form-group"><label for="suretorName">Suretor Name:</label><input type="text" class="form-control" id="suretorName" placeholder="Enter Suretor Name"></div>' +
-        '<div class="form-group"><label for="suretorDOB">Suretor Date of Birth:</label><input type="date" class="form-control" id="suretorDOB" placeholder="Enter Suretor Date of Birth"></div>' +
-        '<div class="form-group"><label for="suretorNIB">Suretor NIB Number:</label><input type="text" class="form-control" id="suretorNIB" placeholder="Enter Suretor NIB Number"></div>',
-      showCancelButton: true,
-      confirmButtonText: 'Attach Suretor',
-      showLoaderOnConfirm: true,
-      preConfirm: () => {
-        // Get the suretor name from the input box
-        const suretorName = (document.getElementById('suretorName') as HTMLInputElement).value;
-        // Get the suretor DOB from the input box
-        const suretorDOB = (document.getElementById('suretorDOB') as HTMLInputElement).value;
-        // Get the suretor NIB from the input box
-        const suretorNIB = (document.getElementById('suretorNIB') as HTMLInputElement).value;
-
-        try {
-          // get all magistratebookings with the same suretorNIB as the activeBooking.suretorNIB and store them in the suretorBookings array
-          this.subscriptions.push(this.fs.collection('magistrateBookings', ref =>
-            ref.where('suretorNIB', '==', suretorNIB)).valueChanges().pipe(take(1)).subscribe((data: Booking[]) => {
-            console.log('Suretor Bookings Search Completed', data);
-            if (data.length >= 1) {
-              // Create a SWAL Dialog telling the user that there is already a Suretor with the same NIB number
-             Swal.fire({
-                title: 'Suretor Already Exists',
-                html: 'There is already a Suretor with the same NIB number as this Suretor.<br><br><b>Booking ID:</b> ' + data[0].id + '<br><b>Offender Name:</b> ' + data[0].firstName + ' ' + data[0].lastName + '<br><b>Offender DOB:</b> ' + data[0].dob,
+  doAttachSuretor2() {
+    // Check to see if there are already 2 suretors attached to the booking and if so, provide a swal message to the user telling them they can only have 2 suretors attached to a booking and then return
+    if (this.activeBooking.suretorNIB2 && this.activeBooking.suretorNIB) {
+      Swal.fire({
+        title: 'Suretor Already Attached',
+        text: 'You can only have 2 Suretors attached to a booking.',
+        icon: 'warning',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
+    // Write an async function that will open a SWAL dialog and ask the user for the Suretors full name, date of birth and NIB number and then save the info to the magistrateBooking and then save the magistratebooking to the firestore database called 'magistrateBookings' where 'id' is equal to the booking id and provide a SWAL Toast to the user letting them know the booking was saved successfully
+    (async () => {
+      const {value: suretorNIB} = await Swal.fire({
+        title: 'Attach Suretor',
+        input: 'text',
+        inputLabel: 'Suretor NIB',
+        inputPlaceholder: 'Enter Suretor NIB',
+        inputAttributes: {
+          'aria-label': 'Type the Suretor NIB here'
+        },
+        showCancelButton: true
+      })
+      const {value: suretorName} = await Swal.fire({
+        title: 'Attach Suretor',
+        input: 'text',
+        inputLabel: 'Suretor Name',
+        inputPlaceholder: 'Enter Suretor Full Name',
+        inputAttributes: {
+          'aria-label': 'Type the Suretor Full Name'
+        },
+        showCancelButton: true
+      })
+      const {value: suretorDOB} = await Swal.fire({
+        title: 'Attach Suretor',
+        input: 'date',
+        inputLabel: 'Suretor DOB',
+        inputPlaceholder: 'Enter Suretor DOB',
+        inputAttributes: {
+          'aria-label': 'Type the Suretor DOB here'
+        },
+        showCancelButton: true
+      })
+    if (suretorNIB && suretorName && suretorDOB) {
+      try{
+        // Get all magistrateBookings where the suretorNIB is not null and store them in the suretorBookings array
+        this.subscriptions.push(this.fs.collection('magistrateBookings',ref => ref.where('suretorNIB', '!=', "")).valueChanges().pipe(take(1)).subscribe((data: Booking[]) => {
+          console.log('Data', data);
+          // Loop through all the suretorBookings and see if the suretorNIB exist in the 'suretorNIB' field
+          for (let i = 0; i < data.length; i++) {
+            if (data[i].suretorNIB == suretorNIB || data[i].suretorNIB2 == suretorNIB) {
+              // Create a SWAL dialog asking if they wish to continue adding this Suretor. If they choose NO, return else saveSuretor
+              Swal.fire({
+                title: 'Suretor Already Attached',
+                html: 'There is already a Suretor with the same NIB number as this Suretor.<br><br><b>Booking ID:</b> ' + data[i].id + '<br><b>Offender Name:</b> ' + data[i].firstName + ' ' + data[i].lastName + '<br><b>Offender DOB:</b> ' + data[i].dob,
                 icon: 'warning',
-                confirmButtonText: 'OK',
-                showCancelButton: true,
-                cancelButtonText: 'CANCEL'
+                showCancelButton: false,
+                confirmButtonText: 'Exit',
               }).then((result) => {
-                if(result.isConfirmed) {
+                if (result.isConfirmed) {
+                  // this.saveSurtor(suretorName, suretorDOB, suretorNIB);
+                  return;
+                } else {
                   return;
                 }
-                return;
               });
-             return;
-            }
-
-            // Get all BookingEvents with the type of 'attachSuretor'
-            this.subscriptions.push(this.fs.collection('BookingEvents', ref =>
-              ref.where('type', '==', 'attachSuretor')).valueChanges().pipe(take(1)).subscribe((data: BookingEvents[]) => {
-              // Loop through all the BookingEvents and see if the Suretor NIB exist in the 'Title' field
-              for (let i = 0; i < data.length; i++) {
-                if (data[i].title.includes(suretorNIB)) {
-                 // Create a SWAL dialog asking if they wish to continue adding this Suretor. If they choose NO, return else saveSuretor
-                  Swal.fire({
-                    title: 'Suretor Already Attached',
-                    html: 'There is already a Suretor with the same NIB number as this Suretor.<br><br><b>Booking ID:</b> ' + data[i].bookingID + '<br><b>Offender Name:</b> ' + data[i].offenderName,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Continue',
-                    cancelButtonText: 'Cancel'
-                  }).then((result) => {
-                    if (result.isConfirmed) {
-                      this.saveSurtor(suretorName, suretorDOB, suretorNIB);
-                      return;
-                    } else {
-                      return;
-                    }
-                  });
-                  return;
-                }
-              }
-            }));
-            this.saveSurtor(suretorName, suretorDOB, suretorNIB);
-          }));
-        } catch (error) {
-          console.log('Error', error)
-        }
+              return;
+            }}
+          // Save the suretor to the booking
+          this.saveSurtor(suretorName, suretorDOB, suretorNIB);
+          return;
+          })
+        )
+      } catch (e) {
+        // Show a dialog with the error message
+        Swal.fire({
+          title: 'Error',
+          text: 'An error occured while searching for Suretor Bookings.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        })
       }
-    }).then((result) => {
+    } else {
+      Swal.fire({
+        title: 'Error',
+        text: 'You must enter a Suretor NIB, Name and DOB to continue.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      })
+      return;
+    }
 
-    } );
+    })();
   }
 
+
   saveSurtor(surName, surDOB, surNIB) {
-    console.log('Saving Suretor');
-    // Save the suretor name to the activeBooking
-    this.activeBooking.suretorName = surName;
-    // Save the suretor DOB to the activeBooking
-    this.activeBooking.suretorDOB = surDOB;
-    // Save the suretor NIB to the activeBooking
-    this.activeBooking.suretorNIB = surNIB;
-    // Save the Suretor Assign Date to the activeBooking
-    this.activeBooking.surtorAssignDate = new Date().toDateString();
+    // console.log('Saving Suretor');
+    if(this.activeBooking.suretorNIB == "" || this.activeBooking.suretorNIB == null || this.activeBooking.suretorNIB == undefined) {
+      // Save the suretor name to the activeBooking
+      this.activeBooking.suretorName = surName;
+      // Save the suretor DOB to the activeBooking
+      this.activeBooking.suretorDOB = surDOB;
+      // Save the suretor NIB to the activeBooking
+      this.activeBooking.suretorNIB = surNIB;
+      // Save the Suretor Assign Date to the activeBooking
+      this.activeBooking.suretorAssignDate = new Date().toDateString();
+    } else if(this.activeBooking.suretorNIB2 == "" || this.activeBooking.suretorNIB2 == null || this.activeBooking.suretorNIB2 == undefined) {
+      // Save the suretor name to the activeBooking
+      this.activeBooking.suretorName2 = surName;
+      // Save the suretor DOB to the activeBooking
+      this.activeBooking.suretorDOB2 = surDOB;
+      // Save the suretor NIB to the activeBooking
+      this.activeBooking.suretorNIB2 = surNIB;
+      // Save the Suretor Assign Date to the activeBooking
+      this.activeBooking.suretorAssignDate2 = new Date().toDateString();
+    } else {
+      // Create a Swal Dialog letting the user know that there can only be 2 suretors attached and one of the current suretors must be removed before adding another
+      Swal.fire({
+        title: 'Suretor Not Attached',
+        text: 'You can only have 2 Suretors attached to a booking. Please remove one of the current Suretors before adding another.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
     // Save the activeBooking to the firestore database called 'magistrateBookings' where 'id' is equal to the booking id and provide a SWAL Toast to the user letting them know the booking was saved successfully
     this.fs.collection('magistrateBookings').doc(this.activeBooking.id).set(this.activeBooking, {merge: true}).then(() => {
       Swal.fire({
@@ -874,7 +950,13 @@ export class MagistrateBookingComponent implements OnInit, OnDestroy, AfterViewI
       this.fs.collection('BookingEvents').doc(bookingEvent.id).set(bookingEvent).then(() => {
 
       }).catch((error) => {
-
+        // Create a swal message letting the user know the booking event was not saved successfully
+        swal.fire({
+          title: 'Booking Event Error - Suretor Not Attached Properly',
+          text: error,
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
       });
     }).catch((error) => {
       // Create a Swal message letting the user know the Suretor was not attached successfully
@@ -888,54 +970,89 @@ export class MagistrateBookingComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   removeSuretor(id: string) {
-    // Remove the BookingEvent using the id from the firestore database called 'BookingEvents'
-    this.fs.collection('BookingEvents').doc(id).delete().then(() => {
-    });
-    const surName = this.activeBooking.suretorName;
-    this.activeBooking.suretorNIB = '';
-    this.activeBooking.suretorName = '';
-    this.activeBooking.suretorDOB = '';
-    this.activeBooking.surtorAssignDate = '';
-    // Save the activeBooking to the firestore database called 'magistrateBookings' where 'id' is equal to the booking id and provide a SWAL Toast to the user letting them know the booking was saved successfully
-    this.fs.collection('magistrateBookings').doc(this.activeBooking.id).set(this.activeBooking, {merge: true}).then(() => {
-      Swal.fire({
-        title: 'Suretor Removed',
-        text: 'The Suretor was removed successfully.',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true,
-        color: '#ffffff',
-        iconColor: '#ffffff',
-        toast: true,
-        position: 'top-end',
-        background: '#ff0000',
-      });
-      // Create a bookingEvent and set the booking event properties
-      const bookingEvent: BookingEvents = {
-        id: this.fs.createId(),
-        bookingID: this.activeBooking.id,
-        type: 'removeSuretor',
-        offenderName: this.activeBooking.firstName + ' ' + this.activeBooking.lastName,
-        title: 'Suretor Removed',
-        description: 'Active Suretor ('+surName+') Removed by ' + this.currentMember.name + ' on ' + new Date().toDateString(),
-        status: 'active',
-        link: '',
-        date: new Date().toDateString(),
-        unixDate: Date.now().toString(),
-      };
-      // Save the bookingEvent to the firestore database called 'BookingEvents' and then provide a SWAL Toast to the user letting them know the booking event was saved successfully
-      this.fs.collection('BookingEvents').doc(bookingEvent.id).set(bookingEvent).then(() => {
+    let surName = '';
 
-      }).catch((error) => {
-        swal.fire({
-          title: 'Booking Event Error - Suretor Not Removed Properly',
-          text: error,
-          icon: 'error',
-          confirmButtonText: 'OK'
+    // Remove the BookingEvent using the id from the firestore database called 'BookingEvents'
+    // this.fs.collection('BookingEvents').doc(id).delete().then(() => {
+    // });
+    // Create a swal dialog with a select box of suretors and ask the user to select the suretor they wish to remove
+    // Must determine if removing Suretor 1 or 2
+    (async() => {
+      const {value: result} = await Swal.fire({
+        title: 'Remove Suretor',
+        html: 'Select the Suretor you wish to remove.',
+        input: 'select',
+        inputOptions: {
+          '1': this.activeBooking.suretorName,
+          '2': this.activeBooking.suretorName2,
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Remove Suretor',
+      }).then((result) => {
+        if(result.isConfirmed) {
+          return result;
+        } else if(result.isDismissed) {
+          return;
+        }
+      });
+      // console.log('Result: ', result);
+      if (result == '1') {
+        surName = this.activeBooking.suretorName;
+        this.activeBooking.suretorName = null;
+        this.activeBooking.suretorDOB = null;
+        this.activeBooking.suretorNIB = null;
+        this.activeBooking.suretorAssignDate = null;
+      } else if (result == '2') {
+        surName = this.activeBooking.suretorName2;
+        this.activeBooking.suretorName2 = null;
+        this.activeBooking.suretorDOB2 = null;
+        this.activeBooking.suretorNIB2 = null;
+        this.activeBooking.suretorAssignDate2 = null;
+      } else {
+        return;
+      }
+      // Save the activeBooking to the firestore database called 'magistrateBookings' where 'id' is equal to the booking id and provide a SWAL Toast to the user letting them know the booking was saved successfully
+      this.fs.collection('magistrateBookings').doc(this.activeBooking.id).set(this.activeBooking, {merge: true}).then(() => {
+        Swal.fire({
+          title: 'Suretor Removed',
+          text: 'The Suretor was removed successfully.',
+          icon: 'success',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true,
+          color: '#ffffff',
+          iconColor: '#ffffff',
+          toast: true,
+          position: 'top-end',
+          background: '#ff0000',
         });
+        // Create a bookingEvent and set the booking event properties
+        const bookingEvent: BookingEvents = {
+          id: this.fs.createId(),
+          bookingID: this.activeBooking.id,
+          type: 'removeSuretor',
+          offenderName: this.activeBooking.firstName + ' ' + this.activeBooking.lastName,
+          title: 'Suretor Removed',
+          description: 'Active Suretor ('+surName+') Removed by ' + this.currentMember.name + ' on ' + new Date().toDateString(),
+          status: 'active',
+          link: '',
+          date: new Date().toDateString(),
+          unixDate: Date.now().toString(),
+        };
+        // Save the bookingEvent to the firestore database called 'BookingEvents' and then provide a SWAL Toast to the user letting them know the booking event was saved successfully
+        this.fs.collection('BookingEvents').doc(bookingEvent.id).set(bookingEvent).then(() => {
+
+        }).catch((error) => {
+          swal.fire({
+            title: 'Booking Event Error - Suretor Not Removed Properly',
+            text: error,
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
         });
-    });
+      });
+    })();
+    return;
   }
 
 

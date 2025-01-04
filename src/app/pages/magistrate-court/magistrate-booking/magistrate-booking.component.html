@@ -232,7 +232,7 @@
         <div class="row">
           <div class="col d-flex flex-column justify-content-center align-items-center" style="padding-left: 35px;">
             <div>
-              <button class="btn btn-info" type="button" style="margin: 5px;" (click)="doAttchSuretor()">ATTACH SURETOR</button>
+              <button class="btn btn-info" type="button" style="margin: 5px;" (click)="doAttachSuretor2()">ATTACH SURETOR</button>
               <button class="btn btn-success" type="button" style="margin: 5px;" (click)="doDocumentUpload()">ADD DOCUMENT</button>
               <button class="btn btn-warning" type="button" style="margin: 5px;" (click)="submitMagistrate()">SUBMIT FOR APPROVAL</button>
               <button *ngIf="currentMember.authMagistrate || currentMember.authAdmin" class="btn btn-primary" type="button" style="margin: 5px;" (click)="approveSurtor()">APPROVE/DENY SURETOR</button>
@@ -247,6 +247,8 @@
                 <div *ngIf="doc.type != '' || doc.type != null">
                   <span *ngIf="doc.type=='newBooking'" class="text-primary">{{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
                   <div *ngIf="doc.type== 'newBooking' " class="small text-muted">{{doc.description}}</div>
+                  <span *ngIf="doc.type=='Custody'" class="text-primary">{{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
+                  <div *ngIf="doc.type== 'Custody' " class="small text-muted">{{doc.description}}</div>
                   <span *ngIf="doc.type=='removeSuretor'" class="text-primary">{{doc.title}} on {{convertUnixDate(doc.unixDate)}}</span>
                   <div *ngIf="doc.type== 'removeSuretor' " class="small text-muted">{{doc.description}}</div>
                   <span *ngIf="doc.type=='attachSuretor'" class="text-primary">{{doc.title}} on {{convertUnixDate(doc.unixDate)}} <i *ngIf="currentMember.authAdmin" class="fa fa-trash" style="cursor: pointer" (click)="removeSuretor(doc.id)"></i></span>

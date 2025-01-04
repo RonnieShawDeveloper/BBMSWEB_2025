@@ -20,7 +20,6 @@ export class DefendantMenuComponent implements OnInit, AfterViewInit {
   editmenu = false;
   changesMade = false;
   originalDefendant: Offender = {};
-  defendantPhotos: Photos[] = [];
 
   showDefendantMenu = true;
   showNewBookingWizard = false;
@@ -29,6 +28,8 @@ export class DefendantMenuComponent implements OnInit, AfterViewInit {
   mainPhotoUrl = '';
 
   showWeb = false; // Show the webcam player
+
+  streams: any;
 
   constructor(private af: AngularFirestore, private storage: AngularFireStorage) {
   }
@@ -44,7 +45,7 @@ export class DefendantMenuComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.originalDefendant = {...this.defendant};
+    // this.originalDefendant = {...this.defendant};
 
     console.log('Booking Defendant', this.defendant);
     // Using the 'defendant.id' property, search the firestore database called 'bookings' for 'offender' equal to the defendant's id using snapshotChanges()
@@ -62,19 +63,6 @@ export class DefendantMenuComponent implements OnInit, AfterViewInit {
         return b.bookDate - a.bookDate;
       });
     });
-
-
-    // get the defendant's photos using the Defendant's id from the firestore collection called 'photos' and put them into the defendantPhotos object
-    this.af.collection('photos', ref => ref.where('offenderID', '==', this.defendant.spn)).snapshotChanges().pipe(take(1)).subscribe((data: any) => {
-      // Create the events array from each booking in the data array with the fields 'bookDate', 'bookTime', 'bookingStatus', and 'classification'
-      this.defendantPhotos = data.map((photo) => {
-        return {
-          id: photo.payload.doc.id,
-          ...photo.payload.doc.data()
-        } as Photos;
-      });
-    });
-
   }
 
   // If the user clicks on the htmlImageElement with the id of 'webImage', open a large swal model with the image in it
@@ -90,7 +78,8 @@ export class DefendantMenuComponent implements OnInit, AfterViewInit {
   }
 
   updatePhoto() {
-    const currentImage = this.defendant.mainPhoto;
+    // Get the current main photo or set to default if no photo is found
+    const currentImage = this.defendant.mainPhoto != null ? this.defendant.mainPhoto : '/assets/img/users/default-user.jpg';
     // Create a modal that open the webcam and allows the user to take a photo
     Swal.fire({
       width: '700px',
@@ -122,8 +111,9 @@ export class DefendantMenuComponent implements OnInit, AfterViewInit {
           video: true,
           audio: false
         };
-        // Create a canvas element and add it to the modal
+
         navigator.mediaDevices.getUserMedia(webcamConstraints).then((stream) => {
+          this.streams = stream;
           webcamPlayer.srcObject = stream;
           webcamPlayer.play();
         });
@@ -204,12 +194,15 @@ export class DefendantMenuComponent implements OnInit, AfterViewInit {
         if (!currentImage.includes('default-user.jpg')) {
           // Delete the current image from the storage bucket using the secure image url
           this.storage.storage.refFromURL(currentImage).delete().then(() => {
-            // console.log('Image Deleted');
+            console.log('Image Deleted');
           }).catch((error) => {
             console.log('Error deleting image', error);
           });
         }
         // Turn off the webcam
+        this.streams.getTracks().forEach((track) => {
+          track.stop();
+        });
 
         // Create a swal alert to show the user that the photo is being uploaded and to please hold
         Swal.fire({
@@ -225,50 +218,48 @@ export class DefendantMenuComponent implements OnInit, AfterViewInit {
             fileRef.getDownloadURL().subscribe((url) => {
               // Add the url to the mainPhotoUrl string
               this.mainPhotoUrl = url;
-
-              // Loop through the defendantPhotos.photos array and set mainPhoto to false in every photo object
-              this.defendantPhotos[0].photos.forEach((photo) => {
-                photo.photoMain = false;
-              });
-
-              // Add the new photo url to the defendantPhotos.photos array
-              this.defendantPhotos[0].photos.push({
-                photoUrl: url,
-                photoMain: true,
-                photoDate: new Date().getTime().toString(),
-                photoComment: 'Photo added during booking process'
-              });
-
-              // Update the photo object in the database collection called 'photos' with the photo object that was just updated
-              this.af.collection('photos').doc(this.defendantPhotos[0].id).set(this.defendantPhotos[0]).then(() => {
-                // Create a Swal alert to let the user know that the photo was successfully uploaded
+              console.log('mainPhotoUrl', this.mainPhotoUrl);
+              // Update the defendant record with the new mainPhotoUrl
+              this.defendant.mainPhoto = '';
+              this.defendant.mainPhoto = this.mainPhotoUrl;
+              console.log('defendant photo', this.defendant.mainPhoto);
+              // Save the defendant object to the firestore database called 'users' with the updated mainPhoto
+              this.af.collection('users').doc(this.defendant.id).update({mainPhoto:this.mainPhotoUrl}).then(() => {
+                // Create a Swal alert to let the user know that the record was successfully updated
                 Swal.fire({
                   icon: 'success',
                   title: 'Success!',
-                  text: 'Photo successfully uploaded!',
+                  html: '<div class="text-center">Photo successfully updated!</div>',
                   showConfirmButton: false,
-                  timer: 1500
+                  timer: 2500
                 });
-                  this.defendant.mainPhoto = url;
-                  // update the defendant object in the database collection called 'users' with the defendant object that was just updated
-                  this.af.collection('users').doc(this.defendant.id).set(this.defendant).then(() => {
-                  });
               }).catch((error) => {
-                // Create a Swal alert to let the user know that the photo was not successfully uploaded
+                // Create a Swal alert to let the user know that the record was not successfully updated
                 Swal.fire({
                   icon: 'error',
-                  title: 'Oops...',
+                  title: 'Oops... Photo not updated',
                   text: 'Something went wrong! Please try again. ' + error,
                   showConfirmButton: false,
                   timer: 3000
                 });
               });
             });
-          })
-        ).subscribe();
-      }
-    });
+          })).subscribe();
+      } else {
+        // Turn off the webcam
+        this.streams.getTracks().forEach((track) => {
+          track.stop();
+        });
+        return; // Do nothing
+      } // end if
+    } // end then
+    );
   }
+
+
+
+
+
 
   // Create a function to convert a data url to a blob
   dataURLtoBlob(dataurl) {
