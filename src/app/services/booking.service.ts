@@ -53,6 +53,8 @@ export class BookingService {
 
     this.eventsCollection = afs.collection('BookingEvents',
       ref => ref.orderBy('unixDate', 'asc'));
+
+
   }
 
   getBookings(offId: string) {

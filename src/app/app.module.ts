@@ -43,7 +43,10 @@ import {AngularFireAuthModule} from "@angular/fire/compat/auth";
 import {AngularFirestoreModule} from "@angular/fire/compat/firestore";
 import { TimerComponent } from './pages/timer/timer.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
+
+// @ts-ignore
 @NgModule({
   imports: [
     AngularFireModule.initializeApp(environment.firebaseConfig),
@@ -88,7 +91,9 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     TimerComponent
   ],
   providers: [
-    AppSettings,provideHttpClient(withJsonpSupport())
+    provideCharts(withDefaultRegisterables()),
+    AppSettings,
+    provideHttpClient(withJsonpSupport())
     // { provide: PERFECT_SCROLLBAR_CONFIG, useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG }
   ],
   bootstrap: [ AppComponent ]

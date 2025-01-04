@@ -1,4 +1,8 @@
 export interface Count {
+  total?: number;
+  submitted?: number;
+  approved?: number;
+  denied?: number;
   id?: string;
   offenderID?: string;
   bookingID?: string;

@@ -12,7 +12,8 @@ export const environment = {
     storageBucket: "bbms-1283c.appspot.com",
     messagingSenderId: "280681404231",
     appId: "1:280681404231:web:86c2a944a9bdfa07"
-  }
+  },
+  // openaiApiKey: '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'
 };
 
 /*

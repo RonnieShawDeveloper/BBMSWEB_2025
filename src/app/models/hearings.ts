@@ -58,6 +58,9 @@ export interface Hearings {
   signatureData?: string;
   active?: boolean; // pending, active, closed
   suretorNIB?: string;
+  suretorName?: string;
+  suretor2NIB?: string;
+  suretor2Name?: string;
   released?: boolean;
   checkLocation?: string;
   bailstatus?: string;

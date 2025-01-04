@@ -1,6 +1,7 @@
 export interface Suretor {
 id?: string;
 spn?: string;
+NIB?: string;
 lastName?: string;
 firstName?: string;
 middleName?: string;
@@ -43,4 +44,5 @@ bankBalance?: string;
 movablePropAdditional?: string;
 mortgageWith?: string;
 signature?: string;
+AIComments?: string;
 }

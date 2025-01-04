@@ -1,31 +1,93 @@
-<section class="d-xl-flex flex-column justify-content-center align-items-center mb-5">
-  <div class="row" style="width: 8.5in;">
-    <div class="col-10" style="text-align: left;"><span style="font-weight: bold;font-size: 25px;">KIOSK CHECK-IN REPORT</span></div>
-    <div class="col-2" style="text-align: right;"><button class="btn btn-primary btn-sm no-print" type="button" (click)="doExit()">EXIT</button></div>
-  </div>
-  <div class="row" style="width: 8.5in;">
-    <div class="col" style="text-align: center;"><span style="font-weight: bold;">CRIMINAL REGISTRY</span></div>
-  </div>
-  <div class="row" style="width: 8.5in;">
-    <div class="col" style="text-align: left;"><span>Report Date {{reportDate}}</span></div>
-  </div>
-  <div class="d-flex flex-row justify-content-center align-items-center text-center" style="width: 8.5in;">
-    <div class="btn btn-primary btn-sm m-1" (click)="doNameSort()">SORT BY NAME AND DATE</div>
-    <div class="btn btn-info btn-sm m-1" (click)="doDateSort()">SORT BY DATE</div>
-  </div>
-  <div style="width: 8.5in;">
-    <div class="col" style="text-align: left;margin-top: 20px"><span class="font-weight-bold">{{checkins.length}} Total Check-ins in Database</span></div>
-  </div>
-  <div class="row" style="width: 8.5in;background: #e3e5e6">
-    <div class="col d-flex align-items-center"><span>Defendants Name</span></div>
-    <div class="col d-flex align-items-center"><span>Check-in Date</span></div>
-    <div class="col"><span>Check-in Location</span></div>
-  </div>
-  <div class="row border-bottom border-dark" *ngFor="let c of checkins" style="width: 8.5in;">
-    <div class="col d-flex align-items-center"><span>{{c.name}}</span></div>
-    <div class="col d-flex align-items-center"><span>{{c.datetime}} (<b>{{c.dayOfWeek}}</b>)</span></div>
-    <div class="col"><span>{{c.location}}</span></div>
-  </div>
-  <div style="height: 50px"></div>
-</section>
+<div style="width: 100%; min-height: 100vh; background-color: #f8f9fa;">
+  <!-- Header Section with Exit Button -->
+  <header style="
+      background-color: navy;
+      color: gold;
+      padding: 1.5rem 0;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      position: relative;
+  ">
+    <button (click)="doExit()" style="
+        position: absolute;
+        top: 50%;
+        left: 20px;
+        transform: translateY(-50%);
+        background-color: red;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+    ">
+      Exit
+    </button>
+    BAIL MANAGEMENT KIOSK CHECK-INS
+  </header>
 
+  <div class="container mt-4">
+    <div *ngIf="loading" class="text-center mb-4" style="font-size: 1.25rem; color: #555;">
+      Data Loading... Please wait
+    </div>
+
+    <div *ngIf="!loading">
+      <div class="text-center mb-4" style="font-size: 1.25rem; color: #555;">
+        IF CHECK-IN HAS A PHOTO, CLICK ON THE PHOTO TO VIEW
+      </div>
+
+      <!-- Search Box -->
+      <input
+        type="text"
+        pInputText
+        placeholder="Search by Name"
+        (input)="filterTable($event.target.value)"
+        style="width: 300px; padding: 0.5rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;"
+      />
+
+      <p-table
+        #dt
+        [value]="checkins"
+        [paginator]="true"
+        [rows]="100"
+        [totalRecords]="totalRecords"
+        [sortField]="'checkinDate'"
+        [sortOrder]="-1"
+        sortMode="multiple"
+        class="p-datatable-striped p-datatable-gridlines"
+        style="width: 100%;"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Photo</th>
+            <th pSortableColumn="name">Defendant Name <p-sortIcon field="name"></p-sortIcon></th>
+            <th pSortableColumn="location">Location <p-sortIcon field="location"></p-sortIcon></th>
+            <th pSortableColumn="dayOfWeek">Day of Week <p-sortIcon field="dayOfWeek"></p-sortIcon></th>
+            <th pSortableColumn="checkinDate">Check-in Date <p-sortIcon field="checkinDate"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-checkin>
+          <tr>
+            <td>
+              <img
+                *ngIf="checkin.photoURL"
+                [src]="checkin.photoURL"
+                alt="Photo"
+                style="height: 50px; width: auto; cursor: pointer;"
+                (click)="showPhoto(checkin.photoURL)"
+              />
+            </td>
+            <td>{{ checkin.name }}</td>
+            <td>{{ checkin.location || 'N/A' }}</td>
+            <td>{{ checkin.dayOfWeek }}</td>
+            <td>{{ checkin.checkinDate | date:'short' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

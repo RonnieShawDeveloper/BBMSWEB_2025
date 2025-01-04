@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, AfterViewInit, ElementRef, ViewChild} from '@angular/core';
 import {AngularFirestore} from "@angular/fire/compat/firestore";
 import Swal from "sweetalert2";
 import {Members} from "../../models/members";
@@ -6,17 +6,23 @@ import {Router} from "@angular/router";
 import {AngularFireAuth} from "@angular/fire/compat/auth";
 import firebase from "firebase/compat/app";
 import {Table} from "primeng/table";
+import { Timeline, DataSet } from 'vis';
 
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']
 })
-export class AdminComponent implements OnInit, OnDestroy {
+export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
+
+  @ViewChild('timeline') timelineContainer!: ElementRef;
+  items = new DataSet();
+  timeline: Timeline | undefined;
 
   currentMember: Members = JSON.parse(localStorage.getItem('member') || '{}');
   allMembers: Members[] = [];
   subscriptions: any[] = [];
+  dt1: Table | undefined;
 
   constructor(private db: AngularFirestore, private router: Router, private auth: AngularFireAuth) {
     console.log('currentMember',this.currentMember)
@@ -62,8 +68,15 @@ export class AdminComponent implements OnInit, OnDestroy {
         if(a.lName > b.lName) { return 1; }
         return 0;
       })
+      // Check for duplicate email addresses
       this.checkDuplicates();
     }));
+  }
+
+  
+
+  ngAfterViewInit(): void {
+   
   }
 
   localTime(timestamp: any): string {
@@ -74,7 +87,12 @@ export class AdminComponent implements OnInit, OnDestroy {
     let date = new Date(timestamp);
     return date.toLocaleString();
   }
-
+  filterGlobal(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    const inputValue = inputElement.value; // Safe to access value now
+    this.dt1.filterGlobal(inputValue, 'contains');
+  }
+  
   checkTime(timestamp: any): boolean {
     // Check if the time is 'No Data' or null and if so, return 'No Data'
     if(timestamp == 'No Data' || timestamp == null) {

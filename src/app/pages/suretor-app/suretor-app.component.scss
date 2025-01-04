@@ -1,0 +1,121 @@
+.container {
+  display: flex;
+  height: 100vh; /* Full viewport height */
+  gap: 16px;
+}
+
+.hero-background {
+  background-image: url('../../../assets/img/app/hero-banner-left2.jpg');
+  background-size: cover; /* Ensures the image covers the entire viewport */
+  background-position: center; /* Centers the image */
+  background-repeat: no-repeat; /* Prevents tiling of the image */
+  margin: 0; /* Removes default body margins */
+}
+
+/* Left column for the form */
+.form-column {
+  flex: 2;
+  overflow-y: auto; /* Enable vertical scrolling */
+  height: 100%; /* Use full height */
+  padding-right: 16px; /* Space for the scrollbar */
+  background-color: #f9f9f9; /* Optional light background for contrast */
+}
+
+/* Right column for chat */
+.chat-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff; /* Optional background */
+  width: 50vw; /* Half of the container width */
+  height: 90vh;
+}
+
+/* Chat window spans full available height */
+.chat-window {
+  flex: 1; /* Allow the chat window to grow */
+  overflow-y: auto; /* Enable vertical scrolling */
+  border: 1px solid #ddd; /* Optional: Add border for better visibility */
+  border-radius: 8px; /* Optional: Rounded corners */
+  padding: 16px; /* Space inside the chat window */
+  background-color: #f9f9f9; /* Optional: Light background color */
+  height: 70vh !important; /* Adjust height considering input area */
+  max-height: 70vh; /* Prevent the chat window from becoming too large */
+  width: 30vw; /* Half of the container width */
+  margin: 3px;
+}
+
+.chat-input {
+  display: flex; /* Align input and button side by side */
+  align-items: center; /* Vertically align input and button */
+  gap: 8px; /* Add spacing between input and button */
+  width: 100%;
+}
+
+.chat-input .mat-form-field {
+  flex: 1; /* Make the input field take up remaining space */
+  margin: 0; /* Remove any default margins */
+}
+
+.chat-input button {
+  height: 56px; /* Match the height of the input field */
+  flex-shrink: 0; /* Prevent shrinking of the button */
+  line-height: normal; /* Ensure proper vertical alignment of text inside the button */
+}
+
+/* Material input fields span full width */
+mat-form-field {
+  width: 100%;
+}
+
+/* User messages */
+.user-message {
+  background-color: #d0e7ff; /* Light blue background */
+  padding: 10px 16px;
+  border-radius: 12px;
+  margin: 8px 0;
+  align-self: flex-end; /* Push to the right */
+  max-width: 90%;
+  word-wrap: break-word;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two equal columns */
+  column-gap: 8px; /* 8px gap between columns */
+}
+
+.form-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; /* Three equal columns */
+  column-gap: 4px; /* 8px gap between columns */
+}
+
+/* AI messages */
+.ai-message {
+  background-color: #f1f1f1; /* Light gray background */
+  padding: 10px 16px;
+  border-radius: 12px;
+  margin: 8px 0;
+  align-self: flex-start; /* Push to the left */
+  max-width: 90%;
+  word-wrap: break-word;
+}
+
+/* Fieldset styling for form sections */
+fieldset {
+  border: 1px solid darkgrey;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 5px;
+}
+
+legend {
+  width: auto;
+  border: 1px solid darkgrey;
+  font-size: 1.2em;
+  font-weight: bold;
+  border-radius: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+}

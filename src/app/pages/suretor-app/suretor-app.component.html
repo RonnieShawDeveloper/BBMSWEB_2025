@@ -1,0 +1,162 @@
+<div class="container">
+  <!-- Left Column: Form -->
+  <div class="form-column scrollable form-window">
+    <h2>Electronic Suretor Application Form</h2>
+    <div style="font-size: 12px; margin: 5px">You will need to complete a written Suretor Application along with this electronic form for registration. If you have any
+    question, use the chat window to the right. The chat can also help you with completing this form.</div>
+    <form [formGroup]="suretorForm" (ngSubmit)="onSubmit()">
+      <mat-card>
+        <mat-card-content>
+          <fieldset>
+            <legend>Personal Information</legend>
+
+            <div class="form-row">
+              <!-- National Insurance Number -->
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>National Insurance Number</mat-label>
+                <input matInput formControlName="NIB" />
+              </mat-form-field>
+
+              <!-- Date of Birth -->
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Date of Birth</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="picker"
+                  formControlName="dob"
+                  placeholder="MM/DD/YYYY"
+                />
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <mat-error *ngIf="suretorForm.get('dob')?.hasError('required')">
+                  Date of Birth is required
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row-3">
+              <!-- Last Name -->
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Last Name</mat-label>
+                <input matInput formControlName="lastName" />
+              </mat-form-field>
+
+              <!-- First Name -->
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>First Name</mat-label>
+                <input matInput formControlName="firstName" />
+              </mat-form-field>
+
+              <!-- Middle Name -->
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Middle Name</mat-label>
+                <input matInput formControlName="middleName" />
+              </mat-form-field>
+            </div>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Full Address</mat-label>
+              <input matInput formControlName="addressFull" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>P.O. Box</mat-label>
+              <input matInput formControlName="poBox" />
+            </mat-form-field>
+
+            <div class="form-row">
+              <!-- Email -->
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" type="email" />
+              </mat-form-field>
+
+              <!-- Phone -->
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Phone</mat-label>
+                <input matInput formControlName="phone" type="tel" />
+              </mat-form-field>
+            </div>
+
+          </fieldset>
+
+          <fieldset>
+            <legend>Employment Information</legend>
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Employer Name</mat-label>
+              <input matInput formControlName="empName" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Employer Full Address</mat-label>
+              <input matInput formControlName="empAddress" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Employer Phone</mat-label>
+              <input matInput formControlName="empPhone" type="tel" />
+            </mat-form-field>
+          </fieldset>
+
+          <fieldset>
+            <legend>Bank Information</legend>
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Bank Name</mat-label>
+              <input matInput formControlName="bankName" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Account Type</mat-label>
+              <input matInput formControlName="bankAccountType" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Account Balance</mat-label>
+              <input matInput formControlName="bankBalance" type="number" />
+            </mat-form-field>
+          </fieldset>
+
+          <mat-card>
+            <mat-card-content>
+              <!-- Form fields go here -->
+            </mat-card-content>
+            <mat-card-actions class="form-row">
+              <button mat-raised-button color="primary" type="submit">Submit</button>
+              <button mat-raised-button color="warn" type="button" (click)="clearFormAndChat()">Clear Form</button>
+            </mat-card-actions>
+          </mat-card>
+        </mat-card-content>
+      </mat-card>
+    </form>
+  </div>
+
+  <!-- Right Column: Chat -->
+  <div class="chat-column">
+    <h2>Suretor Application Assistant</h2>
+    <mat-card>
+      <mat-card-content class="chat-window" #chatWindow style="min-height: 500px">
+        <div *ngFor="let message of chatMessages">
+          <div
+            [ngClass]="{
+              'user-message': message.sender === 'user',
+              'ai-message': message.sender === 'ai'
+            }"
+          >
+            <p>{{ message.text }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions class="chat-input justify-content-center align-items-center">
+        <mat-form-field appearance="outline">
+          <mat-label>Type your message...</mat-label>
+          <textarea
+            matInput
+            [(ngModel)]="userInput"
+            (keydown)="onKeydown($event)"
+          ></textarea>
+        </mat-form-field>
+        <button mat-raised-button color="primary" style="margin-top:-22px">Send</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

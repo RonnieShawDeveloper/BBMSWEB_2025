@@ -19,7 +19,7 @@ export class PagesComponent implements OnInit {
     public menuTypeOption:string;
     
     public settings: Settings;
-    constructor(public appSettings:AppSettings, public router:Router){        
+    constructor(public appSettings:AppSettings, public router:Router) {        
         this.settings = this.appSettings.settings; 
         if(sessionStorage["skin"]) {
             this.settings.theme.skin = sessionStorage["skin"];

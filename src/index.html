@@ -2,42 +2,131 @@
 <html>
 <head>
   <meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>BBMS - Bahama Bail Management System</title>
   <base href="/">
-  <meta name="description" content="Bahama Bail Management System">
-  <meta name="keywords" content="Bahama Bail Management System">
-  <meta name="author" content="Justice Technology Corp Developed by Ronnie Shaw, Chief Systems Engineer">
-  <!--Add a Robots No Index and no Follow -->
-  <meta name="robots" content="noindex, nofollow">
-  <!--Add a Robots No Index and no Follow -->
-  <meta name="googlebot" content="noindex, nofollow">
-  <meta name="google" content="notranslate">
-  <meta name="google" content="nositelinkssearchbox">
-  <meta name="google" content="noimageindex">
-  <meta name="google" content="noarchive">
-  <meta name="google" content="nosnippet">
-  <meta name="google" content="noodp">
-  <meta name="google" content="noydir">
-  <meta name="google" content="nocache">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <script>
-    var global = global || window;
-    // set a timer for 3 seconds, after which hide the splashscreen
+</head>
+<body style="background-color: white;">
+<div id="particles-js" style="position: fixed; width: 100%; height: 100%;"></div>
+<div id="splashscreen" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+  <img src="assets/img/app/splashscreen.png" alt="BBMS Logo" id="splash-logo">
+</div>
+
+<!-- Main Angular app root with fade-in effect after 1s delay -->
+<app-root style="display: none; opacity: 0; animation: fadeIn 1s ease forwards; animation-delay: 0s;"></app-root>
+
+<noscript>Please enable JavaScript to continue using this application.</noscript>
+
+<style>
+  /* Splash logo animation with 1s delay, then a 2s explosion effect */
+  #splash-logo {
+    animation: explode 2s ease forwards;
+    animation-delay: 1s; /* Wait 1 second before starting */
+  }
+
+  /* Explosion animation keyframes */
+  @keyframes explode {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(2.5); /* Increase size for a stronger explosion effect */
+      opacity: 0;
+    }
+  }
+
+  /* Fade-in effect for main app root */
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  function initializeParticles() {
+    if (typeof particlesJS === "undefined") {
+      console.error("particlesJS is not defined");
+      return;
+    }
+
+    particlesJS('particles-js', {
+      particles: {
+        number: {
+          value: 600, // Increase this number for more particles
+          density: {
+            enable: true,
+            value_area: 800
+          }
+        },
+        color: {
+          value: ["#1976d2", "#ff5733", "#ffc300", "#28b463", "#8e44ad"] // Multi-colored particles
+        },
+        shape: { type: ["circle"] },
+        opacity: {
+          value: 0.8, // Initial opacity of particles
+          random: true,
+          anim: {
+            enable: true,
+            speed: 0.5, // Controls how fast particles fade
+            opacity_min: 0.1, // Minimum opacity to achieve the fade-out effect
+            sync: false // Set to false for individual particle fade timing
+          }
+        },
+        size: {
+          value: 2, // Increase this value for larger particles
+          random: true // Random sizes for variety
+        },
+        line_linked: {
+          enable: false
+        },
+        move: {
+          enable: true,
+          speed: 12, // Speed of particles
+          direction: "none",
+          random: true,
+          straight: false,
+          out_mode: "out",
+          bounce: false,
+          attract: {
+            enable: false,
+            rotateX: 600,
+            rotateY: 1200
+          }
+        }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: {
+          onhover: {
+            enable: false
+          },
+          onclick: {
+            enable: false
+          },
+          resize: true
+        },
+      },
+      retina_detect: true
+    });
+
+    // Hide splash screen and particles after 4 seconds
     setTimeout(function() {
       document.getElementById('splashscreen').style.display = 'none';
-    }, 2000);
-  </script>
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#1976d2">
-</head>
-<body style="background-color: white">
-  <app-root>
-  </app-root>
-  <div id="splashscreen" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-    <img src="assets/img/app/splashscreen.png" alt="BBMS Logo">
-  </div>
-  <noscript>Please enable JavaScript to continue using this application.</noscript>
+      document.getElementById('particles-js').style.display = 'none';
+
+      // Show the main Angular app (already fading in due to CSS animation)
+      document.querySelector('app-root').style.display = 'block';
+    }, 4000);
+  }
+</script>
+
+<!-- Load Particles.js from CDN and initialize after load -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js" onload="initializeParticles()"></script>
 </body>
 </html>
+

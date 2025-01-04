@@ -10,6 +10,7 @@ import {TimelineModule} from "primeng/timeline";
 import {CardModule} from "primeng/card";
 import { ViewBookingComponent } from './view-booking/view-booking.component';
 import {NewBookingComponent} from "./new-booking/new-booking.component";
+import { OpenaiSupremeBookingsComponent } from './openai-supreme-bookings/openai-supreme-bookings.component';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import {NewBookingComponent} from "./new-booking/new-booking.component";
     BookingsComponent,
     DefendantMenuComponent,
     ViewBookingComponent,
-    NewBookingComponent
+    NewBookingComponent,
+    OpenaiSupremeBookingsComponent
   ],
     imports: [
         CommonModule,

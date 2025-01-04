@@ -1,0 +1,16 @@
+<div class="background-container">
+    <div #chatWindow class="messages chat-container ">
+        <div *ngFor="let message of chatMessages">
+            <p [class.user]="message.user">{{ message.text }}</p>
+        </div>
+    </div>
+    <div class="input-container">
+        <input
+                [type]="isEnteringPassword ? 'password' : 'text'"
+                [(ngModel)]="userInput"
+                (keydown.enter)="handleUserInput()"
+                [placeholder]="placeholderText"
+        />
+        <button (click)="handleUserInput()">Send</button>
+    </div>
+</div>

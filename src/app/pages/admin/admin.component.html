@@ -1,5 +1,6 @@
 <div class="container-fluid">
-<p-table #dt1 [value]="allMembers" styleClass="p-datatable-striped"
+  
+  <p-table #dt1 [value]="allMembers" styleClass="p-datatable-striped"
          [paginator]="true"
          [rows]="10"
          [showCurrentPageReport]="true"
@@ -11,7 +12,13 @@
     <div class="d-flex flex-row my-3">
       <div class="btn btn-outline-danger" (click)="clear(dt1)"><i class="fa fa-stop-circle"></i> CLEAR FILTERS</div>
       <span class="p-input-icon-right ml-auto">
-                <input id="searchBox" pInputText class="form-control" type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')" placeholder="Search Name/Email" />
+        <input 
+  id="searchBox" 
+  pInputText 
+  class="form-control" 
+  type="text" 
+  (input)="dt1.filterGlobal($event.target.value, 'contains')" 
+  placeholder="Search Name/Email" />
             </span>
     </div>
   </ng-template>

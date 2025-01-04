@@ -64,7 +64,6 @@
     </div>
   </div>
 </section>
-
 <app-view-booking *ngIf="showViewBooking" [booking]="selectedBooking" (exit)="closeViewBooking()"></app-view-booking>
 <app-defendant-menu *ngIf="showDefendantMenu" [defendant]="selectedDefendant" (doShowBooking)="doViewBooking($event)" (exit)="closeMenu($event)"></app-defendant-menu>
 

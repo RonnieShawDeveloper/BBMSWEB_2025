@@ -39,6 +39,7 @@ export class CriminalRegistryComponent implements OnInit, OnDestroy {
   subscriptions: any[] = [];
 
   constructor(private bs: BookingService, private hs: HearingServiceService, private router: Router) {
+
   }
 
 
@@ -84,20 +85,6 @@ export class CriminalRegistryComponent implements OnInit, OnDestroy {
       this.rorHearings = this.hearings.filter(hearing => hearing.releaseOnRecognizance == true).length;
       this.bondsIssued = this.hearings.filter(hearing => hearing.bailBondIssueDateUnix != null && hearing.bailBondIssueDateUnix != undefined && hearing.bailBondIssueDateUnix != "").length;
 
-      if(!this.firstView) {
-        // Create a swal alert to show the user that the data has been updated
-        Swal.fire({
-          toast: true,
-          position: 'top-right',
-          title: 'Hearings Updated',
-          text: 'New Hearings have been added or updated.',
-          icon: 'success',
-          timerProgressBar: true,
-          showConfirmButton: false,
-          timer: 5000,
-        });
-      }
-      this.firstView = false;
     }));
   }
 

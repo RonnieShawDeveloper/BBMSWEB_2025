@@ -1,0 +1,84 @@
+/* Background Styling */
+
+.background-container {
+  background-image: url('../../../assets/img/app/login_background.jpg');
+  background-size: cover; /* Ensures the image fills the entire screen */
+  background-position: center; /* Centers the image */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+  height: 100dvh; /* Full viewport height */
+  width: 100dvw; /* Full viewport width */
+  display: flex; /* Use Flexbox for centering */
+  flex-direction: column;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+}
+
+/* Chat Container Styling */
+.chat-container {
+  background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+  border-radius: 10px; /* Rounded corners */
+  border: 2px solid #000000 ; /* Black border around the container */
+  padding: 20px; /* Padding inside the container */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for visibility */
+  max-width: 500px; /* Optional: Limit width of the chat container */
+  width: 90%; /* Responsive design for smaller screens */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Messages Area Styling */
+.messages {
+  flex: 1; /* Take up available space */
+  max-height: 300px; /* Optional: Set height for scrollable area */
+  overflow-y: auto; /* Add scrolling for overflowing content */
+  margin-bottom: 15px; /* Space between messages and input container */
+}
+
+/* Input Container Styling */
+.input-container {
+  display: flex; /* Layout for input and button */
+  gap: 10px; /* Space between input and button */
+}
+
+input {
+  flex: 1; /* Input takes up remaining space */
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 400px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Message Text Styling */
+.messages p {
+  padding: 10px;
+  border-radius: 10px;
+  margin: 5px 0;
+  word-wrap: break-word;
+}
+
+.messages p.user {
+  background-color: #007bff;
+  color: white;
+  align-self: flex-end; /* Align user messages to the right */
+}
+
+.messages p {
+  background-color: #f1f1f1;
+  color: black;
+  align-self: flex-start; /* Align bot messages to the left */
+}

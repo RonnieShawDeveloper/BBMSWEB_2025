@@ -2,7 +2,8 @@ import { Component, ViewEncapsulation } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AppSettings } from './app.settings';
 import { Settings } from './app.settings.model';
-import { UpdateServiceService } from "./services/update-service.service";
+import {UpdateService } from './services/update-service.service';
+
 
 @Component({
   selector: 'app-root',
@@ -13,7 +14,8 @@ import { UpdateServiceService } from "./services/update-service.service";
 export class AppComponent {
     public settings: Settings;
     constructor(public appSettings:AppSettings,
-                public translate: TranslateService, update: UpdateServiceService){
+                public translate: TranslateService,
+                public updateService: UpdateService) {
       this.settings = this.appSettings.settings;
       translate.addLangs(['en','de','fr','ru','tr']);
       translate.setDefaultLang('en');
