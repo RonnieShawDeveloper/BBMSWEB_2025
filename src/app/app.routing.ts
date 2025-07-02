@@ -38,6 +38,7 @@ export const routes: Routes = [
   { path: 'restapi', loadChildren: () => import('./pages/rest-api/rest-api.module').then(m => m.RestAPIModule) },
   { path: 'clogin', loadChildren: () => import('./pages/chat-login/chat-login.module').then(m => m.ChatLoginModule) },
   { path: 'suretorapp', loadChildren: () => import('./pages/suretor-app/suretor-app.module').then(m => m.SuretorAppModule) },
+  { path: 'systemreport', loadChildren: () => import('./pages/reports/system-report/system-report.module').then(m => m.SystemReportModule) },
 
 
   { path: '**', component: NotFoundComponent }

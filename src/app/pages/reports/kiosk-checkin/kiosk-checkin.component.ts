@@ -38,6 +38,7 @@ export class KioskCheckinComponent implements OnInit {
 
     this.af.collection<KioskCheckin>('kioskCheckin').valueChanges().subscribe((checks: KioskCheckin[]) => {
       console.log("Counts: ", checks.length);
+
       this.checkins = checks
         .map(checkin => {
           const unixTimestamp = parseInt(checkin.unix);

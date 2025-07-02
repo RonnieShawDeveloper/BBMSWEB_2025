@@ -1,16 +1,30 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Hearings} from "../../../models/hearings";
+import {Hearings} from "../../../models/hearings"; // Assuming Hearings model exists
 import Swal, {SweetAlertResult} from "sweetalert2";
-import {HearingServiceService} from "../../../services/hearing-service.service";
-import {Members} from "../../../models/members";
-import {Controls} from "../../../models/controls";
+import {HearingServiceService} from "../../../services/hearing-service.service"; // Assuming HearingServiceService exists
+import {Members} from "../../../models/members"; // Assuming Members model exists
+import {Controls} from "../../../models/controls"; // Assuming Controls model exists
 import {AngularFirestore, DocumentSnapshot, QuerySnapshot} from '@angular/fire/compat/firestore';
-import {BookingEvents} from "../../../models/events";
-import {Offender} from "../../../models/offender";
+import {BookingEvents} from "../../../models/events"; // Assuming BookingEvents model exists
+import {Offender} from "../../../models/offender"; // Assuming Offender model exists
 import {AngularFireStorage} from "@angular/fire/compat/storage";
 import {finalize, take} from "rxjs";
-import {Count} from "../../../models/count";
-import {Suretor} from "../../../models/suretor";
+import {Count} from "../../../models/count"; // Assuming Count model exists
+
+// Import the new and old Suretor interfaces
+import {
+  Suretor, // Old interface
+  SuretyApplication, // New top-level interface
+  Surety, // Nested interface within SuretyApplication
+  CaseDetails,
+  Declarations,
+  Execution,
+  Metadata,
+  MoveableAsset,
+  BankAccount,
+  ImmovableProperty,
+  Timestamp // Firebase Timestamp from @angular/fire/firestore
+} from "../../../models/suretor"; // Adjust path if necessary
 
 @Component({
   selector: 'app-bail-app-table',
@@ -35,8 +49,9 @@ export class BailAppTableComponent implements OnInit {
   remandLink: string = '';
   dppLink: string = '';
 
-  orderHTML = ``;
+  orderHTML = ``; // This seems to be an empty string, might be for dynamic content generation later
 
+  // NOTE TO SELF: Inject AngularFirestore and AngularFireStorage for Firebase operations.
   constructor(private hs: HearingServiceService, private af: AngularFirestore, private storage: AngularFireStorage) {
   }
 
@@ -45,8 +60,8 @@ export class BailAppTableComponent implements OnInit {
     // Get the offender from the 'users' collection using the hearings offenderID
     this.af.collection('users').doc(this.hearings.offenderID).get().pipe(take(1)).subscribe((doc) => {
       this.offender = doc.data() as Offender;
-
     });
+
     // Get counts from the 'counts' collection where bookingID is equal to the hearings bookingID
     this.af.collection('counts', ref => ref.where('bookingID', '==', this.hearings.bookingID)).get().pipe(take(1)).subscribe((querySnapshot) => {
       this.counts = querySnapshot.docs.map((doc) => {
@@ -54,7 +69,7 @@ export class BailAppTableComponent implements OnInit {
       });
       // Foreach count, use regex to check to see if the first 5 characters of 'countCharge' fits the patters '####-' and if so, set the countCharge to the substring of the countCharge from index 5 to the end of the string
       this.counts.forEach((count) => {
-        if (count.countCharge.match(/^\d{4}-/)) {
+        if (count.countCharge && count.countCharge.match(/^\d{4}-/)) {
           count.countCharge = count.countCharge.substring(5);
         }
       });
@@ -91,6 +106,8 @@ export class BailAppTableComponent implements OnInit {
         confirmButtonText: 'Ok'
       });
     }
+
+    // NOTE TO SELF: Initialize source and target controls for drag and drop
     const sourceControls: Controls[] = [
       {
         id: '2',
@@ -120,8 +137,6 @@ export class BailAppTableComponent implements OnInit {
         controlIcon: 'fa-money',
         controlModule: 'suretyApp'
       },
-      // {id: '5', controlName: 'Bail Granted', controlDescription: 'Bail Granted', controlIcon: 'fa-check', controlModule: 'bailGranted'},
-      // {id: '6', controlName: 'Bail Denied', controlDescription: 'Bail Denied', controlIcon: 'fa-remove', controlModule: 'bailDenied'},
       {
         id: '7',
         controlName: 'Revoke Bail',
@@ -129,7 +144,6 @@ export class BailAppTableComponent implements OnInit {
         controlIcon: 'fa-ban',
         controlModule: 'bailRevoked'
       },
-      // {id: '8', controlName: 'Bail Conditions', controlDescription: 'Bail Conditions', controlIcon: 'fa-heartbeat', controlModule: 'bailConditions'},
       {
         id: '9',
         controlName: 'Issue Bond',
@@ -165,10 +179,11 @@ export class BailAppTableComponent implements OnInit {
         controlDate: this.convertUnixDate(this.hearings.unixDate.toString())
       }
     ];
-    // If Bail Granted is true, add the Bail Granted control to the target controls array
+
+    // NOTE TO SELF: Dynamically add controls based on existing hearing data
     if (this.hearings.grantBailChecked) {
       targetControls.push({
-        id: '5',
+        id: '5', // Reusing ID 5, but this is a different control from Surety 2
         controlName: 'Bail Granted',
         controlDescription: 'Bail Granted',
         controlIcon: 'fa-check',
@@ -198,70 +213,34 @@ export class BailAppTableComponent implements OnInit {
       });
     }
 
-
     this.targetControls = targetControls;
 
+    // NOTE TO SELF: Update controls based on existing hearing data (Judge, Hearing Date, Suretors)
     if (this.hearings.judgeID) {
-      // Remove the Judge Assignment control from the source controls array if a judge has been assigned and add it to the target controls array
       const judgeAssignment = this.sourceControls.find((control) => control.controlName === 'Judge Assignment');
-      const index = this.sourceControls.indexOf(judgeAssignment);
-      this.sourceControls.splice(index, 1);
-      this.targetControls.push(judgeAssignment);
-      // Edit the Judge Assignment control in the targetControls array to show the name of the judge that has been assigned and the date that the judge was assigned
-      const judge = this.members.find((member) => member.id === this.hearings.judgeID);
-      const judgeIndex = this.targetControls.indexOf(judgeAssignment);
-      this.targetControls[judgeIndex].controlComment = 'Judge ' + this.hearings.judgeName + ' assigned to this hearing';
-      this.showPickList = false;
-      setTimeout(() => {
-        this.showPickList = true;
-      }, 100);
+      if (judgeAssignment) { // Ensure it exists before trying to remove/add
+        const index = this.sourceControls.indexOf(judgeAssignment);
+        this.sourceControls.splice(index, 1);
+        this.targetControls.push(judgeAssignment);
+        const judgeIndex = this.targetControls.indexOf(judgeAssignment);
+        this.targetControls[judgeIndex].controlComment = 'Judge ' + this.hearings.judgeName + ' assigned to this hearing';
+        this.refreshPickList(); // Helper to refresh PrimeNG PickList
+      }
     }
     if (this.hearings.hearingDateUnix) {
-      // Remove the Hearing Date control from the source controls array if a hearing date has been set and add it to the target controls array
       const hearingDate = this.sourceControls.find((control) => control.controlName === 'Hearing Date');
-      const index = this.sourceControls.indexOf(hearingDate);
-      this.sourceControls.splice(index, 1);
-      this.targetControls.push(hearingDate);
-      // Edit the Hearing Date control in the targetControls array to show the date that the hearing has been set for
-      const hearingDateIndex = this.targetControls.indexOf(hearingDate);
-      this.targetControls[hearingDateIndex].controlComment = 'Hearing Date set for ' + this.convertUnixDate(this.hearings.hearingDateUnix.toString());
-      this.showPickList = false;
-      setTimeout(() => {
-        this.showPickList = true;
-      }, 100);
+      if (hearingDate) { // Ensure it exists
+        const index = this.sourceControls.indexOf(hearingDate);
+        this.sourceControls.splice(index, 1);
+        this.targetControls.push(hearingDate);
+        const hearingDateIndex = this.targetControls.indexOf(hearingDate);
+        this.targetControls[hearingDateIndex].controlComment = 'Hearing Date set for ' + this.convertUnixDate(this.hearings.hearingDateUnix.toString());
+        this.refreshPickList();
+      }
     }
 
-    // If a suretor #1 has been assigned to this hearing, add the Surety control to the target controls array  and remove it from the source controls array
-    if (this.hearings.suretorNIB) {
-      const surety = this.sourceControls.find((control) => control.controlName === 'Surety 1');
-      const index = this.sourceControls.indexOf(surety);
-      this.sourceControls.splice(index, 1);
-      this.targetControls.push(surety);
-
-      // Edit the Surety control in the targetControls array to show the name of the surety that has been assigned
-      const suretyIndex = this.targetControls.indexOf(surety);
-      this.targetControls[suretyIndex].controlComment = 'Surety ' + this.hearings.suretorName + ' assigned to this hearing';
-      this.showPickList = false;
-      setTimeout(() => {
-        this.showPickList = true;
-      }, 100);
-    }
-
-    // If a suretor #2 has been assigned to this hearing, add the Surety control to the target controls array  and remove it from the source controls array
-    if (this.hearings.suretor2NIB) {
-      const surety = this.sourceControls.find((control) => control.controlName === 'Surety 2');
-      const index = this.sourceControls.indexOf(surety);
-      this.sourceControls.splice(index, 1);
-      this.targetControls.push(surety);
-
-      // Edit the Surety control in the targetControls array to show the name of the surety that has been assigned
-      const suretyIndex = this.targetControls.indexOf(surety);
-      this.targetControls[suretyIndex].controlComment = 'Surety ' + this.hearings.suretor2Name + ' assigned to this hearing';
-      this.showPickList = false;
-      setTimeout(() => {
-        this.showPickList = true;
-      }, 100);
-    }
+    // NOTE TO SELF: Initialize Surety 1 and Surety 2 controls based on existing hearing data
+    this.initializeSuretyControls();
 
     // If a bond has been issued
     if (this.hearings.bailBondLink && this.hearings.bailBondLink.length > 0) {
@@ -277,13 +256,76 @@ export class BailAppTableComponent implements OnInit {
       this.targetControls.push(viewBailBond);
       this.sortControls();
     }
-    // // Create an event listener to listen for changes to the element called 'cdk-drop-list-1' for drag and drop events
-    // const dropListOne = document.getElementById('cdk-drop-list-1');
-    // dropListOne.addEventListener('DOMNodeInserted', (event) => {
-    //   console.log('DOMNodeInserted: ', event);
-    // });
     this.sortControls();
   }
+
+  // NOTE TO SELF: Helper to refresh PrimeNG PickList after changes
+  refreshPickList(): void {
+    this.showPickList = false;
+    setTimeout(() => {
+      this.showPickList = true;
+    }, 100);
+  }
+
+  // NOTE TO SELF: Initialize Surety controls logic
+  private async initializeSuretyControls(): Promise<void> {
+    // Surety 1
+    if (this.hearings.suretorNIB) {
+      const suretyControl = this.sourceControls.find((control) => control.controlName === 'Surety 1');
+      if (suretyControl) {
+        const index = this.sourceControls.indexOf(suretyControl);
+        this.sourceControls.splice(index, 1);
+        this.targetControls.push(suretyControl);
+
+        // Fetch Suretor data to get the full name for the comment
+        const suretorDoc = await this.af.collection('suretors').doc(this.hearings.suretorNIB).get().pipe(take(1)).toPromise();
+        if (suretorDoc?.exists) {
+          const suretorData = suretorDoc.data();
+          let suretorFullName = '';
+          // NOTE TO SELF: Check if it's the new SuretyApplication format or old Suretor format
+          if (suretorData && (suretorData as SuretyApplication).surety?.fullName) { // New format
+            suretorFullName = (suretorData as SuretyApplication).surety.fullName;
+          } else if (suretorData && (suretorData as Suretor).firstName) { // Old format
+            const oldSuretor = suretorData as Suretor;
+            suretorFullName = `${oldSuretor.lastName}, ${oldSuretor.firstName} ${oldSuretor.middleName || ''}`.trim();
+          }
+
+          const suretyIndex = this.targetControls.indexOf(suretyControl);
+          this.targetControls[suretyIndex].controlComment = 'Surety ' + suretorFullName + ' assigned to this hearing';
+        }
+        this.refreshPickList();
+      }
+    }
+
+    // Surety 2
+    if (this.hearings.suretor2NIB) {
+      const suretyControl = this.sourceControls.find((control) => control.controlName === 'Surety 2');
+      if (suretyControl) {
+        const index = this.sourceControls.indexOf(suretyControl);
+        this.sourceControls.splice(index, 1);
+        this.targetControls.push(suretyControl);
+
+        // Fetch Suretor data to get the full name for the comment
+        const suretorDoc = await this.af.collection('suretors').doc(this.hearings.suretor2NIB).get().pipe(take(1)).toPromise();
+        if (suretorDoc?.exists) {
+          const suretorData = suretorDoc.data();
+          let suretorFullName = '';
+          // NOTE TO SELF: Check if it's the new SuretyApplication format or old Suretor format
+          if (suretorData && (suretorData as SuretyApplication).surety?.fullName) { // New format
+            suretorFullName = (suretorData as SuretyApplication).surety.fullName;
+          } else if (suretorData && (suretorData as Suretor).firstName) { // Old format
+            const oldSuretor = suretorData as Suretor;
+            suretorFullName = `${oldSuretor.lastName}, ${oldSuretor.firstName} ${oldSuretor.middleName || ''}`.trim();
+          }
+
+          const suretyIndex = this.targetControls.indexOf(suretyControl);
+          this.targetControls[suretyIndex].controlComment = 'Surety ' + suretorFullName + ' assigned to this hearing';
+        }
+        this.refreshPickList();
+      }
+    }
+  }
+
 
   showApplication() {
     window.open(this.hearings.bailAppLink, '_blank');
@@ -305,7 +347,7 @@ export class BailAppTableComponent implements OnInit {
 
   showDPPResponse() {
     // Check to see if a remandLink exists, and if it does not, create a swal modal alert to notify the user that the DPP Response has not been provided in this case
-    if (this.remandLink.length < 1) {
+    if (this.remandLink.length < 1) { // NOTE TO SELF: This should probably check dppLink, not remandLink
       Swal.fire({
         title: 'DPP Response Not Uploaded',
         text: 'The DPP Response has not been uploaded yet. Please check back later.',
@@ -317,15 +359,30 @@ export class BailAppTableComponent implements OnInit {
     window.open(this.dppLink, '_blank');
   }
 
+  // NOTE TO SELF: Helper to revert a drag-and-drop operation for Surety controls
+  private revertSuretyDrag(controlId: string): void {
+    const controlToRevert = this.targetControls.find((control) => control.id === controlId);
+    if (controlToRevert) {
+      const index = this.targetControls.indexOf(controlToRevert);
+      this.targetControls.splice(index, 1);
+      this.sourceControls.unshift(controlToRevert); // Add back to source
+      this.sortControls(); // Re-sort for consistency
+      this.refreshPickList(); // Refresh the UI
+    }
+  }
+
+
   doDrop(control) {
     // console.log('doDrop: ', control.items[0].id);
     // Check to see if the user has dragged the Bail Application Control into the source Controls Array and if so, add it back to the target controls array
     this.sortControls();
     if (control.items[0].id == '1') {
       const bailApp = this.sourceControls.find((control) => control.controlName === 'Bail Application');
-      const index = this.sourceControls.indexOf(bailApp);
-      this.sourceControls.splice(index, 1);
-      this.targetControls.unshift(bailApp);
+      if (bailApp) { // Ensure control exists
+        const index = this.sourceControls.indexOf(bailApp);
+        this.sourceControls.splice(index, 1);
+        this.targetControls.unshift(bailApp);
+      }
       // Create a Swall Modal Alert to notify the user that the Bail Application can not be removed and to use the Terminate Application Control instead
       Swal.fire({
         title: 'Bail Application',
@@ -333,10 +390,7 @@ export class BailAppTableComponent implements OnInit {
         icon: 'warning',
         confirmButtonText: 'OK'
       }).then(() => {
-        this.showPickList = false;
-        setTimeout(() => {
-          this.showPickList = true;
-        }, 100);
+        this.refreshPickList();
       });
     }
 
@@ -345,7 +399,7 @@ export class BailAppTableComponent implements OnInit {
       const judgeAssignment = this.sourceControls.find((control) => control.controlName === 'Judge Assignment');
       const index = this.sourceControls.indexOf(judgeAssignment);
       console.log('index: ', index);
-      if (index >= 0) {
+      if (index >= 0) { // If it's in sourceControls, it means it was dragged *from* target to source (removed)
         // Remove the assigned judge from the hearing and set the judgeID and judgeName to null and then set the judge assignment control comment to 'No Judge Assigned'
         this.hearings.judgeID = null;
         this.hearings.judgeName = null;
@@ -360,22 +414,18 @@ export class BailAppTableComponent implements OnInit {
           icon: 'success',
           timer: 2000,
         }).then(() => {
-          this.showPickList = false;
-          setTimeout(() => {
-            this.showPickList = true;
-          }, 100);
+          this.refreshPickList();
         });
-      } else {
+      } else { // It was dragged *to* target from source (assigned)
         this.assignJugde();
       }
-
-
     }
+
     if (control.items[0].id == '3') {
       // Check to see if the  user has dragged the Hearing Date control into the target controls array or the source controls array
       const hearingDate = this.sourceControls.find((control) => control.controlName === 'Hearing Date');
       const index = this.sourceControls.indexOf(hearingDate);
-      if (index >= 0) {
+      if (index >= 0) { // If in sourceControls, it was dragged *from* target to source (removed)
         // Remove the hearing date from the hearing and set the hearingDateUnix to null and then set the hearing date control comment to 'No Hearing Date Set'
         this.hearings.hearingDateUnix = null;
         // Update the hearing in the database
@@ -389,358 +439,57 @@ export class BailAppTableComponent implements OnInit {
           icon: 'success',
           timer: 2000,
         }).then(() => {
-          this.showPickList = false;
-          setTimeout(() => {
-            this.showPickList = true;
-          }, 100);
+          this.refreshPickList();
         });
-      } else {
+      } else { // It was dragged *to* target from source (assigned)
         this.setHearingDateTime();
       }
     }
 
-    // Add Suretor 1 to the hearing
-    if (control.items[0].id == '4') {
-      let suretorAddress = '';
-      let suretorFullName = '';
-      // Check to see if the Suretor control was dropped in the traget controls array
-      const surety = this.sourceControls.find((control) => control.controlName === 'Surety 1');
-      const index = this.sourceControls.indexOf(surety);
-      if (index >= 0) {
-        // Remove the Surety from the hearing and set the suretorNIB, suretorName, suretorDOB, suretor2NIB, suretor2Name, and suretor2DOB to null
+    // NOTE TO SELF: Handle Surety 1 assignment and conversion logic
+    if (control.items[0].id == '4') { // Surety 1
+      const suretyControl = this.sourceControls.find((c) => c.controlName === 'Surety 1');
+      const indexInSource = this.sourceControls.indexOf(suretyControl);
+
+      if (indexInSource >= 0) { // Surety 1 was dragged *from* target to source (removed)
         this.hearings.suretorNIB = null;
         this.hearings.suretorName = null;
-        // Set the surety control comment to 'No Surety Assigned'
-        const suretyIndex = this.sourceControls.indexOf(surety);
-        this.sourceControls[suretyIndex].controlComment = 'No Surety Assigned';
-        // Update the hearing in the database
         this.hs.updateHearing(this.hearings);
-        // Create a Swal Modal alert letting the user know the Surety has been removed from the hearing
+        this.sourceControls[indexInSource].controlComment = 'No Surety Assigned';
         Swal.fire({
           title: 'Surety #1 Removed',
           text: 'The Surety has been removed from this Bail Application',
           icon: 'success',
           timer: 2000,
         }).then(() => {
-          this.showPickList = false;
-          setTimeout(() => {
-            this.showPickList = true;
-          }, 100);
+          this.refreshPickList();
         });
-      } else {
-        // Check that the suretor control exists in the target controls array
-        const surety = this.targetControls.find((control) => control.controlName === 'Surety 1');
-        const suretyIndex = this.targetControls.indexOf(surety);
-        if (suretyIndex == 0) {
-          return
-        }
-
-        // Create a Swal Dialog asking for the Suretor NIB, name and DOB and then get the Suretor from the "suretors' collection, check the hearings for a hearing with
-        // the same suretor NIB using the suretorNIB field, and if a record does not exist with this NIB, add the suretor to the current hearing using the suretorNIB field.
-        // If a record does exist with that NIB, create a Swal Dialog saying the Suretor already exists on a different offenders record
-        Swal.fire({
-          title: 'Assign Surety #1',
-          html: '<input id="swal-input1" class="swal2-input" placeholder="Surety NIB">',
-          focusConfirm: false,
-          showCancelButton: true,
-          preConfirm: () => {
-            const suretorNIB = (<HTMLInputElement>document.getElementById('swal-input1')).value;
-            return {suretorNIB: suretorNIB};
-          }
-        } as any).then((result) => {
-          // Check to see if the user canceled or dismissed the swal modal
-          if (result.isConfirmed == false) {
-            return;
-          }
-          // Check to see if the suretorNIB is null or undefined and return an empty string if it is
-          if (result.value.suretorNIB == null || result.value.suretorNIB == undefined) {
-            return;
-          }
-
-          // Check to see if the suretorNIB is a number
-          if (isNaN(parseInt(result.value.suretorNIB))) {
-            // Create a Swal Modal to alert the user that the NIB is invalid
-            Swal.fire({
-              title: 'Invalid NIB',
-              text: 'The Suretor NIB is invalid. Please enter a valid NIB',
-              icon: 'error',
-              confirmButtonText: 'Ok'
-            });
-            return;
-          }
-
-          // Check to see if the Suretor already exists on a different offenders record as suertor2NIB
-          this.af.collection('hearings', ref => ref
-            .where('suretor2NIB', '==', result.value.suretorNIB))
-            .get().pipe(take(1)).subscribe((querySnapshot1: QuerySnapshot<Hearings>) => {
-              console.log('querySnapshot: ', querySnapshot1);
-              // Check to see if the snapshot is not empty and if so, create a Swal Modal to alert the user that the Suretor already exists on a different offenders record
-              if (!querySnapshot1.empty) {
-                // Move the Surty 1 control back to the source controls array
-                const surety = this.targetControls.find((control) => control.controlName === 'Surety 1');
-                const suretyIndex = this.targetControls.indexOf(surety);
-                this.targetControls.splice(suretyIndex, 1);
-                this.sourceControls.unshift(surety);
-                this.showPickList = false;
-                // Sort the source and target controls arrays by id
-                this.sortControls();
-                setTimeout(() => {
-                  this.showPickList = true;
-                }, 100);
-                Swal.fire({
-                  title: 'Suretor Already Exists',
-                  text: 'The Suretor already exists on a different offenders record: ' + querySnapshot1.docs[0].data().offenderName,
-                  icon: 'error',
-                  confirmButtonText: 'Ok'
-                });
-                return;
-              }
-
-            // Search the 'hearings' collection for a hearing with the same suretorNIB
-            this.af.collection('hearings', ref => ref
-              .where('suretorNIB', '==', result.value.suretorNIB))
-              .get().pipe(take(1)).subscribe((querySnapshot: QuerySnapshot<Hearings>) => {
-              // Check to see if the querySnapshot is empty and if so, add the suretor to the current hearing
-              if (querySnapshot.empty) {
-                // Check that a Suretor record exists in the 'suretors' collection with the doc id as the suretorNIB
-                this.af.collection('suretors').doc(result.value.suretorNIB).get().pipe(take(1)).subscribe((doc: DocumentSnapshot<Suretor>) => {
-                  // Check to see if the doc exists and if not, create a Swal Modal to alert the user that the Suretor does not exist in the system
-                  if (!doc.exists) {
-                    // Move the Surty 1 control back to the source controls array
-                    const surety = this.targetControls.find((control) => control.controlName === 'Surety 1');
-                    const suretyIndex = this.targetControls.indexOf(surety);
-                    this.targetControls.splice(suretyIndex, 1);
-                    this.sourceControls.unshift(surety);
-                    this.showPickList = false;
-                    // Sort the source and target controls arrays by id
-                    this.sortControls();
-
-                    setTimeout(() => {
-                      this.showPickList = true;
-                    }, 100);
-                    Swal.fire({
-                      title: 'Suretor Not Found',
-                      text: 'The Suretor does not exist in the system. Please have the Suretor complete the Digital Application first!',
-                      icon: 'error',
-                      confirmButtonText: 'Ok'
-                    });
-                    return;
-                  } else {
-                    suretorFullName = doc.data().lastName + ', ' + doc.data().firstName + ' ' + doc.data().middleName;
-                    suretorAddress = doc.data().addressFull;
-                    this.hearings.suretorNIB = result.value.suretorNIB;
-                    this.hearings.suretorName = suretorFullName;
-                    this.hs.updateHearing(this.hearings);
-                    // Update the Surety 1 control in the targetControls array to show the name of the surety that has been assigned
-                    const surety = this.targetControls.find((control) => control.controlName === 'Surety 1');
-                    const suretyIndex = this.targetControls.indexOf(surety);
-                    this.targetControls[suretyIndex].controlComment = 'Surety ' + suretorFullName + ' assigned to this hearing';
-                    // Create a Swal Modal to alert the user that the Suretor has been added to the hearing
-                    Swal.fire({
-                      title: 'Suretor Added',
-                      text: `The Suretor (${suretorFullName}) has been added to this Bail Application`,
-                      icon: 'success',
-                      confirmButtonText: 'Ok'
-                    }).then(() => {
-                      this.showPickList = false;
-                      setTimeout(() => {
-                        this.showPickList = true;
-                      }, 100);
-                    });
-                  }
-                });
-
-
-              } else {
-                // Create a Swal Modal to alert the user that the Suretor already exists on a different offenders record
-                Swal.fire({
-                  title: 'Suretor Already Exists',
-                  text: 'The Suretor already exists on a different offenders record: ' + querySnapshot.docs[0].data().offenderName,
-                  icon: 'error',
-                  confirmButtonText: 'Ok'
-                });
-              }
-            });
-          });
-        });
-
+      } else { // Surety 1 was dragged *to* target from source (assigned)
+        this.assignSurety(control.items[0].id);
       }
-
     }
 
-    // Add Suretor 2 to the hearing
-    if (control.items[0].id == '5') {
-      let suretorAddress = '';
-      let suretorFullName = '';
-      // Check to see if the Suretor control was dropped in the traget controls array
-      const surety = this.sourceControls.find((control) => control.controlName === 'Surety 2');
-      const index = this.sourceControls.indexOf(surety);
-      if (index >= 0) {
-        // Remove the Surety from the hearing and set the suretorNIB, suretorName, suretorDOB, suretor2NIB, suretor2Name, and suretor2DOB to null
+    // NOTE TO SELF: Handle Surety 2 assignment and conversion logic
+    if (control.items[0].id == '5') { // Surety 2
+      const suretyControl = this.sourceControls.find((c) => c.controlName === 'Surety 2');
+      const indexInSource = this.sourceControls.indexOf(suretyControl);
+
+      if (indexInSource >= 0) { // Surety 2 was dragged *from* target to source (removed)
         this.hearings.suretor2NIB = null;
         this.hearings.suretor2Name = null;
-        // Set the surety control comment to 'No Surety Assigned'
-        const suretyIndex = this.sourceControls.indexOf(surety);
-        this.sourceControls[suretyIndex].controlComment = 'No Surety Assigned';
-        // Update the hearing in the database
         this.hs.updateHearing(this.hearings);
-        // Create a Swal Modal alert letting the user know the Surety has been removed from the hearing
+        this.sourceControls[indexInSource].controlComment = 'No Surety Assigned';
         Swal.fire({
           title: 'Surety #2 Removed',
           text: 'The Surety has been removed from this Bail Application',
           icon: 'success',
           timer: 2000,
         }).then(() => {
+          this.refreshPickList();
         });
-      } else {
-        // Check that the suretor control exists in the target controls array
-        const surety = this.targetControls.find((control) => control.controlName === 'Surety 2');
-        const suretyIndex = this.targetControls.indexOf(surety);
-        if (suretyIndex == 0) {
-          return
-        }
-
-        // Create a Swal Dialog asking for the Suretor NIB, name and DOB and then get the Suretor from the "suretors' collection, check the hearings for a hearing with
-        // the same suretor NIB using the suretorNIB field, and if a record does not exist with this NIB, add the suretor to the current hearing using the suretorNIB field.
-        // If a record does exist with that NIB, create a Swal Dialog saying the Suretor already exists on a different offenders record
-        Swal.fire({
-          title: 'Assign Surety #2',
-          html: '<input id="swal-input1" class="swal2-input" placeholder="Surety NIB">',
-          focusConfirm: false,
-          showCancelButton: true,
-          preConfirm: () => {
-            const suretorNIB = (<HTMLInputElement>document.getElementById('swal-input1')).value;
-            return {suretorNIB: suretorNIB};
-          }
-        } as any).then((result) => {
-          // Check to see if the user canceled or dismissed the swal modal
-          if (result.isConfirmed == false) {
-            return;
-          }
-          // Check to see if the suretorNIB is null or undefined and return an empty string if it is
-          if (result.value.suretorNIB == null || result.value.suretorNIB == undefined) {
-            return;
-          }
-
-          // Check to see if the suretorNIB is a number
-          if (isNaN(parseInt(result.value.suretorNIB))) {
-            // Create a Swal Modal to alert the user that the NIB is invalid
-            Swal.fire({
-              title: 'Invalid NIB',
-              text: 'The Suretor NIB is invalid. Please enter a valid NIB',
-              icon: 'error',
-              confirmButtonText: 'Ok'
-            });
-            return;
-          }
-
-          // Check to see if the Suretor already exists on a different offenders record as suertor2NIB
-          this.af.collection('hearings', ref => ref.where('suretor2NIB', '==', result.value.suretorNIB)).get().pipe(take(1)).subscribe((querySnapshot1: QuerySnapshot<Hearings>) => {
-            if(!querySnapshot1.empty){
-              // Move the Surty 2 control back to the source controls array
-              const surety = this.targetControls.find((control) => control.controlName === 'Surety 2');
-              const suretyIndex = this.targetControls.indexOf(surety);
-              this.targetControls.splice(suretyIndex, 1);
-              this.sourceControls.unshift(surety);
-              this.showPickList = false;
-              // Sort the source and target controls arrays by id
-              this.sortControls();
-
-              setTimeout(() => {
-                this.showPickList = true;
-              }, 100);
-              Swal.fire({
-                title: 'Suretor Already Exists',
-                text: 'The Suretor already exists on a different offenders record: ' + querySnapshot1.docs[0].data().offenderName,
-                icon: 'error',
-                confirmButtonText: 'Ok'
-              });
-              return;
-            }
-
-
-          // Search the 'hearings' collection for a hearing with the same suretorNIB
-          this.af.collection('hearings', ref => ref
-            .where('suretor1NIB', '==', result.value.suretorNIB))
-            .get().pipe(take(1)).subscribe((querySnapshot: QuerySnapshot<Hearings>) => {
-            // Check to see if the querySnapshot is empty and if so, add the suretor to the current hearing
-            if (querySnapshot.empty) {
-              // Check that a Suretor record exists in the 'suretors' collection with the doc id as the suretorNIB
-              this.af.collection('suretors').doc(result.value.suretorNIB).get().pipe(take(1)).subscribe((doc: DocumentSnapshot<Suretor>) => {
-                // Check to see if the doc exists and if not, create a Swal Modal to alert the user that the Suretor does not exist in the system
-                if (!doc.exists) {
-                  // Move the Surty 1 control back to the source controls array
-                  const surety = this.targetControls.find((control) => control.controlName === 'Surety 2');
-                  const suretyIndex = this.targetControls.indexOf(surety);
-                  this.targetControls.splice(suretyIndex, 1);
-                  this.sourceControls.unshift(surety);
-                  this.showPickList = false;
-                  // Sort the source and target controls arrays by id
-                  this.sortControls();
-
-                  setTimeout(() => {
-                    this.showPickList = true;
-                  }, 100);
-                  Swal.fire({
-                    title: 'Suretor Not Found',
-                    text: 'The Suretor does not exist in the system. Please have the Suretor complete the Digital Application first!',
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                  });
-                  return;
-                } else {
-                  suretorFullName = doc.data().lastName + ', ' + doc.data().firstName + ' ' + doc.data().middleName;
-                  suretorAddress = doc.data().addressFull;
-                  this.hearings.suretor2NIB = result.value.suretorNIB;
-                  this.hearings.suretor2Name = suretorFullName;
-                  this.hs.updateHearing(this.hearings);
-                  // Update the Surety 1 control in the targetControls array to show the name of the surety that has been assigned
-                  const surety = this.targetControls.find((control) => control.controlName === 'Surety 2');
-                  const suretyIndex = this.targetControls.indexOf(surety);
-                  this.targetControls[suretyIndex].controlComment = 'Surety ' + suretorFullName + ' assigned to this hearing';
-                  // Create a Swal Modal to alert the user that the Suretor has been added to the hearing
-                  Swal.fire({
-                    title: 'Suretor Added',
-                    text: `The Suretor (${suretorFullName}) has been added to this Bail Application`,
-                    icon: 'success',
-                    confirmButtonText: 'Ok'
-                  }).then(() => {
-                    this.showPickList = false;
-                    setTimeout(() => {
-                      this.showPickList = true;
-                    }, 100);
-                  });
-                }
-              });
-
-
-            } else {
-              // Move the Surty 2 control back to the source controls array
-              const surety = this.targetControls.find((control) => control.controlName === 'Surety 2');
-              const suretyIndex = this.targetControls.indexOf(surety);
-              this.targetControls.splice(suretyIndex, 1);
-              this.sourceControls.unshift(surety);
-              this.showPickList = false;
-              // Sort the source and target controls arrays by id
-              this.sortControls();
-
-              setTimeout(() => {
-                this.showPickList = true;
-              }, 100);
-              // Create a Swal Modal to alert the user that the Suretor already exists on a different offenders record
-              Swal.fire({
-                title: 'Suretor Already Exists',
-                text: 'The Suretor already exists on a different offenders record: ' + querySnapshot.docs[0].data().offenderName,
-                icon: 'error',
-                confirmButtonText: 'Ok'
-              });
-            }
-          });
-          });
-        });
-
+      } else { // Surety 2 was dragged *to* target from source (assigned)
+        this.assignSurety(control.items[0].id);
       }
-
     }
 
 
@@ -758,8 +507,9 @@ export class BailAppTableComponent implements OnInit {
           if (result.value) {
             // Locate the Issue Bond control and add a comment that says 'click to issue bond'
             const issueBond = this.targetControls.find((control) => control.id === '9');
-            const index = this.targetControls.indexOf(issueBond);
-            this.targetControls[index].controlComment = 'Click to issue bond';
+            if (issueBond) {
+              issueBond.controlComment = 'Click to issue bond';
+            }
             // Open a Swal Modal and tell the user that they need to Click on the Issue Bond Control to Open the Issue Bond Menu
             Swal.fire({
               title: 'Must Confirm through Issue Bond Menu',
@@ -770,20 +520,20 @@ export class BailAppTableComponent implements OnInit {
           } else {
             // Remove the Issue Bond Control from the target controls array and add it back to the source controls array
             const issueBond = this.targetControls.find((control) => control.id === '9');
-            const index = this.targetControls.indexOf(issueBond);
-            this.targetControls.splice(index, 1);
-            this.sourceControls.unshift(issueBond);
-            this.showPickList = false;
-            setTimeout(() => {
-              this.showPickList = true;
-            }, 100);
+            if (issueBond) {
+              const index = this.targetControls.indexOf(issueBond);
+              this.targetControls.splice(index, 1);
+              this.sourceControls.unshift(issueBond);
+            }
+            this.refreshPickList();
           }
         });
       } else {
         // Locate the Issue Bond control and add a comment that says 'click to issue bond'
         const issueBond = this.targetControls.find((control) => control.id === '9');
-        const index = this.targetControls.indexOf(issueBond);
-        this.targetControls[index].controlComment = 'Click to issue bond';
+        if (issueBond) {
+          issueBond.controlComment = 'Click to issue bond';
+        }
         // Open a Swal Modal and tell the user that they need to Click on the Issue Bond Control to Open the Issue Bond Menu
         Swal.fire({
           title: 'Click on Issue Bond Tab',
@@ -797,8 +547,9 @@ export class BailAppTableComponent implements OnInit {
     if (control.items[0].id == '11') {
       // Locate the Termination Control and add a comment that says 'click to terminate this application'
       const terminationControl = this.targetControls.find((control) => control.id === '11');
-      const index = this.targetControls.indexOf(terminationControl);
-      this.targetControls[index].controlComment = 'Click to terminate this application';
+      if (terminationControl) {
+        terminationControl.controlComment = 'Click to terminate this application';
+      }
       // Open a Swal Modal and tell the user that they need to Click on the Termination Control to Open the Termination Menu
       Swal.fire({
         title: 'Must Confirm through Termination Menu',
@@ -806,21 +557,216 @@ export class BailAppTableComponent implements OnInit {
         icon: 'info',
         confirmButtonText: 'Ok'
       });
-      this.showPickList = false;
-      setTimeout(() => {
-        this.showPickList = true;
-      }, 100);
+      this.refreshPickList();
     }
   }
+
+  // NOTE TO SELF: New helper function to handle Suretor assignment logic, including conversion
+  private assignSurety(controlId: string): void {
+    const isSurety1 = controlId === '4';
+    const suretyControlName = isSurety1 ? 'Surety 1' : 'Surety 2';
+
+    Swal.fire({
+      title: `Assign ${suretyControlName}`,
+      html: '<input id="swal-input1" class="swal2-input" placeholder="Surety NIB">',
+      focusConfirm: false,
+      showCancelButton: true,
+      preConfirm: () => {
+        const suretorNIB = (<HTMLInputElement>document.getElementById('swal-input1')).value;
+        return {suretorNIB: suretorNIB};
+      }
+    } as any).then(async (result) => { // Use async here for await
+      if (!result.isConfirmed || !result.value.suretorNIB) {
+        this.revertSuretyDrag(controlId); // Revert drag if cancelled or NIB not entered
+        return;
+      }
+
+      const inputNIB = result.value.suretorNIB.trim();
+
+      if (!/^\d+$/.test(inputNIB)) { // Simple numeric validation for NIB
+        Swal.fire({
+          title: 'Invalid NIB',
+          text: 'The Suretor NIB is invalid. Please enter a valid NIB (numbers only).',
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+        this.revertSuretyDrag(controlId);
+        return;
+      }
+
+      // NOTE TO SELF: Check if the Suretor NIB is already assigned to ANY other hearing
+      const existingAssignmentQuery1 = this.af.collection('hearings', ref => ref.where('suretorNIB', '==', inputNIB)).get().pipe(take(1));
+      const existingAssignmentQuery2 = this.af.collection('hearings', ref => ref.where('suretor2NIB', '==', inputNIB)).get().pipe(take(1));
+
+      const [querySnapshot1, querySnapshot2] = await Promise.all([
+        existingAssignmentQuery1.toPromise(),
+        existingAssignmentQuery2.toPromise()
+      ]);
+
+      let alreadyAssignedHearing: Hearings | null = null;
+
+      if (querySnapshot1 && !querySnapshot1.empty) {
+        // Check if the assignment is to the *current* hearing, if so, allow it (e.g., re-assigning same suretor)
+        if (querySnapshot1.docs[0].id !== this.hearings.id) {
+          alreadyAssignedHearing = querySnapshot1.docs[0].data() as Hearings;
+        }
+      }
+      if (querySnapshot2 && !querySnapshot2.empty) {
+        if (querySnapshot2.docs[0].id !== this.hearings.id) {
+          alreadyAssignedHearing = querySnapshot2.docs[0].data() as Hearings;
+        }
+      }
+
+      if (alreadyAssignedHearing) {
+        Swal.fire({
+          title: 'Suretor Already Assigned',
+          text: `The Suretor with NIB ${inputNIB} is already assigned to another offender: ${alreadyAssignedHearing.offenderName}. A Suretor can only represent one defendant.`,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+        this.revertSuretyDrag(controlId);
+        return;
+      }
+
+      // NOTE TO SELF: Fetch the Suretor document from the 'suretors' collection
+      const suretorDoc = await this.af.collection('suretors').doc(inputNIB).get().pipe(take(1)).toPromise();
+
+      if (!suretorDoc?.exists) {
+        Swal.fire({
+          title: 'Suretor Not Found',
+          text: 'The Suretor does not exist in the system with this NIB. Please have the Suretor complete the Digital Application first!',
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+        this.revertSuretyDrag(controlId);
+        return;
+      }
+
+      // NOTE TO SELF: Determine if it's old or new format and convert if necessary
+      let suretorData: Suretor | SuretyApplication = suretorDoc.data() as any; // Use 'any' for initial type flexibility
+      let suretorToAssign: Surety; // This will hold the Surety object from either format
+      let suretorFullName: string;
+
+      // Detection: Check for the 'surety' nested object, which is unique to the new format
+      if ((suretorData as SuretyApplication).surety?.nib) {
+        // NOTE TO SELF: It's the new SuretyApplication format
+        console.log('NOTE TO SELF: Detected new SuretyApplication format.');
+        suretorToAssign = (suretorData as SuretyApplication).surety;
+        suretorFullName = suretorToAssign.fullName; // Use fullName from new format
+        // No conversion needed, it's already in the desired structure.
+      } else {
+        // NOTE TO SELF: It's the old Suretor format. Perform on-the-fly conversion.
+        console.log('NOTE TO SELF: Detected old Suretor format. Converting to new SuretyApplication.');
+        const oldSuretor = suretorData as Suretor;
+
+        // Construct the new Surety object from the old Suretor data
+        const newSurety: Surety = {
+          fullName: `${oldSuretor.lastName || ''}, ${oldSuretor.firstName || ''} ${oldSuretor.middleName || ''}`.trim(),
+          firstName: oldSuretor.firstName || '',
+          middleName: oldSuretor.middleName || '',
+          lastName: oldSuretor.lastName || '',
+          address: oldSuretor.addressFull || '',
+          nib: oldSuretor.NIB || '', // Map old NIB to new nib
+          dob: null, // Old format doesn't have DOB, default to null
+          email: oldSuretor.email || '',
+          phone: oldSuretor.phone || '',
+          poBox: oldSuretor.poBox || '',
+          spn: oldSuretor.spn || '',
+          empName: oldSuretor.empName || '',
+          empAddress: oldSuretor.empAddress || '',
+          empPhone: oldSuretor.empPhone || '',
+          immovableProperty: { // Default empty immovable property
+            particulars: oldSuretor.immovablePropDesc || '',
+            estimatedValue: parseFloat(oldSuretor.immovablePropValue || '0') || 0.0
+          },
+          bankAccount: { // Default empty bank account
+            bankName: oldSuretor.bankName || '',
+            accountType: oldSuretor.bankAccountType || '',
+            accountBalance: parseFloat(oldSuretor.bankBalance || '0') || 0.0
+          },
+          otherMoveableProperty: [] // Old format has movablePropAdditional as string, new has list. Default to empty.
+        };
+
+        // Construct the full new SuretyApplication object
+        const newSuretyApplication: SuretyApplication = {
+          applicationId: suretorDoc.id, // Use NIB as applicationId for converted records
+          caseDetails: { // Default empty CaseDetails
+            defendantName: '',
+            defendantAddress: '',
+            bondAmount: 0.0,
+            court: ''
+          },
+          surety: newSurety,
+          declarations: { // Default empty Declarations
+            encumbranceStatus: '',
+            mortgageHolder: null,
+            priorSuretyCases: '',
+            hasPendingCriminalCharges: false,
+            isCurrentlySurety: false
+          },
+          execution: { // Default Execution with current date
+            suretySignatureUrl: '',
+            dateSigned: Timestamp.now(),
+            attestingOfficialName: ''
+          },
+          metadata: { // Default Metadata
+            status: 'Legacy Converted', // Indicate this was converted
+            scannedAt: Timestamp.now(),
+            scannedByUserId: 'system-conversion', // Indicate system conversion
+            reviewedAt: null,
+            reviewedByUserId: null,
+            originalImageUrls: []
+          },
+          aiComments: { 'conversion': 'Automatically converted from old Suretor format.' },
+          approval: 'pending' // Default approval status
+        };
+
+        // NOTE TO SELF: Overwrite the old document in Firestore with the new format
+        await this.af.collection('suretors').doc(inputNIB).set(newSuretyApplication)
+          .then(() => console.log('NOTE TO SELF: Successfully converted and saved old Suretor to new SuretyApplication format.'))
+          .catch(error => console.error('NOTE TO SELF: Error converting and saving old Suretor:', error));
+
+        suretorToAssign = newSurety; // Use the newly constructed Surety object
+        suretorFullName = newSurety.fullName;
+        suretorData = newSuretyApplication; // Update suretorData to the new format for consistency
+      }
+
+      // NOTE TO SELF: Assign the Suretor to the current hearing
+      if (isSurety1) {
+        this.hearings.suretorNIB = suretorToAssign.nib;
+        this.hearings.suretorName = suretorFullName;
+        // NOTE TO SELF: Optionally store the full SuretyApplication ID if needed for deeper linking
+        // this.hearings.suretor1ApplicationId = (suretorData as SuretyApplication).applicationId;
+      } else {
+        this.hearings.suretor2NIB = suretorToAssign.nib;
+        this.hearings.suretor2Name = suretorFullName;
+        // this.hearings.suretor2ApplicationId = (suretorData as SuretyApplication).applicationId;
+      }
+      this.hs.updateHearing(this.hearings);
+
+      // NOTE TO SELF: Update the control comment in the UI
+      const suretyControl = this.targetControls.find((c) => c.id === controlId);
+      if (suretyControl) {
+        suretyControl.controlComment = `Surety ${suretorFullName} assigned to this hearing`;
+      }
+
+      Swal.fire({
+        title: 'Suretor Added',
+        text: `The Suretor (${suretorFullName}) has been added to this Bail Application`,
+        icon: 'success',
+        confirmButtonText: 'Ok'
+      }).then(() => {
+        this.refreshPickList();
+      });
+    });
+  }
+
 
   // Sort the SourceControls array and the TargetControls array by the id property
   sortControls() {
     this.sourceControls.sort((a, b) => a.id.localeCompare(b.id));
     this.targetControls.sort((a, b) => a.id.localeCompare(b.id));
-    this.showPickList = false;
-    setTimeout(() => {
-      this.showPickList = true;
-    }, 100);
+    this.refreshPickList(); // Use the helper
   }
 
   setHearingDateTime() {
@@ -843,30 +789,34 @@ export class BailAppTableComponent implements OnInit {
         }
         // In the array targetSource find the item with the ID of '3' and remove it from the array
         const hearingDate = this.targetControls.find((control) => control.id === '3');
-        const index = this.targetControls.indexOf(hearingDate);
-        this.targetControls.splice(index, 1);
-        // Add the hearingDate to the top of the sourceControls array
-        this.sourceControls.unshift(hearingDate);
+        if (hearingDate) {
+          const index = this.targetControls.indexOf(hearingDate);
+          this.targetControls.splice(index, 1);
+          // Add the hearingDate to the top of the sourceControls array
+          this.sourceControls.unshift(hearingDate);
+        }
       } else {
         const unixTimestamp = new Date(result.value.date).getTime();
         this.hearings.hearingDateUnix = unixTimestamp.toString();
         this.updateHearing(this.hearings);
         // Get the BookingEvent for this hearing
-        this.af.collection('BookingEvents').doc(this.hearings.eventID).get().subscribe((bookingEvent: BookingEvents) => {
-          const bailApp: BookingEvents = bookingEvent[0];
-          bailApp.hearingDateSet = unixTimestamp.toString();
-          this.af.collection('BookingEvents').doc(this.hearings.eventID).update(bailApp);
+        // NOTE TO SELF: This part might need adjustment if BookingEvents structure changes or is not directly accessible this way.
+        this.af.collection('BookingEvents').doc(this.hearings.eventID).get().subscribe((bookingEventDoc) => {
+          if (bookingEventDoc.exists) {
+            const bailApp = bookingEventDoc.data() as BookingEvents;
+            bailApp.hearingDateSet = unixTimestamp.toString();
+            this.af.collection('BookingEvents').doc(this.hearings.eventID).update(bailApp);
+          }
         });
         // Find the hearing date control in the targetControls array and update the comment to show the date that the hearing has been set for
         const hearingDate = this.targetControls.find((control) => control.id === '3');
-        const index = this.targetControls.indexOf(hearingDate);
-        this.targetControls[index].controlComment = 'Hearing Date set for ' + this.convertUnixDate(this.hearings.hearingDateUnix.toString());
+        if (hearingDate) {
+          const index = this.targetControls.indexOf(hearingDate);
+          this.targetControls[index].controlComment = 'Hearing Date set for ' + this.convertUnixDate(this.hearings.hearingDateUnix.toString());
+        }
       }
     }).then(() => {
-      this.showPickList = false;
-      setTimeout(() => {
-        this.showPickList = true;
-      }, 100);
+      this.refreshPickList();
     });
   }
 
@@ -895,22 +845,31 @@ export class BailAppTableComponent implements OnInit {
           });
         }
       } as any).then((result) => {
+        if (!result.isConfirmed) { // Handle cancel
+          this.revertJudgeDrag(); // Revert the drag if cancelled
+          return;
+        }
         // Set the judge field in the hearings collection to the selected judge
         this.hearings.judgeName = this.members[result.value].name;
         this.hearings.judgeID = this.members[result.value].id;
         this.updateHearing(this.hearings);
 
         // Get the BookingEvent for this hearing
-        this.af.collection('BookingEvents').doc(this.hearings.eventID).get().subscribe((bookingEvent: BookingEvents) => {
-          const bailApp: BookingEvents = bookingEvent[0];
-          bailApp.judge = this.hearings.judgeName;
-          bailApp.judgeID = this.hearings.judgeID;
-          this.af.collection('BookingEvents').doc(this.hearings.eventID).update(bailApp);
+        // NOTE TO SELF: This part might need adjustment if BookingEvents structure changes or is not directly accessible this way.
+        this.af.collection('BookingEvents').doc(this.hearings.eventID).get().subscribe((bookingEventDoc) => {
+          if (bookingEventDoc.exists) {
+            const bailApp = bookingEventDoc.data() as BookingEvents;
+            bailApp.judge = this.hearings.judgeName;
+            bailApp.judgeID = this.hearings.judgeID;
+            this.af.collection('BookingEvents').doc(this.hearings.eventID).update(bailApp);
+          }
         });
         // Locate the Judge Assignment control in the targetControls array and edit it to show the name of the judge that has been assigned
         const judgeAssignment = this.targetControls.find((control) => control.id === '2');
-        const judgeIndex = this.targetControls.indexOf(judgeAssignment);
-        this.targetControls[judgeIndex].controlComment = 'Judge ' + this.hearings.judgeName + ' assigned to this hearing';
+        if (judgeAssignment) {
+          const judgeIndex = this.targetControls.indexOf(judgeAssignment);
+          this.targetControls[judgeIndex].controlComment = 'Judge ' + this.hearings.judgeName + ' assigned to this hearing';
+        }
         // Provide a swal alert to let the user know that the judge has been assigned
         Swal.fire({
           title: 'Judge Assigned',
@@ -918,15 +877,24 @@ export class BailAppTableComponent implements OnInit {
           icon: 'success',
           confirmButtonText: 'Ok'
         }).then(() => {
-          this.showPickList = false;
-          setTimeout(() => {
-            this.showPickList = true;
-          }, 100);
+          this.refreshPickList();
         });
       });
     });
-
   }
+
+  // NOTE TO SELF: Helper to revert judge drag if assignment is cancelled
+  private revertJudgeDrag(): void {
+    const judgeControl = this.targetControls.find((control) => control.id === '2');
+    if (judgeControl) {
+      const index = this.targetControls.indexOf(judgeControl);
+      this.targetControls.splice(index, 1);
+      this.sourceControls.unshift(judgeControl);
+      this.sortControls();
+      this.refreshPickList();
+    }
+  }
+
 
   // Convert unixDate to localDate for display
   convertUnixDate(unixDate: string) {
@@ -961,7 +929,9 @@ export class BailAppTableComponent implements OnInit {
     const originalName = hearing.offenderName;
     // We need to reverse the offender name to First Last from Last, First before saving to the database
     const offenderName = hearing.offenderName.split(', ');
-    hearing.offenderName = offenderName[1] + ' ' + offenderName[0];
+    if (offenderName.length === 2) { // Ensure it's in "Last, First" format
+      hearing.offenderName = offenderName[1].trim() + ' ' + offenderName[0].trim();
+    }
     // Update the hearing in the database
     this.hs.updateHearing(hearing);
     // Set the offender name back to the original value
@@ -969,7 +939,7 @@ export class BailAppTableComponent implements OnInit {
   }
 
   exitBailApplicationTable() {
-    this.hearings = null;
+    this.hearings = null; // Clear hearings data
     this.exitBailAppTable.emit(true);
   }
 
@@ -1035,16 +1005,20 @@ export class BailAppTableComponent implements OnInit {
       confirmButtonText: 'Upload',
       showLoaderOnConfirm: true,
       preConfirm: (file) => {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           const reader = new FileReader();
           reader.onload = (event) => {
-            resolve(event.target.result);
+            resolve(event.target?.result as string); // Cast to string
           };
           reader.readAsDataURL(file);
         });
       },
       allowOutsideClick: () => !Swal.isLoading()
     }).then((result: SweetAlertResult<string>) => {
+      if (!result.isConfirmed || !result.value) { // Handle cancel or no file selected
+        return;
+      }
+
       // get the offender name and remove all spaces and commas
       const offenderName = this.hearings.offenderName.replace(/ /g, '').replace(/,/g, '');
       // Upload the file to firebase storage and then save the link to the database in the bailBondLink field
@@ -1145,13 +1119,17 @@ export class BailAppTableComponent implements OnInit {
       // Move the termination control back to the sourceControls array and remove from the targetControls array and remove the comment
       const terminationControl = this.targetControls.find((control) => control.id === '11');
       const index = this.targetControls.indexOf(terminationControl);
-      this.targetControls.splice(index, 1);
+      if (index > -1) { // Ensure it exists before splicing
+        this.targetControls.splice(index, 1);
+      }
       this.sourceControls.push(terminationControl);
       // Remove the comment from the termination control in the sourceControls array
       const sourceTerminationControl = this.sourceControls.find((control) => control.id === '11');
-      const sourceIndex = this.sourceControls.indexOf(sourceTerminationControl);
-      this.sourceControls[sourceIndex].controlComment = '';
-      this.showPickList = false;
+      if (sourceTerminationControl) {
+        const sourceIndex = this.sourceControls.indexOf(sourceTerminationControl);
+        this.sourceControls[sourceIndex].controlComment = '';
+      }
+      this.refreshPickList();
       // Open a Swal modal to let the user know the termination was canceled
       Swal.fire({
         title: 'Termination Canceled',
@@ -1159,9 +1137,6 @@ export class BailAppTableComponent implements OnInit {
         icon: 'success',
         confirmButtonText: 'Ok'
       });
-      setTimeout(() => {
-        this.showPickList = true;
-      }, 100);
     } else if (event == true) {
       // Open a Swal modal letting the user know the Application has been Terminated
       Swal.fire({
@@ -1173,11 +1148,6 @@ export class BailAppTableComponent implements OnInit {
         // True event means the termination was submitted and this application is terminated
         this.exitBailAppTable.emit(true);
       });
-
-
     }
-
   }
-
-
 }

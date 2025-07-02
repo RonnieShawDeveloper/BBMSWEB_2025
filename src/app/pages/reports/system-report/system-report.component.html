@@ -1,0 +1,62 @@
+<div class="container mt-4">
+  <h2 class="text-center">The Bahamas Bail Management System Offender Report</h2>
+
+  <div class="row mt-4">
+    <!-- Total Offenders -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Total Offenders</h5>
+          <p><strong>Supreme Court :</strong> {{ usersCount }}</p>
+          <p><strong>Magistrate Court:</strong> {{ magistrateCount }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gender Count -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Gender Breakdown (Supreme Court Only)</h5>
+          <p><strong>Male:</strong> {{ genderCount.male }}</p>
+          <p><strong>Female:</strong> {{ genderCount.female }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Locality Information -->
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Localities (Supreme Court)</h5>
+          <ul>
+            <li *ngFor="let locality of userLocalityData | keyvalue">
+              {{ locality.key }}: {{ locality.value }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Localities (Magistrate Court)</h5>
+          <ul>
+            <li *ngFor="let locality of magistrateLocalityData | keyvalue">
+              {{ locality.key }}: {{ locality.value }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Print Button -->
+  <div class="text-center mt-4">
+    <button class="btn btn-primary" (click)="printReport()">Print Report</button>
+  </div>
+</div>
+
