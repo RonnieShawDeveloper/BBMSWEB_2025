@@ -10,8 +10,9 @@ import {Offender} from "../../../models/offender"; // Assuming Offender model ex
 import {AngularFireStorage} from "@angular/fire/compat/storage";
 import {finalize, take} from "rxjs";
 import {Count} from "../../../models/count"; // Assuming Count model exists
+import {Booking} from "../../../models/booking"; // Import Booking model for magistrateBookings
 
-// Import the new and old Suretor interfaces
+// Import the new and old Suretor interfaces, and directly import Timestamp from firestore
 import {
   Suretor, // Old interface
   SuretyApplication, // New top-level interface
@@ -23,8 +24,8 @@ import {
   MoveableAsset,
   BankAccount,
   ImmovableProperty,
-  Timestamp // Firebase Timestamp from @angular/fire/firestore
-} from "../../../models/suretor"; // Adjust path if necessary
+} from "../../../models/suretor";
+import { Timestamp } from '@angular/fire/firestore'; // Corrected Timestamp import
 
 @Component({
   selector: 'app-bail-app-table',
@@ -284,14 +285,20 @@ export class BailAppTableComponent implements OnInit {
           let suretorFullName = '';
           // NOTE TO SELF: Check if it's the new SuretyApplication format or old Suretor format
           if (suretorData && (suretorData as SuretyApplication).surety?.fullName) { // New format
-            suretorFullName = (suretorData as SuretyApplication).surety.fullName;
+            const newSurety = (suretorData as SuretyApplication).surety;
+            // Ensure fullName is present, construct if not
+            if (!newSurety.fullName || newSurety.fullName.trim() === '') {
+              suretorFullName = `${newSurety.lastName || ''}, ${newSurety.firstName || ''} ${newSurety.middleName || ''}`.trim();
+            } else {
+              suretorFullName = newSurety.fullName;
+            }
           } else if (suretorData && (suretorData as Suretor).firstName) { // Old format
             const oldSuretor = suretorData as Suretor;
-            suretorFullName = `${oldSuretor.lastName}, ${oldSuretor.firstName} ${oldSuretor.middleName || ''}`.trim();
+            suretorFullName = `${oldSuretor.lastName || ''}, ${oldSuretor.firstName || ''} ${oldSuretor.middleName || ''}`.trim();
           }
 
           const suretyIndex = this.targetControls.indexOf(suretyControl);
-          this.targetControls[suretyIndex].controlComment = 'Surety ' + suretorFullName + ' assigned to this hearing';
+          this.targetControls[suretyIndex].controlComment = `Surety ${suretorFullName} assigned to this hearing. Click to edit Suretor.`;
         }
         this.refreshPickList();
       }
@@ -312,14 +319,20 @@ export class BailAppTableComponent implements OnInit {
           let suretorFullName = '';
           // NOTE TO SELF: Check if it's the new SuretyApplication format or old Suretor format
           if (suretorData && (suretorData as SuretyApplication).surety?.fullName) { // New format
-            suretorFullName = (suretorData as SuretyApplication).surety.fullName;
+            const newSurety = (suretorData as SuretyApplication).surety;
+            // Ensure fullName is present, construct if not
+            if (!newSurety.fullName || newSurety.fullName.trim() === '') {
+              suretorFullName = `${newSurety.lastName || ''}, ${newSurety.firstName || ''} ${newSurety.middleName || ''}`.trim();
+            } else {
+              suretorFullName = newSurety.fullName;
+            }
           } else if (suretorData && (suretorData as Suretor).firstName) { // Old format
             const oldSuretor = suretorData as Suretor;
-            suretorFullName = `${oldSuretor.lastName}, ${oldSuretor.firstName} ${oldSuretor.middleName || ''}`.trim();
+            suretorFullName = `${oldSuretor.lastName || ''}, ${oldSuretor.firstName || ''} ${oldSuretor.middleName || ''}`.trim();
           }
 
           const suretyIndex = this.targetControls.indexOf(suretyControl);
-          this.targetControls[suretyIndex].controlComment = 'Surety ' + suretorFullName + ' assigned to this hearing';
+          this.targetControls[suretyIndex].controlComment = `Surety ${suretorFullName} assigned to this hearing. Click to edit Suretor.`;
         }
         this.refreshPickList();
       }
@@ -594,39 +607,86 @@ export class BailAppTableComponent implements OnInit {
         return;
       }
 
-      // NOTE TO SELF: Check if the Suretor NIB is already assigned to ANY other hearing
-      const existingAssignmentQuery1 = this.af.collection('hearings', ref => ref.where('suretorNIB', '==', inputNIB)).get().pipe(take(1));
-      const existingAssignmentQuery2 = this.af.collection('hearings', ref => ref.where('suretor2NIB', '==', inputNIB)).get().pipe(take(1));
+      // --- START NEW SURETOR CONFLICT CHECK ---
+      let conflictingCases: string[] = [];
 
-      const [querySnapshot1, querySnapshot2] = await Promise.all([
-        existingAssignmentQuery1.toPromise(),
-        existingAssignmentQuery2.toPromise()
+      // 1. Check Supreme Court (hearings collection)
+      const supremeCourtQuery1 = this.af.collection('hearings', ref =>
+        ref.where('suretorNIB', '==', inputNIB).where('active', '==', true)
+      ).get().pipe(take(1));
+      const supremeCourtQuery2 = this.af.collection('hearings', ref =>
+        ref.where('suretor2NIB', '==', inputNIB).where('active', '==', true)
+      ).get().pipe(take(1));
+
+      const [supremeSnapshot1, supremeSnapshot2] = await Promise.all([
+        supremeCourtQuery1.toPromise(),
+        supremeCourtQuery2.toPromise()
       ]);
 
-      let alreadyAssignedHearing: Hearings | null = null;
-
-      if (querySnapshot1 && !querySnapshot1.empty) {
-        // Check if the assignment is to the *current* hearing, if so, allow it (e.g., re-assigning same suretor)
-        if (querySnapshot1.docs[0].id !== this.hearings.id) {
-          alreadyAssignedHearing = querySnapshot1.docs[0].data() as Hearings;
-        }
+      if (supremeSnapshot1 && !supremeSnapshot1.empty) {
+        supremeSnapshot1.docs.forEach(doc => {
+          const hearing = doc.data() as Hearings;
+          // Exclude the current hearing being processed
+          if (hearing.id !== this.hearings.id) {
+            conflictingCases.push(`Supreme Court (Offender: ${hearing.offenderName})`);
+          }
+        });
       }
-      if (querySnapshot2 && !querySnapshot2.empty) {
-        if (querySnapshot2.docs[0].id !== this.hearings.id) {
-          alreadyAssignedHearing = querySnapshot2.docs[0].data() as Hearings;
-        }
+      if (supremeSnapshot2 && !supremeSnapshot2.empty) {
+        supremeSnapshot2.docs.forEach(doc => {
+          const hearing = doc.data() as Hearings;
+          // Exclude the current hearing being processed
+          if (hearing.id !== this.hearings.id) {
+            conflictingCases.push(`Supreme Court (Offender: ${hearing.offenderName})`);
+          }
+        });
       }
 
-      if (alreadyAssignedHearing) {
+      // 2. Check Magistrate Court (magistrateBookings collection)
+      const magistrateCourtQuery1 = this.af.collection('magistrateBookings', ref =>
+        ref.where('suretorNIB', '==', inputNIB).where('bookingStatus', '==', 'Open')
+      ).get().pipe(take(1));
+      const magistrateCourtQuery2 = this.af.collection('magistrateBookings', ref =>
+        ref.where('suretorNIB2', '==', inputNIB).where('bookingStatus', '==', 'Open')
+      ).get().pipe(take(1));
+
+      const [magistrateSnapshot1, magistrateSnapshot2] = await Promise.all([
+        magistrateCourtQuery1.toPromise(),
+        magistrateCourtQuery2.toPromise()
+      ]);
+
+      if (magistrateSnapshot1 && !magistrateSnapshot1.empty) {
+        magistrateSnapshot1.docs.forEach(doc => {
+          const booking = doc.data() as Booking;
+          // Construct full name for Magistrate Court records
+          const offenderFullName = `${booking.lastName || ''}, ${booking.firstName || ''} ${booking.middleName || ''}`.trim();
+          conflictingCases.push(`Magistrate Court (Offender: ${offenderFullName})`);
+        });
+      }
+      if (magistrateSnapshot2 && !magistrateSnapshot2.empty) {
+        magistrateSnapshot2.docs.forEach(doc => {
+            const booking = doc.data() as Booking;
+            // Construct full name for Magistrate Court records
+            const offenderFullName = `${booking.lastName || ''}, ${booking.firstName || ''} ${booking.middleName || ''}`.trim();
+            conflictingCases.push(`Magistrate Court (Offender: ${offenderFullName})`);
+          }
+        );
+      }
+
+      // If conflicts found, show warning and revert
+      if (conflictingCases.length > 0) {
+        const conflictList = conflictingCases.map(c => `<li>${c}</li>`).join('');
         Swal.fire({
-          title: 'Suretor Already Assigned',
-          text: `The Suretor with NIB ${inputNIB} is already assigned to another offender: ${alreadyAssignedHearing.offenderName}. A Suretor can only represent one defendant.`,
+          title: 'Suretor Already Assigned!',
+          html: `The Suretor with NIB ${inputNIB} was found on the following ACTIVE case(s):<br><ul>${conflictList}</ul><br>A Suretor can only be assigned to one active/open case at a time.`,
           icon: 'error',
           confirmButtonText: 'Ok'
         });
         this.revertSuretyDrag(controlId);
         return;
       }
+      // --- END NEW SURETOR CONFLICT CHECK ---
+
 
       // NOTE TO SELF: Fetch the Suretor document from the 'suretors' collection
       const suretorDoc = await this.af.collection('suretors').doc(inputNIB).get().pipe(take(1)).toPromise();
@@ -651,9 +711,19 @@ export class BailAppTableComponent implements OnInit {
       if ((suretorData as SuretyApplication).surety?.nib) {
         // NOTE TO SELF: It's the new SuretyApplication format
         console.log('NOTE TO SELF: Detected new SuretyApplication format.');
-        suretorToAssign = (suretorData as SuretyApplication).surety;
-        suretorFullName = suretorToAssign.fullName; // Use fullName from new format
-        // No conversion needed, it's already in the desired structure.
+        const newSuretyApp = suretorData as SuretyApplication;
+        suretorToAssign = newSuretyApp.surety;
+
+        // Ensure fullName is present, construct if not
+        if (!suretorToAssign.fullName || suretorToAssign.fullName.trim() === '') {
+          suretorFullName = `${suretorToAssign.lastName || ''}, ${suretorToAssign.firstName || ''} ${suretorToAssign.middleName || ''}`.trim();
+          // Optionally, update the suretorData in Firestore with the generated fullName
+          await this.af.collection('suretors').doc(inputNIB).update({ 'surety.fullName': suretorFullName })
+            .then(() => console.log('NOTE TO SELF: Updated fullName in new SuretyApplication format.'))
+            .catch(error => console.error('NOTE TO SELF: Error updating fullName in new SuretyApplication:', error));
+        } else {
+          suretorFullName = suretorToAssign.fullName;
+        }
       } else {
         // NOTE TO SELF: It's the old Suretor format. Perform on-the-fly conversion.
         console.log('NOTE TO SELF: Detected old Suretor format. Converting to new SuretyApplication.');
@@ -661,6 +731,7 @@ export class BailAppTableComponent implements OnInit {
 
         // Construct the new Surety object from the old Suretor data
         const newSurety: Surety = {
+          // Always construct fullName during conversion for old format
           fullName: `${oldSuretor.lastName || ''}, ${oldSuretor.firstName || ''} ${oldSuretor.middleName || ''}`.trim(),
           firstName: oldSuretor.firstName || '',
           middleName: oldSuretor.middleName || '',
@@ -727,7 +798,7 @@ export class BailAppTableComponent implements OnInit {
           .catch(error => console.error('NOTE TO SELF: Error converting and saving old Suretor:', error));
 
         suretorToAssign = newSurety; // Use the newly constructed Surety object
-        suretorFullName = newSurety.fullName;
+        suretorFullName = newSurety.fullName; // Use the constructed fullName
         suretorData = newSuretyApplication; // Update suretorData to the new format for consistency
       }
 
@@ -747,7 +818,7 @@ export class BailAppTableComponent implements OnInit {
       // NOTE TO SELF: Update the control comment in the UI
       const suretyControl = this.targetControls.find((c) => c.id === controlId);
       if (suretyControl) {
-        suretyControl.controlComment = `Surety ${suretorFullName} assigned to this hearing`;
+        suretyControl.controlComment = `Surety ${suretorFullName} assigned to this hearing. Click to edit Suretor.`;
       }
 
       Swal.fire({
@@ -770,15 +841,59 @@ export class BailAppTableComponent implements OnInit {
   }
 
   setHearingDateTime() {
+    // Pre-populate with current or existing date/time
+    let currentDateFormatted = '';
+    let currentTimeFormatted = '';
+    if (this.hearings.hearingDateUnix) {
+      let existingTimestamp = parseInt(this.hearings.hearingDateUnix);
+      // Convert the unixTimestamp to milliseconds if needed
+      if (existingTimestamp.toString().length < 13) {
+        existingTimestamp = existingTimestamp * 1000;
+      }
+      const existingDate = new Date(existingTimestamp);
+      currentDateFormatted = existingDate.toISOString().split('T')[0]; // YYYY-MM-DD
+      currentTimeFormatted = existingDate.toTimeString().split(' ')[0].substring(0, 5); // HH:mm
+    } else {
+      // Default to current date/time if not set, for user convenience
+      const now = new Date();
+      currentDateFormatted = now.toISOString().split('T')[0];
+      currentTimeFormatted = now.toTimeString().split(' ')[0].substring(0, 5);
+    }
+
     // Open a model with Swal to show a calendar and time selection to set a hearing date and time
     Swal.fire({
-      title: 'Set Hearing Date and Time',
-      html: '<input id="swal-input1" type="datetime-local" class="swal2-input" placeholder="Date">',
+      title: 'Set Bail Application Hearing Date & Time',
+      html: `
+        <div class="form-group text-left">
+          <label for="swal-date-input" class="col-form-label">Select Hearing Date:</label>
+          <input id="swal-date-input" type="date" class="form-control" value="${currentDateFormatted}">
+        </div>
+        <div class="form-group mt-3 text-left">
+          <label for="swal-time-input" class="col-form-label">Select Hearing Time:</label>
+          <input id="swal-time-input" type="time" class="form-control" value="${currentTimeFormatted}">
+        </div>
+      `,
       focusConfirm: false,
       showCancelButton: true,
+      confirmButtonText: 'Set Date & Time',
       preConfirm: () => {
-        const datetime = (<HTMLInputElement>document.getElementById('swal-input1')).value;
-        return {date: datetime};
+        const dateInput = (<HTMLInputElement>document.getElementById('swal-date-input')).value;
+        const timeInput = (<HTMLInputElement>document.getElementById('swal-time-input')).value;
+
+        if (!dateInput || !timeInput) {
+          Swal.showValidationMessage('Please select both a date and a time.');
+          return false;
+        }
+
+        const combinedDateTimeString = `${dateInput}T${timeInput}:00`; // ISO 8601 format
+        const selectedDate = new Date(combinedDateTimeString);
+
+        if (isNaN(selectedDate.getTime())) {
+          Swal.showValidationMessage('Invalid date or time entered.');
+          return false;
+        }
+
+        return selectedDate.getTime(); // Return Unix timestamp in milliseconds
       }
     } as any).then((result) => {
       // Check to see if the user canceled or dismissed the swal modal
@@ -796,15 +911,15 @@ export class BailAppTableComponent implements OnInit {
           this.sourceControls.unshift(hearingDate);
         }
       } else {
-        const unixTimestamp = new Date(result.value.date).getTime();
-        this.hearings.hearingDateUnix = unixTimestamp.toString();
+        const unixTimestamp = result.value.toString(); // Result is already in milliseconds
+        this.hearings.hearingDateUnix = unixTimestamp;
         this.updateHearing(this.hearings);
         // Get the BookingEvent for this hearing
         // NOTE TO SELF: This part might need adjustment if BookingEvents structure changes or is not directly accessible this way.
         this.af.collection('BookingEvents').doc(this.hearings.eventID).get().subscribe((bookingEventDoc) => {
           if (bookingEventDoc.exists) {
             const bailApp = bookingEventDoc.data() as BookingEvents;
-            bailApp.hearingDateSet = unixTimestamp.toString();
+            bailApp.hearingDateSet = unixTimestamp; // Save as string
             this.af.collection('BookingEvents').doc(this.hearings.eventID).update(bailApp);
           }
         });
@@ -957,6 +1072,9 @@ export class BailAppTableComponent implements OnInit {
       if (control.id == '3') {
         this.setHearingDateTime();
       }
+      if (control.id == '4' || control.id == '5') { // Handle click for Surety 1 or Surety 2
+        this.editSuretorInfo(control.id);
+      }
       if (control.id == '6') {
         this.showReasonDenied();
       }
@@ -973,6 +1091,303 @@ export class BailAppTableComponent implements OnInit {
         this.doShowBailBond();
       }
     }
+  }
+
+  // New method to edit Suretor information
+  private async editSuretorInfo(controlId: string): Promise<void> {
+    const isSurety1 = controlId === '4';
+    const suretorNIB = isSurety1 ? this.hearings.suretorNIB : this.hearings.suretor2NIB;
+
+    if (!suretorNIB) {
+      Swal.fire({
+        title: 'Suretor Not Assigned',
+        text: 'No suretor is currently assigned to this slot.',
+        icon: 'info',
+        confirmButtonText: 'Ok'
+      });
+      return;
+    }
+
+    const suretorDoc = await this.af.collection('suretors').doc(suretorNIB).get().pipe(take(1)).toPromise();
+
+    if (!suretorDoc?.exists) {
+      Swal.fire({
+        title: 'Suretor Not Found',
+        text: 'The suretor record could not be found in the system.',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+      });
+      return;
+    }
+
+    let suretorData: SuretyApplication = suretorDoc.data() as SuretyApplication;
+    let currentSurety: Surety = suretorData.surety;
+
+    // Format DOB for input type="date"
+    const dobFormatted = currentSurety.dob instanceof Timestamp ?
+      currentSurety.dob.toDate().toISOString().split('T')[0] : '';
+
+    // Generate HTML for the form
+    const formHtml = `
+      <style>
+        .swal2-input-group {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          margin-bottom: 10px;
+          text-align: left;
+        }
+        .swal2-input-group label {
+          margin-bottom: 5px;
+          font-weight: bold;
+          color: #333;
+        }
+        .swal2-input-group input,
+        .swal2-input-group textarea {
+          width: 100%;
+          padding: 8px;
+          margin-top: 2px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          box-sizing: border-box; /* Include padding in width */
+        }
+        .swal2-textarea {
+          resize: vertical;
+          min-height: 60px;
+        }
+        .swal2-title {
+          color: #0056b3; /* A nice blue for titles */
+        }
+        .swal2-container {
+            font-family: 'Inter', sans-serif; /* Use Inter font */
+        }
+        .swal2-styled.swal2-confirm {
+            background-color: #007bff !important; /* Blue save button */
+            border-radius: 8px !important;
+            padding: 10px 20px !important;
+            font-size: 16px !important;
+        }
+        .swal2-styled.swal2-cancel {
+            border-radius: 8px !important;
+            padding: 10px 20px !important;
+            font-size: 16px !important;
+        }
+      </style>
+      <div class="swal2-input-group">
+        <label for="swal-nib">NIB (Not Editable):</label>
+        <input id="swal-nib" class="swal2-input" value="${currentSurety.nib || ''}" readonly>
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-firstName">First Name:</label>
+        <input id="swal-firstName" class="swal2-input" value="${currentSurety.firstName || ''}">
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-middleName">Middle Name:</label>
+        <input id="swal-middleName" class="swal2-input" value="${currentSurety.middleName || ''}">
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-lastName">Last Name:</label>
+        <input id="swal-lastName" class="swal2-input" value="${currentSurety.lastName || ''}">
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-address">Address:</label>
+        <input id="swal-address" class="swal2-input" value="${currentSurety.address || ''}">
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-dob">Date of Birth:</label>
+        <input id="swal-dob" type="date" class="swal2-input" value="${dobFormatted}">
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-email">Email:</label>
+        <input id="swal-email" type="email" class="swal2-input" value="${currentSurety.email || ''}">
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-phone">Phone:</label>
+        <input id="swal-phone" type="tel" class="swal2-input" value="${currentSurety.phone || ''}">
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-poBox">PO Box:</label>
+        <input id="swal-poBox" class="swal2-input" value="${currentSurety.poBox || ''}">
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-spn">SPN:</label>
+        <input id="swal-spn" class="swal2-input" value="${currentSurety.spn || ''}">
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-empName">Employer Name:</label>
+        <input id="swal-empName" class="swal2-input" value="${currentSurety.empName || ''}">
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-empAddress">Employer Address:</label>
+        <input id="swal-empAddress" class="swal2-input" value="${currentSurety.empAddress || ''}">
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-empPhone">Employer Phone:</label>
+        <input id="swal-empPhone" type="tel" class="swal2-input" value="${currentSurety.empPhone || ''}">
+      </div>
+
+      <h3 style="margin-top: 20px; color: #0056b3;">Immovable Property</h3>
+      <div class="swal2-input-group">
+        <label for="swal-immovableParticulars">Particulars:</label>
+        <textarea id="swal-immovableParticulars" class="swal2-textarea">${currentSurety.immovableProperty?.particulars || ''}</textarea>
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-immovableValue">Estimated Value:</label>
+        <input id="swal-immovableValue" type="number" step="0.01" class="swal2-input" value="${currentSurety.immovableProperty?.estimatedValue || 0}">
+      </div>
+
+      <h3 style="margin-top: 20px; color: #0056b3;">Bank Account</h3>
+      <div class="swal2-input-group">
+        <label for="swal-bankName">Bank Name:</label>
+        <input id="swal-bankName" class="swal2-input" value="${currentSurety.bankAccount?.bankName || ''}">
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-accountType">Account Type:</label>
+        <input id="swal-accountType" class="swal2-input" value="${currentSurety.bankAccount?.accountType || ''}">
+      </div>
+      <div class="swal2-input-group">
+        <label for="swal-accountBalance">Account Balance:</label>
+        <input id="swal-accountBalance" type="number" step="0.01" class="swal2-input" value="${currentSurety.bankAccount?.accountBalance || 0}">
+      </div>
+
+      <h3 style="margin-top: 20px; color: #0056b3;">Other Moveable Property</h3>
+      <div class="swal2-input-group">
+        <label for="swal-otherMoveableProperty">Description (Comma Separated):</label>
+        <textarea id="swal-otherMoveableProperty" class="swal2-textarea">${currentSurety.otherMoveableProperty?.map(a => a.description).join(', ') || ''}</textarea>
+      </div>
+    `;
+
+    Swal.fire({
+      title: `Edit Suretor Information (${suretorNIB})`,
+      html: formHtml,
+      width: '600px',
+      showCancelButton: true,
+      confirmButtonText: 'Save Changes',
+      showLoaderOnConfirm: true,
+      preConfirm: () => {
+        // Retrieve values from the form
+        const firstName = (<HTMLInputElement>document.getElementById('swal-firstName')).value;
+        const middleName = (<HTMLInputElement>document.getElementById('swal-middleName')).value;
+        const lastName = (<HTMLInputElement>document.getElementById('swal-lastName')).value;
+        const address = (<HTMLInputElement>document.getElementById('swal-address')).value;
+        const dobInput = (<HTMLInputElement>document.getElementById('swal-dob')).value;
+        const email = (<HTMLInputElement>document.getElementById('swal-email')).value;
+        const phone = (<HTMLInputElement>document.getElementById('swal-phone')).value;
+        const poBox = (<HTMLInputElement>document.getElementById('swal-poBox')).value;
+        const spn = (<HTMLInputElement>document.getElementById('swal-spn')).value;
+        const empName = (<HTMLInputElement>document.getElementById('swal-empName')).value;
+        const empAddress = (<HTMLInputElement>document.getElementById('swal-empAddress')).value;
+        const empPhone = (<HTMLInputElement>document.getElementById('swal-empPhone')).value;
+
+        const immovableParticulars = (<HTMLTextAreaElement>document.getElementById('swal-immovableParticulars')).value;
+        const immovableValue = parseFloat((<HTMLInputElement>document.getElementById('swal-immovableValue')).value);
+
+        const bankName = (<HTMLInputElement>document.getElementById('swal-bankName')).value;
+        const accountType = (<HTMLInputElement>document.getElementById('swal-accountType')).value;
+        const accountBalance = parseFloat((<HTMLInputElement>document.getElementById('swal-accountBalance')).value);
+
+        const otherMoveablePropertyText = (<HTMLTextAreaElement>document.getElementById('swal-otherMoveableProperty')).value;
+
+        // Basic validation
+        if (!firstName || !lastName || !address || !phone) {
+          Swal.showValidationMessage('Please fill in all required personal fields (First Name, Last Name, Address, Phone).');
+          return false;
+        }
+
+        // Convert DOB string to Timestamp
+        let dobTimestamp: Timestamp | null = null;
+        if (dobInput) {
+          try {
+            dobTimestamp = Timestamp.fromDate(new Date(dobInput));
+          } catch (e) {
+            Swal.showValidationMessage('Invalid Date of Birth format.');
+            return false;
+          }
+        }
+
+        // Convert otherMoveablePropertyText to array of MoveableAsset
+        const otherMoveableProperty: MoveableAsset[] = otherMoveablePropertyText.split(',').map(desc => ({
+          description: desc.trim(),
+          estimatedValue: 0 // Default value, as we only capture description here
+        })).filter(asset => asset.description !== '');
+
+
+        return {
+          firstName, middleName, lastName, address, dob: dobTimestamp, email, phone, poBox, spn,
+          empName, empAddress, empPhone,
+          immovableProperty: {
+            particulars: immovableParticulars,
+            estimatedValue: isNaN(immovableValue) ? 0 : immovableValue
+          },
+          bankAccount: {
+            bankName,
+            accountType,
+            accountBalance: isNaN(accountBalance) ? 0 : accountBalance
+          },
+          otherMoveableProperty
+        };
+      },
+      allowOutsideClick: () => !Swal.isLoading()
+    } as any).then(async (formValues) => {
+      if (formValues.isConfirmed && formValues.value) {
+        const updatedSuretyData = formValues.value;
+
+        // Construct full name for updated data
+        const newFullName = `${updatedSuretyData.lastName || ''}, ${updatedSuretyData.firstName || ''} ${updatedSuretyData.middleName || ''}`.trim();
+        updatedSuretyData.fullName = newFullName;
+
+        try {
+          // Update only the 'surety' sub-object within the SuretyApplication document
+          // Firestore update syntax for nested objects
+          const updatePayload: any = {
+            'surety.firstName': updatedSuretyData.firstName,
+            'surety.middleName': updatedSuretyData.middleName,
+            'surety.lastName': updatedSuretyData.lastName,
+            'surety.fullName': updatedSuretyData.fullName,
+            'surety.address': updatedSuretyData.address,
+            'surety.dob': updatedSuretyData.dob,
+            'surety.email': updatedSuretyData.email,
+            'surety.phone': updatedSuretyData.phone,
+            'surety.poBox': updatedSuretyData.poBox,
+            'surety.spn': updatedSuretyData.spn,
+            'surety.empName': updatedSuretyData.empName,
+            'surety.empAddress': updatedSuretyData.empAddress,
+            'surety.empPhone': updatedSuretyData.empPhone,
+            'surety.immovableProperty.particulars': updatedSuretyData.immovableProperty.particulars,
+            'surety.immovableProperty.estimatedValue': updatedSuretyData.immovableProperty.estimatedValue,
+            'surety.bankAccount.bankName': updatedSuretyData.bankAccount.bankName,
+            'surety.bankAccount.accountType': updatedSuretyData.bankAccount.accountType,
+            'surety.bankAccount.accountBalance': updatedSuretyData.bankAccount.accountBalance,
+            'surety.otherMoveableProperty': updatedSuretyData.otherMoveableProperty,
+          };
+
+          await this.af.collection('suretors').doc(suretorNIB).update(updatePayload);
+
+          Swal.fire({
+            title: 'Suretor Info Updated!',
+            text: 'The suretor information has been successfully saved.',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          });
+
+          // Update the control comment in the UI to reflect potential name changes
+          const suretyControl = this.targetControls.find((c) => c.id === controlId);
+          if (suretyControl) {
+            suretyControl.controlComment = `Surety ${updatedSuretyData.fullName} assigned to this hearing. Click to edit Suretor.`;
+          }
+          this.refreshPickList(); // Refresh the UI to reflect changes
+
+        } catch (error) {
+          console.error('Error updating suretor:', error);
+          Swal.fire({
+            title: 'Error!',
+            text: 'There was an error saving the suretor information: ' + error.message,
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
+        }
+      }
+    });
   }
 
   showReasonDenied() {

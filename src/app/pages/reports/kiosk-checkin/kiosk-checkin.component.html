@@ -1,93 +1,110 @@
-<div style="width: 100%; min-height: 100vh; background-color: #f8f9fa;">
-  <!-- Header Section with Exit Button -->
-  <header style="
-      background-color: navy;
-      color: gold;
-      padding: 1.5rem 0;
-      text-align: center;
-      font-size: 2rem;
-      font-weight: bold;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      position: relative;
-  ">
-    <button (click)="doExit()" style="
-        position: absolute;
-        top: 50%;
-        left: 20px;
-        transform: translateY(-50%);
-        background-color: red;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        font-size: 1rem;
-        font-weight: bold;
-        cursor: pointer;
-        border-radius: 5px;
-    ">
+<div class="container-fluid py-4 bg-light">
+  <!-- Header Section -->
+  <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4">
+    <h1 class="text-center text-primary mb-4 mb-sm-0 w-100 w-sm-auto" style="color: #003366;">
+      BAIL MANAGEMENT KIOSK CHECK-INS
+    </h1>
+    <button (click)="exitKiosk()"
+            class="btn btn-danger shadow-sm mt-3 mt-sm-0"> <!-- Standard width button -->
       Exit
     </button>
-    BAIL MANAGEMENT KIOSK CHECK-INS
-  </header>
+  </div>
 
-  <div class="container mt-4">
-    <div *ngIf="loading" class="text-center mb-4" style="font-size: 1.25rem; color: #555;">
-      Data Loading... Please wait
+  <!-- Summary Section - Centered -->
+  <div class="text-center my-4">
+    <h2 class="text-secondary mb-2">Displaying {{ displayedCount }} People</h2>
+    <p class="text-muted">Date Range: {{ currentDateRange }}</p>
+  </div>
+
+  <!-- Date Range Buttons - Centered -->
+  <div class="d-flex flex-wrap justify-content-center mb-4">
+    <button (click)="loadCheckins('week')"
+            class="btn btn-primary shadow-sm mx-1 my-1"
+            [class.active]="selectedRange === 'week'">
+      Past Week
+    </button>
+    <button (click)="loadCheckins('month')"
+            class="btn btn-primary shadow-sm mx-1 my-1"
+            [class.active]="selectedRange === 'month'">
+      1 Month
+    </button>
+    <button (click)="loadCheckins('3months')"
+            class="btn btn-primary shadow-sm mx-1 my-1"
+            [class.active]="selectedRange === '3months'">
+      3 Months
+    </button>
+    <button (click)="loadCheckins('6months')"
+            class="btn btn-primary shadow-sm mx-1 my-1"
+            [class.active]="selectedRange === '6months'">
+      6 Months
+    </button>
+    <button (click)="loadAllCheckins()"
+            class="btn btn-warning shadow-sm mx-1 my-1"
+            [class.active]="selectedRange === 'all'">
+      Show All
+    </button>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="text-center text-muted my-5">
+    Data Loading... Please wait
+  </div>
+
+  <!-- Main Content Area -->
+  <div *ngIf="!isLoading" class="card shadow-sm p-3 my-4">
+    <p class="text-center text-info font-weight-bold mb-3">
+      IF CHECK-IN HAS A PHOTO, CLICK ON THE PHOTO TO VIEW
+    </p>
+
+    <!-- Search Input -->
+    <div class="mb-3">
+      <input pInputText type="text" (input)="applyFilterGlobal($event, 'contains')" placeholder="Search by Defendant Name"
+             class="form-control">
     </div>
 
-    <div *ngIf="!loading">
-      <div class="text-center mb-4" style="font-size: 1.25rem; color: #555;">
-        IF CHECK-IN HAS A PHOTO, CLICK ON THE PHOTO TO VIEW
-      </div>
+    <!-- PrimeNG Table for Kiosk Check-ins -->
+    <p-table #dt [value]="filteredKioskCheckins" [paginator]="true" [rows]="100" [showCurrentPageReport]="true"
+             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+             [rowsPerPageOptions]="[10,25,50,100]" styleClass="p-datatable-gridlines p-datatable-sm"
+             [globalFilterFields]="['defendantName']"
+             [sortField]="'checkinDate'" [sortOrder]="-1"> <!-- Default sort by checkinDate descending -->
 
-      <!-- Search Box -->
-      <input
-        type="text"
-        pInputText
-        placeholder="Search by Name"
-        (input)="filterTable($event.target.value)"
-        style="width: 300px; padding: 0.5rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px;"
-      />
-
-      <p-table
-        #dt
-        [value]="checkins"
-        [paginator]="true"
-        [rows]="100"
-        [totalRecords]="totalRecords"
-        [sortField]="'checkinDate'"
-        [sortOrder]="-1"
-        sortMode="multiple"
-        class="p-datatable-striped p-datatable-gridlines"
-        style="width: 100%;"
-      >
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Photo</th>
-            <th pSortableColumn="name">Defendant Name <p-sortIcon field="name"></p-sortIcon></th>
-            <th pSortableColumn="location">Location <p-sortIcon field="location"></p-sortIcon></th>
-            <th pSortableColumn="dayOfWeek">Day of Week <p-sortIcon field="dayOfWeek"></p-sortIcon></th>
-            <th pSortableColumn="checkinDate">Check-in Date <p-sortIcon field="checkinDate"></p-sortIcon></th>
-          </tr>
-        </ng-template>
-
-        <ng-template pTemplate="body" let-checkin>
-          <tr>
-            <td>
-              <img
-                *ngIf="checkin.photoURL"
-                [src]="checkin.photoURL"
-                alt="Photo"
-                style="height: 50px; width: auto; cursor: pointer;"
-                (click)="showPhoto(checkin.photoURL)"
-              />
-            </td>
-            <td>{{ checkin.name }}</td>
-            <td>{{ checkin.location || 'N/A' }}</td>
-            <td>{{ checkin.dayOfWeek }}</td>
-            <td>{{ checkin.checkinDate | date:'short' }}</td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="photoURL" class="text-center">Photo <p-sortIcon field="photoURL"></p-sortIcon></th>
+          <th pSortableColumn="defendantName" class="text-center">Defendant Name <p-sortIcon field="defendantName"></p-sortIcon></th>
+          <th pSortableColumn="location" class="text-center">Location <p-sortIcon field="location"></p-sortIcon></th>
+          <th pSortableColumn="dayOfWeek" class="text-center">Day of Week <p-sortIcon field="dayOfWeek"></p-sortIcon></th>
+          <th pSortableColumn="checkinDate" class="text-center">Check-in Date <p-sortIcon field="checkinDate"></p-sortIcon></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-checkin>
+        <tr>
+          <td class="text-center">
+            <ng-container *ngIf="checkin.photoURL; else noPhoto">
+              <img [src]="checkin.photoURL" alt="Check-in Photo"
+                   class="rounded-circle shadow-sm mx-auto d-block"
+                   style="width: 64px; height: 64px; object-fit: cover; cursor: pointer;"
+                   (click)="viewPhoto(checkin.photoURL)"
+                   onerror="this.onerror=null;this.src='https://placehold.co/64x64/cccccc/333333?text=No+Photo';">
+            </ng-container>
+            <ng-template #noPhoto>
+              <img src="https://placehold.co/64x64/cccccc/333333?text=No+Photo" alt="No Photo Available"
+                   class="rounded-circle mx-auto d-block"
+                   style="width: 64px; height: 64px; object-fit: cover;">
+            </ng-template>
+          </td>
+          <td class="text-center">{{ checkin.defendantName }}</td>
+          <td class="text-center">{{ checkin.location }}</td>
+          <td class="text-center">{{ checkin.dayOfWeek }}</td>
+          <td class="text-center">{{ checkin.checkinDate | date:'short' }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center py-4 text-muted">No check-ins found for the selected date range.</td>
+        </tr>
+      </ng-template>
+    </p-table>
   </div>
 </div>

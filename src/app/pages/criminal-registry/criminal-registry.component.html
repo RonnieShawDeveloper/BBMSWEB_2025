@@ -1,100 +1,163 @@
-<section>
-  <div class="row" style="background: var(--blue);text-align: center;">
-    <div class="col-4 text-left"><span style="color: rgb(255,255,255);font-size: 26px;font-weight: bold;">CRIMINAL REGISTRY</span></div>
-    <div class="col-8 text-right">
-      <span class="btn btn-warning m-1" (click)="doBailAppReport()"><i class="fa fa-print fa-2x"></i> APPLICATION REPORT</span>
-      <span class="btn btn-success m-1" (click)="doPhoneReport()"><i class="fa fa-print fa-2x"></i> PHONE CHECK-INS</span>
-      <span class="btn btn-secondary m-1" (click)="doBailKioskCheckin()"><i class="fa fa-print fa-2x"></i> KIOSK CHECK-IN REPORT</span>
+<section class="bg-primary text-white py-4 px-3 rounded-bottom shadow">
+  <div class="d-flex flex-column flex-md-row align-items-center justify-content-between">
+    <div class="text-center text-md-left mb-3 mb-md-0">
+      <h1 class="display-4 font-weight-bold">CRIMINAL REGISTRY</h1>
+    </div>
+    <div class="d-flex flex-wrap justify-content-center justify-content-md-end">
+      <button type="button" class="btn btn-warning btn-sm m-1" (click)="doBailAppReport()">
+        <i class="fa fa-print"></i> APPLICATION REPORT
+      </button>
+      <button type="button" class="btn btn-success btn-sm m-1" (click)="doPhoneReport()">
+        <i class="fa fa-print"></i> PHONE CHECK-INS
+      </button>
+      <button type="button" class="btn btn-secondary btn-sm m-1" (click)="doBailKioskCheckin()">
+        <i class="fa fa-print"></i> KIOSK CHECK-IN REPORT
+      </button>
     </div>
   </div>
 </section>
-<section *ngIf="showMainTable">
-  <div class="row border border-dark rounded m-2">
-    <div class="col d-flex justify-content-center align-items-center" style="font-size: 10px; font-weight: bold">FILTERS: &nbsp;
-      <div class="btn btn-sm btn-success p-0 px-1 mx-1" style="font-size: 10px" (click)="showAllHearings()">ALL</div>
-      <div class="btn btn-sm btn-secondary p-0 px-1 mx-1" style="font-size: 10px" (click)="showUnacknowledgedHearings()">NEW</div>
-      <div class="btn btn-sm btn-outline-info p-0 px-1 mx-1" style="font-size: 10px" (click)="showUpdatedHearings()">UPDATED</div>
-      <div class="btn btn-sm btn-outline-success p-0 px-1 mx-1" style="font-size: 10px" (click)="showPendingHearings()">PENDING</div>
-      <div class="btn btn-sm btn-info p-0 px-1 mx-1" style="font-size: 10px" (click)="showGrantedHearings()">GRANTED</div>
-      <div class="btn btn-sm btn-danger p-0 px-1 mx-1" style="font-size: 10px"(click)="showDeniedHearings()">DENIED</div>
-      <div class="btn btn-sm btn-warning p-0 px-1 mx-1" style="font-size: 10px" (click)="showRORHearings()">ROR</div>
-      <div class="btn btn-sm btn-primary p-0 px-1 mx-1" style="font-size: 10px" (click)="showBondHearings()">BOND</div>
-    </div>
-    <div class="col d-flex justify-content-center align-items-center" style="font-size: 10px; font-weight: bold"> STATISTICS: &nbsp;
-      <div class="badge badge-pill badge-success m-1" style="font-size: 10px">TOTAL: {{totalHearings}}</div>
-      <div class="badge badge-pill badge-secondary m-1" style="font-size: 10px">NEW: {{newHearings}}</div>
-      <div class="badge badge-pill badge-gray text-white m-1" style="font-size: 10px">PENDING HEARING: {{pendingHearings}}</div>
-      <div class="badge badge-pill badge-info m-1" style="font-size: 10px">GRANTED: {{grantedHearings}}</div>
-      <div class="badge badge-pill badge-danger m-1" style="font-size: 10px">DENIED: {{deniedHearings}}</div>
-      <div class="badge badge-pill badge-warning m-1" style="font-size: 10px">ROR: {{rorHearings}}</div>
-      <div class="badge badge-pill badge-primary m-1" style="font-size: 10px">BONDS ISSUED: {{bondsIssued}}</div>
+
+<section *ngIf="showMainTable" class="p-4">
+  <div class="card shadow-lg mb-4">
+    <div class="card-body">
+      <div class="row">
+        <!-- Filters Section -->
+        <div class="col-12 col-md-6 border-right border-md-2 border-gray-200 py-3">
+          <h3 class="h5 font-weight-bold text-secondary mb-3">FILTERS:</h3>
+          <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-success btn-sm m-1" (click)="showAllHearings()">ALL</button>
+            <button type="button" class="btn btn-secondary btn-sm m-1" (click)="showUnacknowledgedHearings()">NEW</button>
+            <button type="button" class="btn btn-outline-info btn-sm m-1" (click)="showUpdatedHearings()">UPDATED</button>
+            <button type="button" class="btn btn-outline-success btn-sm m-1" (click)="showPendingHearings()">PENDING</button>
+            <button type="button" class="btn btn-info btn-sm m-1" (click)="showGrantedHearings()">GRANTED</button>
+            <button type="button" class="btn btn-danger btn-sm m-1" (click)="showDeniedHearings()">DENIED</button>
+            <button type="button" class="btn btn-warning btn-sm m-1" (click)="showRORHearings()">ROR</button>
+            <button type="button" class="btn btn-primary btn-sm m-1" (click)="showBondHearings()">BOND</button>
+          </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="col-12 col-md-6 py-3">
+          <h3 class="h5 font-weight-bold text-secondary mb-3">STATISTICS:</h3>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge badge-pill badge-success m-1">TOTAL: {{totalHearings}}</span>
+            <span class="badge badge-pill badge-secondary m-1">NEW: {{newHearings}}</span>
+            <span class="badge badge-pill badge-dark m-1">PENDING HEARING: {{pendingHearings}}</span>
+            <span class="badge badge-pill badge-info m-1">GRANTED: {{grantedHearings}}</span>
+            <span class="badge badge-pill badge-danger m-1">DENIED: {{deniedHearings}}</span>
+            <span class="badge badge-pill badge-warning m-1">ROR: {{rorHearings}}</span>
+            <span class="badge badge-pill badge-info m-1">BONDS ISSUED: {{bondsIssued}}</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="card">
+
+  <div class="card p-4 shadow-lg rounded-lg">
     <p-table #dt1 [value]="hearings" [paginator]="true"
-             [rows]="5" sortField="unixDate" sortMode="single" sortOrder="-1"
+             [rows]="20" sortField="unixDate" sortMode="single" [sortOrder]="-1"
              [showCurrentPageReport]="true"
              [tableStyle]="{ 'min-width': '50rem' }"
              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Applications"
              [globalFilterFields]="['offenderName', 'unixDate', 'attorneyName', 'judgeName']">
+      <ng-template pTemplate="caption">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h4 font-weight-bold text-dark">Bail Applications</h2>
+          <button type="button" class="btn btn-danger btn-sm" (click)="clear(dt1)">
+            <i class="pi pi-filter-slash"></i> Clear Filters
+          </button>
+        </div>
+      </ng-template>
       <ng-template pTemplate="header">
         <tr>
           <th>
-            <p-columnFilter type="text" field="offenderName"></p-columnFilter>
+            <div class="d-flex align-items-center">
+              Name <p-sortIcon field="offenderName"></p-sortIcon>
+              <p-columnFilter type="text" field="offenderName" class="ml-auto"></p-columnFilter>
+            </div>
           </th>
           <th>
-            <p-columnFilter type="text" field="unixDate"></p-columnFilter>
+            <div class="d-flex align-items-center">
+              Application Date <p-sortIcon field="unixDate"></p-sortIcon>
+              <p-columnFilter type="text" field="unixDate" class="ml-auto"></p-columnFilter>
+            </div>
           </th>
           <th>
-            <p-columnFilter type="text" field="attorneyName"></p-columnFilter>
+            <div class="d-flex align-items-center">
+              Attorney <p-sortIcon field="attorneyName"></p-sortIcon>
+              <p-columnFilter type="text" field="attorneyName" class="ml-auto"></p-columnFilter>
+            </div>
           </th>
           <th>
-            <p-columnFilter type="text" field="judgeName"></p-columnFilter>
+            <div class="d-flex align-items-center">
+              Judge <p-sortIcon field="judgeName"></p-sortIcon>
+              <p-columnFilter type="text" field="judgeName" class="ml-auto"></p-columnFilter>
+            </div>
           </th>
           <th>
-            <p-columnFilter type="text" field="hearingDateUnix"></p-columnFilter>
+            <div class="d-flex align-items-center">
+              Hearing Date <p-sortIcon field="hearingDateUnix"></p-sortIcon>
+              <p-columnFilter type="text" field="hearingDateUnix" class="ml-auto"></p-columnFilter>
+            </div>
           </th>
-          <th class="text-center">
-            <div class="btn btn-danger btn-lg" (click)="clear(dt1)">CLEAR SEARCH</div>
-          </th>
-        </tr>
-        <tr>
-          <th pSortableColumn="offenderName">Name <p-sortIcon field="offenderName"></p-sortIcon></th>
-          <th pSortableColumn="unixDate">Application Date <p-sortIcon field="unixDate"></p-sortIcon></th>
-          <th pSortableColumn="attorneyName">Attorney <p-sortIcon field="attorneyName"></p-sortIcon></th>
-          <th pSortableColumn="judgeName">Judge <p-sortIcon field="judgeName"></p-sortIcon></th>
-          <th pSortableColumn="hearingDateUnix">Hearing Date <p-sortIcon field="hearingDateUnix"></p-sortIcon></th>
           <th class="text-center">CONTROLS</th>
         </tr>
-
       </ng-template>
       <ng-template pTemplate="body" let-apps>
         <tr>
-          <td class="text-center"><span class="font-weight-bold">{{ apps.offenderName }}</span><br>
-            <span *ngIf="!apps.registrarAck&&!apps.grantBailChecked&&!apps.deniedBailChecked"><span class="m-1 badge badge-danger p-1" style="font-size: 10px">NEW</span></span>
-            <span *ngIf="!apps.registrarAck&&apps.grantBailChecked"><span class="m-1 badge badge-warning p-1" style="font-size: 10px">UPDATED</span></span>
-            <span *ngIf="!apps.registrarAck&&apps.deniedBailChecked"><span class="m-1 badge badge-warning p-1" style="font-size: 10px">UPDATED</span></span>
-            <span *ngIf="apps.bailBondIssueDateUnix"><span class="m-1 badge badge-primary p-1" style="font-size: 10px">ON BOND</span></span>
-            <span *ngIf="apps.releaseOnRecognizance"><span class="m-1 badge p-badge-success border border-danger p-1" style="font-size: 10px">RELEASED ON RECOGNIZANCE</span></span>
-            <span *ngIf="apps.grantBailChecked"><span class="m-1 badge badge-success p-1" style="font-size: 10px">GRANTED</span></span>
-            <span *ngIf="apps.deniedBailChecked"><span class="m-1 badge badge-warning p-1" style="font-size: 10px">DENIED</span></span>
-            <span *ngIf="apps.elecMonitorChecked"><span class="m-1 badge badge-warning p-1" style="font-size: 10px">MONITOR</span></span>
-            <span *ngIf="apps.surrenderPassportChecked"><span class="m-1 badge badge-warning p-1" style="font-size: 10px">PASSPORT</span></span>
-            <span *ngIf="checkHearingDate(apps.hearingDateUnix)"><span class="m-1 badge badge-info p-1" style="font-size: 10px">HEARING SET</span></span>
-          </td>
-          <td class="text-center">{{ convertUnixDate(apps.unixDate) }}<br>{{humanizeDate(apps.unixDate)}}</td>
-          <td>{{ apps.attorneyName?apps.attorneyName:'NO ATTORNEY ASSIGNED' }}</td>
-          <td *ngIf="apps.judgeName">{{ apps.judgeName }}<br>
-            <div *ngIf="apps.judgeNewHearingAssignedEmailed" class="badge badge-success badge-pill" style="font-size: 10px; padding: 1px">EMAIL SENT</div>
-            <div *ngIf="!apps.judgeNewHearingAssignedEmailed" class="badge badge-warning badge-pill" style="cursor: pointer; font-size: 10px; padding: 1px" (click)="doResendNotice(apps)">EMAIL NOT SENT</div>
-          </td>
-          <td *ngIf="!apps.judgeName"><span class="font-weight-bold text-danger">NO JUDGE ASSIGNED</span></td>
-          <td *ngIf="apps.hearingDateUnix"  class="text-center">{{ convertUnixDate(apps.hearingDateUnix) }}<br>{{humanizeDate(apps.hearingDateUnix)}}</td>
-          <td *ngIf="!apps.hearingDateUnix" class="text-center"><span class="font-weight-bold text-danger">NO HEARING DATE SET</span></td>
           <td class="text-center">
-            <span class="btn btn-sm btn-success p-1 m-1 small" (click)="openBailApp(apps.bailAppLink)">VIEW APPLICATION</span>
-            <span class="btn btn-sm btn-info p-1 m-1 small" (click)="doBailAppTable(apps)">BAIL APP MENU</span>
+            <span class="font-weight-bold h5">{{ apps.offenderName }}</span><br>
+            <div class="d-flex flex-wrap justify-content-center mt-1">
+              <span *ngIf="!apps.registrarAck && !apps.grantBailChecked && !apps.deniedBailChecked" class="badge badge-danger badge-pill m-1">NEW</span>
+              <span *ngIf="!apps.registrarAck && (apps.grantBailChecked || apps.deniedBailChecked)" class="badge badge-warning badge-pill m-1">UPDATED</span>
+              <span *ngIf="apps.bailBondIssueDateUnix" class="badge badge-info badge-pill m-1">ON BOND</span>
+              <span *ngIf="apps.releaseOnRecognizance" class="badge badge-success badge-pill border border-danger m-1">RELEASED ON RECOGNIZANCE</span>
+              <span *ngIf="apps.grantBailChecked" class="badge badge-success badge-pill m-1">GRANTED</span>
+              <span *ngIf="apps.deniedBailChecked" class="badge badge-warning badge-pill m-1">DENIED</span>
+              <span *ngIf="apps.elecMonitorChecked" class="badge badge-info badge-pill m-1">MONITOR</span>
+              <span *ngIf="apps.surrenderPassportChecked" class="badge badge-info badge-pill m-1">PASSPORT</span>
+              <span *ngIf="checkHearingDate(apps.hearingDateUnix)" class="badge badge-info badge-pill m-1">HEARING SET</span>
+            </div>
           </td>
+          <td class="text-center">
+            {{ convertUnixDate(apps.unixDate) }}<br>
+            <span class="text-muted small">{{humanizeDate(apps.unixDate)}}</span>
+          </td>
+          <td>{{ apps.attorneyName ? apps.attorneyName : 'NO ATTORNEY ASSIGNED' }}</td>
+          <td>
+            <ng-container *ngIf="apps.judgeName; else noJudge">
+              {{ apps.judgeName }}<br>
+              <span *ngIf="apps.judgeNewHearingAssignedEmailed" class="badge badge-success badge-pill m-1">EMAIL SENT</span>
+              <span *ngIf="!apps.judgeNewHearingAssignedEmailed" class="badge badge-warning badge-pill m-1 cursor-pointer" (click)="doResendNotice(apps)">EMAIL NOT SENT</span>
+            </ng-container>
+            <ng-template #noJudge>
+              <span class="font-weight-bold text-danger">NO JUDGE ASSIGNED</span>
+            </ng-template>
+          </td>
+          <td class="text-center">
+            <ng-container *ngIf="apps.hearingDateUnix; else noHearingDate">
+              {{ convertUnixDate(apps.hearingDateUnix) }}<br>
+              <span class="text-muted small">{{humanizeDate(apps.hearingDateUnix)}}</span>
+            </ng-container>
+            <ng-template #noHearingDate>
+              <span class="font-weight-bold text-danger">NO HEARING DATE SET</span>
+            </ng-template>
+          </td>
+          <td class="text-center">
+            <div class="d-flex flex-column">
+              <button type="button" class="btn btn-success btn-sm mb-2" (click)="openBailApp(apps.bailAppLink)">
+                <i class="pi pi-file-pdf"></i> VIEW APPLICATION
+              </button>
+              <button type="button" class="btn btn-info btn-sm" (click)="doBailAppTable(apps)">
+                <i class="pi pi-bars"></i> BAIL APP MENU
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center py-5 text-muted">No bail applications found.</td>
         </tr>
       </ng-template>
     </p-table>
