@@ -7,35 +7,16 @@
   <base href="/">
 </head>
 <body style="background-color: white;">
-<div id="particles-js" style="position: fixed; width: 100%; height: 100%;"></div>
-<div id="splashscreen" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+<div id="splashscreen" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0; transition: opacity 500ms ease-in-out;">
   <img src="assets/img/app/splashscreen.png" alt="BBMS Logo" id="splash-logo">
 </div>
 
-<!-- Main Angular app root with fade-in effect after 1s delay -->
-<app-root style="display: none; opacity: 0; animation: fadeIn 1s ease forwards; animation-delay: 0s;"></app-root>
+<!-- Main Angular app root -->
+<app-root style="display: none;"></app-root>
 
 <noscript>Please enable JavaScript to continue using this application.</noscript>
 
 <style>
-  /* Splash logo animation with 1s delay, then a 2s explosion effect */
-  #splash-logo {
-    animation: explode 2s ease forwards;
-    animation-delay: 1s; /* Wait 1 second before starting */
-  }
-
-  /* Explosion animation keyframes */
-  @keyframes explode {
-    0% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    100% {
-      transform: scale(2.5); /* Increase size for a stronger explosion effect */
-      opacity: 0;
-    }
-  }
-
   /* Fade-in effect for main app root */
   @keyframes fadeIn {
     0% {
@@ -48,85 +29,36 @@
 </style>
 
 <script>
-  function initializeParticles() {
-    if (typeof particlesJS === "undefined") {
-      console.error("particlesJS is not defined");
-      return;
-    }
+  document.addEventListener('DOMContentLoaded', () => {
+    const splashscreen = document.getElementById('splashscreen');
+    const appRoot = document.querySelector('app-root');
 
-    particlesJS('particles-js', {
-      particles: {
-        number: {
-          value: 600, // Increase this number for more particles
-          density: {
-            enable: true,
-            value_area: 800
-          }
-        },
-        color: {
-          value: ["#1976d2", "#ff5733", "#ffc300", "#28b463", "#8e44ad"] // Multi-colored particles
-        },
-        shape: { type: ["circle"] },
-        opacity: {
-          value: 0.8, // Initial opacity of particles
-          random: true,
-          anim: {
-            enable: true,
-            speed: 0.5, // Controls how fast particles fade
-            opacity_min: 0.1, // Minimum opacity to achieve the fade-out effect
-            sync: false // Set to false for individual particle fade timing
-          }
-        },
-        size: {
-          value: 2, // Increase this value for larger particles
-          random: true // Random sizes for variety
-        },
-        line_linked: {
-          enable: false
-        },
-        move: {
-          enable: true,
-          speed: 12, // Speed of particles
-          direction: "none",
-          random: true,
-          straight: false,
-          out_mode: "out",
-          bounce: false,
-          attract: {
-            enable: false,
-            rotateX: 600,
-            rotateY: 1200
-          }
-        }
-      },
-      interactivity: {
-        detect_on: "canvas",
-        events: {
-          onhover: {
-            enable: false
-          },
-          onclick: {
-            enable: false
-          },
-          resize: true
-        },
-      },
-      retina_detect: true
-    });
+    // Initial state: hide app-root
+    appRoot.style.display = 'none';
 
-    // Hide splash screen and particles after 4 seconds
-    setTimeout(function() {
-      document.getElementById('splashscreen').style.display = 'none';
-      document.getElementById('particles-js').style.display = 'none';
+    // 1. Fade in splash screen (500ms)
+    splashscreen.style.display = 'block'; // Ensure it's visible for animation
+    setTimeout(() => {
+      splashscreen.style.opacity = '1';
+    }, 50); // Small delay to ensure CSS transition applies
 
-      // Show the main Angular app (already fading in due to CSS animation)
-      document.querySelector('app-root').style.display = 'block';
-    }, 4000);
-  }
+    // 2. Show for 1000ms after fade-in completes
+    // 3. Fade out splash screen (500ms)
+    setTimeout(() => {
+      splashscreen.style.opacity = '0';
+    }, 500 + 2000); // 500ms (fade-in) + 2000ms (display)
+
+    // 4. Hide splash screen and show app-root after fade-out completes
+    setTimeout(() => {
+      splashscreen.style.display = 'none';
+      appRoot.style.display = 'block';
+      // Optionally, if you want app-root to fade in as well:
+      // appRoot.style.opacity = '0';
+      // appRoot.style.transition = 'opacity 500ms ease-in-out';
+      // setTimeout(() => { appRoot.style.opacity = '1'; }, 50);
+    }, 500 + 2000 + 500); // Total duration
+  });
 </script>
-
-<!-- Load Particles.js from CDN and initialize after load -->
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js" onload="initializeParticles()"></script>
 </body>
 </html>
 
