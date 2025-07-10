@@ -8,10 +8,16 @@
   </div>
 
 </div>
-
 <div class="text-center h5 text-white bg-warning p-2 rounded rounded-lg shadow shadow-sm">
   NOTICE: ALL ACCESS TO THE SITE, AS WELL AS ALL CHANGES AND UPDATES TO ANY DATA FOUND WITHIN THIS SITE ARE RECORDED
 </div>
+<div class="row">
+  <div class="col-12 text-center">
+    <h5 class="text-white bg-info p-2 rounded rounded-lg shadow shadow-sm">Data for: {{ startDate }} - {{ endDate }}</h5>
+  </div>
+</div>
+
+
 <!-- Charts -->
 <div class="row" style="border: 1px solid black; border-radius: 10px; padding: 8px; margin-bottom: 30px">
   <!-- First Row: Full-Width Line Chart -->
@@ -30,7 +36,7 @@
     <canvas baseChart
             [data]="topChargesData"
             [type]="topChargesChartType"
-            [options]="{ indexAxis: 'y' }"> <!-- Makes it a horizontal bar chart -->
+            [options]="topChargesChartOptions">
     </canvas>
   </div>
 </div>
@@ -42,7 +48,7 @@
     <canvas baseChart
             [data]="honorableMentionsData"
             [type]="honorableMentionsChartType"
-            [options]="{ indexAxis: 'y' }"
+            [options]="honorableMentionsChartOptions"
             style="height: 400px; width: 100%;">
     </canvas>
   </div>
@@ -61,6 +67,14 @@
         {{ offender.name }} - {{ offender.age }} years
       </li>
     </ul>
+
+    <h4 class="mt-4">Top 5 Islands by Offender Count</h4>
+    <canvas baseChart
+            [data]="topIslandsData"
+            [type]="topIslandsChartType"
+            [options]="topIslandsChartOptions"
+            style="height: 200px; width: 100%;">
+    </canvas>
   </div>
 
   <!-- Magistrate Case Counts Horizontal Bar Chart -->
@@ -69,7 +83,7 @@
     <canvas baseChart
             [data]="magistrateCaseCountsData"
             [type]="magistrateCaseCountsChartType"
-            [options]="{ indexAxis: 'y' }"
+            [options]="magistrateCaseCountsChartOptions"
             style="height: 400px; width: 100%;">
     </canvas>
   </div>

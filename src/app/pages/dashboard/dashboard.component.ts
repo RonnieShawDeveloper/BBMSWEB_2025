@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from "@angular/fire/compat/firestore";
-import { ChartData, ChartType } from "chart.js";
+import { ChartData, ChartType, Chart } from "chart.js";
 import * as moment from 'moment';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,10 +29,12 @@ export class DashboardComponent implements OnInit {
   // Horizontal bar chart properties for top 20 charges
   public topChargesData: ChartData<'bar'>;
   public topChargesChartType: ChartType = 'bar';
+  public topChargesChartOptions: any; // Options for datalabels
 
   // Horizontal bar chart properties for Honorable Mentions (Top 10 offenders by bail amount)
   public honorableMentionsData: ChartData<'bar'>;
   public honorableMentionsChartType: ChartType = 'bar';
+  public honorableMentionsChartOptions: any; // Options for datalabels
 
   // Lists for oldest and youngest offenders
   public oldestOffenders: { name: string; age: number }[] = [];
@@ -39,12 +42,74 @@ export class DashboardComponent implements OnInit {
 
   public magistrateCaseCountsData: ChartData<'bar'>;
   public magistrateCaseCountsChartType: ChartType = 'bar';
+  public magistrateCaseCountsChartOptions: any; // Options for datalabels
 
-  constructor(private af: AngularFirestore) {}
+  // New properties for Top Islands Chart
+  public topIslandsData: ChartData<'bar'>;
+  public topIslandsChartType: ChartType = 'bar';
+  public topIslandsChartOptions: any; // Options for datalabels
+
+  public startDate: string;
+  public endDate: string;
+
+  constructor(private af: AngularFirestore) {
+    Chart.register(ChartDataLabels); // Register the datalabels plugin globally
+  }
 
   ngOnInit(): void {
-    // Fetch all bookings for Magistrate Court cases
-    this.af.collection('magistrateBookings').get().subscribe(snapshot => {
+    // Initialize chart options for datalabels
+    this.topChargesChartOptions = {
+      indexAxis: 'y',
+      plugins: {
+        datalabels: {
+          anchor: 'center',
+          align: 'center',
+          formatter: (value) => value // Display the value directly
+        }
+      }
+    };
+
+    this.honorableMentionsChartOptions = {
+      indexAxis: 'y',
+      plugins: {
+        datalabels: {
+          anchor: 'center',
+          align: 'center',
+          formatter: (value) => value // Display the value directly
+        }
+      }
+    };
+
+    this.magistrateCaseCountsChartOptions = {
+      indexAxis: 'y',
+      plugins: {
+        datalabels: {
+          anchor: 'center',
+          align: 'center',
+          formatter: (value) => value // Display the value directly
+        }
+      }
+    };
+
+    this.topIslandsChartOptions = {
+      indexAxis: 'y',
+      plugins: {
+        datalabels: {
+          anchor: 'center',
+          align: 'center',
+          formatter: (value) => value // Display the value directly
+        }
+      }
+    };
+
+    const sixMonthsAgo = moment().subtract(6, 'months').startOf('day');
+    const sixMonthsAgoUnixString = sixMonthsAgo.valueOf().toString(); // Convert to milliseconds string
+
+    this.startDate = sixMonthsAgo.format('MMMM D, YYYY');
+    this.endDate = moment().format('MMMM D, YYYY');
+
+    // Fetch bookings for Magistrate Court cases from the last 6 months
+    this.af.collection('magistrateBookings', ref => ref.where('unixDate', '>=', sixMonthsAgoUnixString)).get().subscribe(snapshot => {
       this.magistrateBookings = snapshot.docs.map(doc => doc.data());
       this.updateMagistrateCaseProgressionChart();
       this.updateMagistrateBailStatusChart();
@@ -52,6 +117,7 @@ export class DashboardComponent implements OnInit {
       this.updateHonorableMentionsChart();
       this.updateOldestAndYoungestOffenders();
       this.updateMagistrateCaseCountsChart();
+      this.updateTopIslandsChart(); // Call the new method
     });
   }
 
@@ -194,14 +260,7 @@ export class DashboardComponent implements OnInit {
 
     offenderBails.sort((a, b) => b.bailAmount - a.bailAmount);
 
-    const topOffenders = [];
-    for (const offender of offenderBails) {
-      if (topOffenders.length < 10 || offender.bailAmount === topOffenders[topOffenders.length - 1].bailAmount) {
-        topOffenders.push(offender);
-      } else {
-        break;
-      }
-    }
+    const topOffenders = offenderBails.slice(0, 10); // Strictly get top 10
 
     const labels = topOffenders.map(offender => offender.name);
     const data = topOffenders.map(offender => offender.bailAmount);
@@ -267,13 +326,49 @@ export class DashboardComponent implements OnInit {
     });
 
     // Prepare labels and data for the chart
-    const labels = Object.keys(magistrateCounts);
-    const data = Object.values(magistrateCounts);
+    const sortedMagistrates = Object.entries(magistrateCounts)
+      .sort((a, b) => a[1] - b[1]); // Sort by count, lowest to highest
+
+    const labels = sortedMagistrates.map(([magistrateName]) => magistrateName);
+    const data = sortedMagistrates.map(([, count]) => count);
 
     this.magistrateCaseCountsData = {
       labels: labels,
       datasets: [
         { data: data, label: 'Total Cases', backgroundColor: 'rgba(75, 192, 192, 0.6)' }
+      ]
+    };
+  }
+
+  // New method to update the Top Islands chart
+  private updateTopIslandsChart(): void {
+    const islandCounts: { [key: string]: number } = {};
+
+    this.magistrateBookings.forEach(booking => {
+      let islandName = booking.island;
+      if (islandName) {
+        // Remove text after comma, remove "Bahamas" (case-insensitive), then trim and uppercase
+        islandName = islandName.split(',')[0] // Remove text after comma
+                               .replace(/bahamas/gi, '') // Remove "Bahamas" case-insensitive
+                               .trim()
+                               .toUpperCase();
+        if (islandName) { // Ensure islandName is not empty after cleaning
+          islandCounts[islandName] = (islandCounts[islandName] || 0) + 1;
+        }
+      }
+    });
+
+    const sortedIslands = Object.entries(islandCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5); // Get top 5 islands
+
+    const labels = sortedIslands.map(([islandName]) => islandName);
+    const data = sortedIslands.map(([, count]) => count);
+
+    this.topIslandsData = {
+      labels: labels,
+      datasets: [
+        { data: data, label: 'Top 5 Islands', backgroundColor: 'rgba(153, 102, 255, 0.6)' } // Example color
       ]
     };
   }
