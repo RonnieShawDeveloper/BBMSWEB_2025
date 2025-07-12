@@ -1,0 +1,6 @@
+feat: Enhance Magistrate Suretor Report and Admin User Management
+
+- Refactored Magistrate Suretor Report to use PrimeNG table for improved display and functionality.
+- Implemented advanced duplicate detection for suretors, flagging only those associated with multiple distinct defendants (based on NIB).
+- Added "Show Logged In Today" filter to the Admin component, allowing administrators to easily view users who have logged in on the current day.
+- Corrected date parsing for `lastLogin` in the Admin component to accurately handle GMT timestamp format.

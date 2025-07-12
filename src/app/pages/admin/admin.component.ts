@@ -21,6 +21,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
   currentMember: Members = JSON.parse(localStorage.getItem('member') || '{}');
   allMembers: Members[] = [];
+  originalAllMembers: Members[] = [];
+  showLoggedInTodayOnly = false;
   subscriptions: any[] = [];
   dt1: Table | undefined;
 
@@ -70,6 +72,10 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       })
       // Check for duplicate email addresses
       this.checkDuplicates();
+      this.originalAllMembers = [...this.allMembers]; // Create a backup of the original list
+      if (this.showLoggedInTodayOnly) {
+        this.applyTodayFilter(); // Re-apply the filter if it was active
+      }
     }));
   }
 
@@ -264,4 +270,28 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     } );
   }
 
+  toggleLoggedInTodayFilter() {
+    this.showLoggedInTodayOnly = !this.showLoggedInTodayOnly;
+    if (this.showLoggedInTodayOnly) {
+      this.applyTodayFilter();
+    } else {
+      this.allMembers = [...this.originalAllMembers]; // Restore from backup
+    }
+  }
+
+  applyTodayFilter() {
+    const today = new Date();
+    this.allMembers = this.originalAllMembers.filter(member => {
+      if (!member.lastLogin || member.lastLogin === 'No Data') {
+        return false;
+      }
+      // lastLogin is in format "Wed, 10 Apr 2024 00:35:53 GMT"
+      const loginDate = new Date(member.lastLogin);
+
+      // Compare year, month, and day components
+      return loginDate.getFullYear() === today.getFullYear() &&
+             loginDate.getMonth() === today.getMonth() &&
+             loginDate.getDate() === today.getDate();
+    });
+  }
 }

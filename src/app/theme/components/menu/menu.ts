@@ -4,14 +4,10 @@ export const verticalMenuItems = [
     new Menu (1, 'Dashboard', '/', null, 'tachometer', null, false, 0),
     new Menu (40, 'Intake', '/intake', null, 'sign-in', null, false, 0),
     new Menu (50, 'Bookings', '/bookings', null, 'file', null, false, 0),
-    new Menu (60, 'Magistrate Court', '/magistratecourt', null, 'gavel', null, true, 0),
-    new Menu (61, 'Enter Order', '/magistrate-bench', null, 'gavel', null, false, 60),
+    new Menu (60, 'Magistrate Court', '/magistratecourt', null, 'gavel', null, false, 0),
     new Menu (70, 'Supreme Court', null, null, 'gavel', null, true, 0),
     new Menu (71, 'Registrar', '/criminalregistry', null, 'gavel', null, false, 70),
     new Menu (72, 'Judicial Portal', '/supreme_judge', null, 'gavel', null, false, 70),
-    new Menu (80, 'Attorney', '/attorney', null, 'black-tie', null, false, 0),
-    new Menu (90, 'DPP Office', '/dpp', null, 'lock', null, false, 0),
-    new Menu (100, 'Forms', '/forms', null, 'folder-open-o', null, false, 0),
     new Menu (110, 'Admin', 'admin', null, 'gear', null, false, 0),
 ]
 

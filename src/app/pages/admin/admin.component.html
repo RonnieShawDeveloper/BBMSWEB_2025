@@ -9,17 +9,23 @@
          [rowsPerPageOptions]="[10, 25, 50]"
          [globalFilterFields]="['lName', 'email', 'fName']">
   <ng-template pTemplate="caption">
-    <div class="d-flex flex-row my-3">
+    <div class="d-flex flex-row my-3 align-items-center">
       <div class="btn btn-outline-danger" (click)="clear(dt1)"><i class="fa fa-stop-circle"></i> CLEAR FILTERS</div>
-      <span class="p-input-icon-right ml-auto">
-        <input 
-  id="searchBox" 
-  pInputText 
-  class="form-control" 
-  type="text" 
-  (input)="dt1.filterGlobal($event.target.value, 'contains')" 
-  placeholder="Search Name/Email" />
-            </span>
+      <span class="ml-auto d-flex align-items-center">
+        <button class="btn btn-info" style="margin-right: 5px;" (click)="toggleLoggedInTodayFilter()">
+          <span *ngIf="!showLoggedInTodayOnly">Show Logged In Today</span>
+          <span *ngIf="showLoggedInTodayOnly">Show All Users</span>
+        </button>
+        <span class="p-input-icon-right">
+          <input 
+            id="searchBox" 
+            pInputText 
+            class="form-control" 
+            type="text" 
+            (input)="dt1.filterGlobal($event.target.value, 'contains')" 
+            placeholder="Search Name/Email" />
+        </span>
+      </span>
     </div>
   </ng-template>
 

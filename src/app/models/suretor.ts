@@ -49,6 +49,7 @@ export interface Suretor {
 }
 
 // New interfaces mirroring the Kotlin SuretyApplication data model from the Android app
+// This is the new format for the SuretyApplication document in Firestore form the Supreme Court
 
 export interface MoveableAsset {
   description: string;

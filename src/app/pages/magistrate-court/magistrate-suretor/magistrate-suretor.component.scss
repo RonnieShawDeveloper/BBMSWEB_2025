@@ -1,0 +1,8 @@
+::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  background-color: blue;
+  color: white;
+}
+
+::ng-deep .p-sortable-column-icon {
+  color: white !important;
+}
