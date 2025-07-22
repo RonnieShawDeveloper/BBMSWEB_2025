@@ -4,7 +4,7 @@ import { Settings } from '../../../app.settings.model';
 import { MenuService } from '../menu/menu.service';
 import { AuthService } from "../../../services/auth.service";
 import { UpdateService } from 'src/app/services/update-service.service';
-import Swal from 'sweetalert2';
+import { UiStateService } from '../../../services/ui-state.service';
 
 @Component({
   selector: 'app-header',
@@ -26,7 +26,8 @@ export class HeaderComponent implements OnInit {
     private authService: AuthService,
     private updateService: UpdateService,
     public appSettings: AppSettings,
-    public menuService: MenuService
+    public menuService: MenuService,
+    private uiStateService: UiStateService
   ) {
     this.settings = this.appSettings.settings;
     this.menuItems = this.menuService.getHorizontalMenuItems();
@@ -54,5 +55,13 @@ export class HeaderComponent implements OnInit {
 
   public logout() {
     this.authService.logout();
+  }
+
+  public zoomIn(): void {
+    this.uiStateService.zoomIn();
+  }
+
+  public zoomOut(): void {
+    this.uiStateService.zoomOut();
   }
 }

@@ -3,6 +3,8 @@ import { AngularFirestore } from "@angular/fire/compat/firestore";
 import { ChartData, ChartType, Chart } from "chart.js";
 import * as moment from 'moment';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { AnnouncementService } from '../../services/announcement.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-dashboard',
@@ -52,11 +54,12 @@ export class DashboardComponent implements OnInit {
   public startDate: string;
   public endDate: string;
 
-  constructor(private af: AngularFirestore) {
+  constructor(private af: AngularFirestore, private announcementService: AnnouncementService) {
     Chart.register(ChartDataLabels); // Register the datalabels plugin globally
   }
 
   ngOnInit(): void {
+    this.showAnnouncement();
     // Initialize chart options for datalabels
     this.topChargesChartOptions = {
       indexAxis: 'y',
@@ -120,6 +123,21 @@ export class DashboardComponent implements OnInit {
       this.updateTopIslandsChart(); // Call the new method
     });
   }
+
+  private showAnnouncement(): void {
+    if (this.announcementService.shouldShowAnnouncement()) {
+      const announcement = this.announcementService.getAnnouncement();
+      Swal.fire({
+        title: announcement.title,
+        html: announcement.html,
+        icon: 'info',
+        confirmButtonText: 'Got it!'
+      }).then(() => {
+        this.announcementService.markAsSeen();
+      });
+    }
+  }
+
 
 
   // Method to update the Magistrate Court bail status pie chart

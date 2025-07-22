@@ -13,7 +13,7 @@
                 <span *ngIf="member.authRegistrarClerk" class="badge badge-success badge-pill m-1">CRIMINAL REGISTRY STAFF</span>
                 <br>
                 <!-- Show the dates to the logged in user -->
-                <span class="text-warning">Member Since:</span> {{ member.memberSince | date: 'medium' }} 
+                <span class="text-warning">Member Since:</span> {{ member.memberSince | date: 'medium' }}
                 <span class="text-warning">Last Login:</span> {{ member.lastLogin | date: 'medium' }}
 
               </div>
@@ -38,6 +38,12 @@
                 >
                   <i class="fa fa-sign-out" aria-hidden="true"></i> LOGOUT
                 </span>
+                <button (click)="zoomOut()" class="btn btn-sm btn-outline-info ml-2 text-white" style="padding: 0px 4px; font-size: 14px; border-radius: 8px; line-height: 19px">
+                  <i class="fa fa-search-minus"></i>
+                </button>
+                <button (click)="zoomIn()" class="btn btn-sm btn-outline-info ml-1 text-white" style="padding: 0px 4px; font-size: 14px; border-radius: 8px; line-height: 19px">
+                  <i class="fa fa-search-plus"></i>
+                </button>
               </div>
 
         </div>

@@ -81,5 +81,6 @@ export interface Hearings {
   releaseOnRecognizance?: boolean;
   hearingDateReadable?: string;
   status?: string;
+  bondHtml?: string;
 }
 

@@ -1,11 +1,14 @@
-<div class="app"  [ngClass]="settings.theme.skin" 
-                  [class.navbar-fixed]="settings.theme.navbarIsFixed"  
-                  [class.sidebar-fixed]="settings.theme.sidebarIsFixed"  
-                  [class.horizontal-menu]="settings.theme.menu == 'horizontal'" 
-                  [class.compact]="settings.theme.menuType == 'compact'" 
-                  [class.mini]="settings.theme.menuType == 'mini'" 
+<div class="app"  [ngClass]="settings.theme.skin"
+                  [class.navbar-fixed]="settings.theme.navbarIsFixed"
+                  [class.sidebar-fixed]="settings.theme.sidebarIsFixed"
+                  [class.horizontal-menu]="settings.theme.menu == 'horizontal'"
+                  [class.compact]="settings.theme.menuType == 'compact'"
+                  [class.mini]="settings.theme.menuType == 'mini'"
                   [class.menu-hide]="!settings.theme.showMenu">
-    <div class="wrapper">
+    <div class="wrapper" [style.transform]="'scale(' + (zoomLevel$ | async) + ')'"
+         [style.transform-origin]="'top left'"
+         [style.width]="(100 / (zoomLevel$ | async)) + '%'"
+         [style.height]="(100 / (zoomLevel$ | async)) + '%'">
         <router-outlet></router-outlet>
-    </div> 
+    </div>
 </div>

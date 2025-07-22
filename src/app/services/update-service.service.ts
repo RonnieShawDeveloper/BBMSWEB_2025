@@ -40,7 +40,7 @@ export class UpdateService {
       cancelButtonText: 'No, I will update later',
     }).then((result) => {
       if (result.isConfirmed) {
-        window.location.reload();
+        this.swUpdate.activateUpdate().then(() => document.location.reload());
       } else {
         this.updateAvailableSubject.next(true);
         // Show an additional alert about the update button

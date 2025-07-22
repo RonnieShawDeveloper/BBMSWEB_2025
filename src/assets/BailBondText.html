@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bail Bond</title>
+</head>
+<body>
+<div id="bond-container">
+  <h1 style="text-align: center; font-weight: bold; text-decoration: underline; margin-bottom: 30px;">BAIL BOND</h1>
+
+  <div style="margin-bottom: 30px;">
+    <p>
+      FPO/CRI/BAL/___/___<br>
+      IN THE SUPREME COURT<br>
+      COMMONWEALTH OF THE BAHAMAS<br>
+      CRIMINAL DIVISION
+      <br><br>
+    </p>
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <p>
+      BE IT REMEMBERED that on the {{bondDate}}, {{partiesList}}, all of the Commonwealth of the Bahamas, came into the Registry of the Supreme Court before me
+    </p>
+    <p style="text-align: center; margin-top: 30px; margin-bottom: 30px;">
+      - <strong>{{assistantRegistrarName}}</strong> -
+    </p>
+    <p>
+      Assistant Registrar of the said Court and acknowledged to owe to The Crown the sum of {{bondAmountWords}} ({{bondAmount}}) lawful money of the Commonwealth of the Bahamas with one (1) or two (2) sureties to be levied upon THEIR goods and chattels, lands and tenements to The Crown's use and which payment truly to be made bind/s THEIR heirs, executors and administrators firmly by these presents.
+    </p>
+    <p>
+      <br>
+      SEALED with THEIR seal(s) and dated this {{bondDateFull}}.
+    </p>
+    <div style="text-align: right;">
+      <div style="border-top: 1px solid #000; width: 250px; margin-top: 50px; margin-bottom: 5px; margin-left: auto;"></div>
+      <div style="border-top: 1px solid #000; width: 250px; margin-top: 30px; margin-left: auto;"></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <p>
+      The condition of the above written bond or obligation is such that if the said <strong>{{offenderName}}</strong> shall attend upon the <strong>{{courtName}}</strong>, until the charges of <strong>{{charges}}</strong> is/are disposed of and observe the conditions (if any) specified on the reverse side hereof then this recognizance shall be void but otherwise to remain in full force and virtue and which terms are overleaf.
+    </p>
+    <p>
+      <br><br>
+      Taken in the Registry of the Supreme<br>
+      Court this {{bondDateFull}}.
+    </p>
+    <div style="text-align: right;">
+      <div style="border-top: 1px solid #000; width: 250px; margin-top: 50px; margin-bottom: 5px; margin-left: auto;"></div>
+      (for) Registrar<br>
+      Supreme Court
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 50px; text-decoration: underline; font-weight: bold;">
+    <p>RECOGNIZANCE OF BAIL</p>
+  </div>
+
+  <!-- Page 2 Content -->
+  <div style="margin-top: 80px; page-break-before: always;">
+    <h2 style="text-align: left; text-decoration: underline; font-size: 1.2em;">SURETIES:</h2>
+    <div style="margin-left: 20px; margin-bottom: 20px;">
+      <p>
+        <strong>1.</strong> <span style="text-decoration: underline;">Name: {{surety1Name}}</span><br>
+        <strong>Add:</strong> {{surety1Address}}<br>
+        <strong>P.O. Box:</strong> {{surety1PoBox}}<br>
+        <strong>Telephone:</strong> {{surety1Telephone}}<br>
+        <strong>Workplace:</strong> {{surety1Workplace}}<br>
+        <strong>Add:</strong> {{surety1WorkplaceAddress}}<br>
+        <strong>Telephone:</strong> {{surety1WorkplaceTelephone}}<br>
+        <strong>Position:</strong> {{surety1Position}}
+      </p>
+    </div>
+    <div style="margin-left: 20px; margin-bottom: 20px;">
+      <p>
+        <strong>2.</strong> <span style="text-decoration: underline;">Name: {{surety2Name}}</span><br>
+        <strong>Add:</strong> {{surety2Address}}<br>
+        <strong>P.O. Box:</strong> {{surety2PoBox}}<br>
+        <strong>Telephone:</strong> {{surety2Telephone}}<br>
+        <strong>Workplace:</strong> {{surety2Workplace}}<br>
+        <strong>Add:</strong> {{surety2WorkplaceAddress}}<br>
+        <strong>Telephone:</strong> {{surety2WorkplaceTelephone}}<br>
+        <strong>Position:</strong> {{surety2Position}}
+      </p>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <br>
+    <h2 style="text-align: left; text-decoration: underline; font-size: 1.2em;">CONDITIONS:</h2>
+    <p><strong>
+      {{reportingClause}}. FAILURE TO REPORT RENDERS APPLICANT LIABLE TO FURTHER REMAND.
+    </strong></p>
+    <p style="text-align: right; margin-top: 30px;">
+      {{judgeName}}<br>
+      {{orderGrantingBailDate}}
+    </p>
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <p>
+      This is to certify that I <strong>{{offenderName}}</strong> agree to comply with the conditions of this bail bond as outlined above.
+    </p>
+    <div style="text-align: right;">
+      <div style="border-top: 1px solid #000; width: 250px; margin-top: 50px; margin-bottom: 5px; margin-left: auto;"></div>
+      Defendant's Signature<br>
+      Date <span style="text-decoration: underline; margin-left: 10px;">{{signatureDate}}</span>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <p>
+      This is to certify that I <strong>{{clerkName}}</strong>, explained the condition of this bail bond to <strong>{{offenderName}}</strong> and witnessed his/her signature agreeing to comply with the said condition.
+    </p>
+    <div style="text-align: right;">
+      <div style="border-top: 1px solid #000; width: 250px; margin-top: 50px; margin-bottom: 5px; margin-left: auto;"></div>
+      Dated this {{bondDateFull}}
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
