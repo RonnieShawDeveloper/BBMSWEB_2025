@@ -131,7 +131,8 @@ export class DashboardComponent implements OnInit {
         title: announcement.title,
         html: announcement.html,
         icon: 'info',
-        confirmButtonText: 'Got it!'
+        confirmButtonText: 'Got it!',
+        width: '600px'
       }).then(() => {
         this.announcementService.markAsSeen();
       });

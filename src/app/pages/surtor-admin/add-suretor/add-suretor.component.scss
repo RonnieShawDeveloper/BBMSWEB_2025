@@ -1,0 +1,102 @@
+.add-suretor-container {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.mat-dialog-title {
+  margin: 0 -24px 20px;
+}
+
+.mat-dialog-content {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 0 10px;
+}
+
+.section-header {
+  border-radius: 4px;
+  margin-top: 20px;
+}
+
+.section-header h3 {
+  font-weight: 500;
+}
+
+.suretor-form {
+  padding-bottom: 20px;
+}
+
+// Make mat-form-field take full width of container
+.mat-form-field {
+  width: 100%;
+}
+
+// Add some spacing between form sections
+.section-header:not(:first-child) {
+  margin-top: 30px;
+}
+
+// Style for checkboxes
+mat-checkbox {
+  display: block;
+  margin-top: 10px;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .mat-dialog-content {
+    max-height: 80vh;
+  }
+
+  .col-md-4, .col-md-6, .col-md-8, .col-md-12 {
+    margin-bottom: 15px;
+  }
+}
+
+// Custom styling for dialog actions
+.mat-dialog-actions {
+  padding: 12px 24px;
+  margin-bottom: 0;
+  border-top: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+}
+
+// Style for required field indicator
+.mat-form-field-required-marker {
+  color: #f44336;
+}
+
+// Style for form field labels
+.mat-form-field-label {
+  font-weight: 500;
+}
+
+// Style for form field outlines
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  color: #ced4da;
+}
+
+// Style for focused form fields
+.mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color: #007bff;
+}
+
+// Style for form field errors
+.mat-error {
+  font-size: 12px;
+}
+
+// Style for select dropdowns
+.mat-select-panel {
+  max-height: 300px;
+}
+
+// Style for datepicker
+.mat-datepicker-toggle {
+  color: #6c757d;
+}
+
+// Style for prefix in currency fields
+[matPrefix] {
+  color: #6c757d;
+}

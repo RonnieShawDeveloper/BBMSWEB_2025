@@ -1,0 +1,320 @@
+<div class="add-suretor-container">
+  <h2 mat-dialog-title class="text-center bg-primary text-white py-3">{{title}}</h2>
+
+  <div class="text-right mb-3 mt-2 mr-2">
+    <button type="button" class="btn btn-info" (click)="openFileDialog()">
+      <i class="fa fa-upload mr-1"></i> Import Scanned Application
+    </button>
+    <input type="file" #fileInput style="display: none;" accept=".jpeg,.jpg" (change)="onFileSelected($event)">
+  </div>
+
+  <mat-dialog-content class="mat-typography">
+    <form [formGroup]="suretorForm" class="suretor-form">
+      <!-- Personal Information Section -->
+      <div class="section-header bg-light p-2 mb-3">
+        <h3 class="h5 mb-0">Personal Information</h3>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName" required>
+            <mat-error *ngIf="suretorForm.get('firstName')?.hasError('required')">First name is required</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Middle Name</mat-label>
+            <input matInput formControlName="middleName">
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName" required>
+            <mat-error *ngIf="suretorForm.get('lastName')?.hasError('required')">Last name is required</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>NIB Number</mat-label>
+            <input matInput formControlName="nib" required>
+            <mat-error *ngIf="suretorForm.get('nib')?.hasError('required')">NIB is required</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Date of Birth</mat-label>
+            <input matInput [matDatepicker]="dobPicker" formControlName="dob">
+            <mat-datepicker-toggle matSuffix [for]="dobPicker"></mat-datepicker-toggle>
+            <mat-datepicker #dobPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Address</mat-label>
+            <textarea matInput formControlName="address" required rows="2"></textarea>
+            <mat-error *ngIf="suretorForm.get('address')?.hasError('required')">Address is required</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>P.O. Box</mat-label>
+            <input matInput formControlName="poBox">
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Primary Phone</mat-label>
+            <input matInput formControlName="phone" required>
+            <mat-error *ngIf="suretorForm.get('phone')?.hasError('required')">Phone is required</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Secondary Phone</mat-label>
+            <input matInput formControlName="phone2">
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" type="email">
+            <mat-error *ngIf="suretorForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>SPN</mat-label>
+            <input matInput formControlName="spn">
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-8 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              <mat-option value="Active">Active</mat-option>
+              <mat-option value="Inactive">Inactive</mat-option>
+              <mat-option value="Deleted">Deleted</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Employment Information Section -->
+      <div class="section-header bg-light p-2 mb-3">
+        <h3 class="h5 mb-0">Employment Information</h3>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Employer Name</mat-label>
+            <input matInput formControlName="empName">
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Employer Address</mat-label>
+            <input matInput formControlName="empAddress">
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Employer Phone</mat-label>
+            <input matInput formControlName="empPhone">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Property Information Section -->
+      <div class="section-header bg-light p-2 mb-3">
+        <h3 class="h5 mb-0">Property Information</h3>
+      </div>
+
+      <div class="row">
+        <div class="col-md-8 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Immovable Property Description</mat-label>
+            <textarea matInput formControlName="immovablePropertyParticulars" rows="2"></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Estimated Value</mat-label>
+            <input matInput formControlName="immovablePropertyValue" type="number">
+            <span matPrefix>$&nbsp;</span>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Bank Account Information Section -->
+      <div class="section-header bg-light p-2 mb-3">
+        <h3 class="h5 mb-0">Bank Account Information</h3>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Bank Name</mat-label>
+            <input matInput formControlName="bankName">
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Account Type</mat-label>
+            <input matInput formControlName="accountType">
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Account Balance</mat-label>
+            <input matInput formControlName="accountBalance" type="number">
+            <span matPrefix>$&nbsp;</span>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Moveable Assets Section -->
+      <div class="section-header bg-light p-2 mb-3">
+        <h3 class="h5 mb-0">Moveable Assets</h3>
+      </div>
+
+      <div class="row">
+        <div class="col-md-8 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Asset Description</mat-label>
+            <textarea matInput formControlName="moveableAssetDescription" rows="2"></textarea>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Estimated Value</mat-label>
+            <input matInput formControlName="moveableAssetValue" type="number">
+            <span matPrefix>$&nbsp;</span>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Case Details Section -->
+      <div class="section-header bg-light p-2 mb-3">
+        <h3 class="h5 mb-0">Case Details</h3>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Defendant Name</mat-label>
+            <input matInput formControlName="defendantName">
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Defendant Address</mat-label>
+            <input matInput formControlName="defendantAddress">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Bond Amount</mat-label>
+            <input matInput formControlName="bondAmount" type="number">
+            <span matPrefix>$&nbsp;</span>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Court</mat-label>
+            <mat-select formControlName="court">
+              <mat-option value="Supreme Court">Supreme Court</mat-option>
+              <mat-option value="Magistrate Court">Magistrate Court</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Declarations Section -->
+      <div class="section-header bg-light p-2 mb-3">
+        <h3 class="h5 mb-0">Declarations</h3>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Encumbrance Status</mat-label>
+            <mat-select formControlName="encumbranceStatus">
+              <mat-option value="Unknown">Unknown</mat-option>
+              <mat-option value="Encumbered">Encumbered</mat-option>
+              <mat-option value="Unencumbered">Unencumbered</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Mortgage Holder</mat-label>
+            <input matInput formControlName="mortgageHolder">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Prior Surety Cases</mat-label>
+            <textarea matInput formControlName="priorSuretyCases" rows="2"></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <mat-checkbox formControlName="hasPendingCriminalCharges" color="primary">
+            Has Pending Criminal Charges
+          </mat-checkbox>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <mat-checkbox formControlName="isCurrentlySurety" color="primary">
+            Is Currently a Surety for Another Case
+          </mat-checkbox>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" class="btn btn-secondary mr-2">Cancel</button>
+    <button mat-button (click)="onSubmit()" [disabled]="suretorForm.invalid" class="btn btn-primary">{{submitButtonText}}</button>
+  </mat-dialog-actions>
+</div>

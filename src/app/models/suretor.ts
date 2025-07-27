@@ -49,7 +49,7 @@ export interface Suretor {
 }
 
 // New interfaces mirroring the Kotlin SuretyApplication data model from the Android app
-// This is the new format for the SuretyApplication document in Firestore form the Supreme Court
+// This is the new format for the SuretyApplication document in Firestore for the Supreme Court
 
 export interface MoveableAsset {
   description: string;
@@ -82,6 +82,7 @@ export interface Surety {
   dob: Timestamp | null; // Firebase Timestamp
   email: string;
   phone: string;
+  phone2: string; // Optional second phone number
   poBox: string;
   spn: string;
   empName: string;

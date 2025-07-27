@@ -1,0 +1,119 @@
+<section class="bg-primary text-white py-4 px-3 rounded-bottom shadow">
+  <div class="d-flex flex-column flex-md-row align-items-center justify-content-between">
+    <div class="text-center text-md-left mb-3 mb-md-0">
+      <h1 class="display-4 font-weight-bold">SURETOR ADMINISTRATION</h1>
+    </div>
+    <div class="d-flex flex-wrap justify-content-center justify-content-md-end">
+      <button type="button" class="btn btn-success btn-sm m-1" (click)="openAddSuretorDialog()">
+        <i class="fa fa-plus"></i> ADD SURETOR
+      </button>
+      <button type="button" class="btn btn-warning btn-sm m-1">
+        <i class="fa fa-print"></i> SURETOR REPORT
+      </button>
+    </div>
+  </div>
+</section>
+
+<p-toast></p-toast>
+<p-confirmDialog [style]="{width: '50vw'}" [baseZIndex]="10000"></p-confirmDialog>
+
+<section class="p-4">
+  <div class="card shadow-lg mb-4">
+    <div class="card-body">
+      <div class="row">
+        <!-- Filters Section -->
+        <div class="col-12 col-md-6 border-right border-md-2 border-gray-200 py-3">
+          <h3 class="h5 font-weight-bold text-secondary mb-3">FILTERS:</h3>
+          <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-success btn-sm m-1" (click)="filterSuretors('all')">ALL</button>
+            <button type="button" class="btn btn-secondary btn-sm m-1" (click)="filterSuretors('active')">ACTIVE</button>
+            <button type="button" class="btn btn-outline-info btn-sm m-1" (click)="filterSuretors('inactive')">INACTIVE</button>
+            <button type="button" class="btn btn-warning btn-sm m-1" (click)="filterSuretors('deleted')">DELETED</button>
+            <button type="button" class="btn btn-info btn-sm m-1" (click)="filterSuretors('magistrate')">MAGISTRATE</button>
+          </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="col-12 col-md-6 py-3">
+          <h3 class="h5 font-weight-bold text-secondary mb-3">STATISTICS:</h3>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge badge-pill badge-success m-1">TOTAL: {{totalSuretors}}</span>
+            <span class="badge badge-pill badge-secondary m-1">ACTIVE: {{activeSuretors}}</span>
+            <span class="badge badge-pill badge-info m-1">INACTIVE: {{inactiveSuretors}}</span>
+            <span class="badge badge-pill badge-warning m-1">DELETED: {{deletedSuretors}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-4 shadow-lg rounded-lg">
+    <p-table #dt [value]="suretors" [loading]="loading" [paginator]="true"
+             [rows]="10" [showCurrentPageReport]="true"
+             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} suretors"
+             [rowsPerPageOptions]="[10,25,50]"
+             [globalFilterFields]="['name', 'nib', 'offenderNames']"
+             responsiveLayout="scroll">
+      <ng-template pTemplate="caption">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h4 font-weight-bold text-dark">Suretor List</h2>
+          <div class="d-flex">
+            <button type="button" class="btn btn-danger btn-sm mr-2" (click)="clear(dt)">
+              <i class="pi pi-filter-slash"></i> Clear Filters
+            </button>
+            <span class="p-input-icon-left ml-2">
+              <i class="pi pi-search"></i>
+              <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Search Suretors" />
+            </span>
+          </div>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="name">Suretor Name <p-sortIcon field="name"></p-sortIcon></th>
+          <th pSortableColumn="nib">NIB <p-sortIcon field="nib"></p-sortIcon></th>
+          <th>ACTIVE IN</th>
+          <th class="text-center">ACTIONS</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-suretor>
+        <tr>
+          <td>
+            <div class="font-weight-bold">{{suretor.name}}</div>
+            <div class="mt-1">
+              <span *ngIf="suretor.status === 'active'" class="badge badge-success">Active</span>
+              <span *ngIf="suretor.status === 'inactive'" class="badge badge-secondary">Inactive</span>
+              <span *ngIf="suretor.status === 'deleted'" class="badge badge-warning">DELETED</span>
+              <span *ngIf="suretor.source === 'magistrate'" class="badge badge-info ml-1">Magistrate</span>
+              <span *ngIf="suretor.dob" class="ml-1 text-muted small">DOB: {{suretor.dob}}</span>
+            </div>
+          </td>
+          <td>{{suretor.nib}}</td>
+          <td>
+            <div *ngIf="suretor.activeIn.length === 0">Not active in any court</div>
+            <div *ngFor="let court of suretor.activeIn; let i = index">
+              <span *ngIf="court === 'SUPREME COURT'" class="badge badge-danger">{{court}}</span>
+              <span *ngIf="court === 'MAGISTRATE'" class="badge badge-success">{{court}}</span>
+              <span *ngIf="suretor.offenderNames[i]"> - {{suretor.offenderNames[i]}}</span>
+            </div>
+          </td>
+          <td class="text-center">
+            <div class="btn-group">
+              <button type="button" class="btn btn-sm btn-info mr-1" title="Edit Suretor" (click)="openEditSuretorDialog(suretor)">
+                <i class="fa fa-edit"></i>
+              </button>
+              <button type="button" class="btn btn-sm btn-danger" title="Delete Suretor" (click)="deleteSuretor(suretor)">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="text-center py-5 text-muted">No suretors found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</section>

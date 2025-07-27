@@ -7,8 +7,10 @@ export const verticalMenuItems = [
     new Menu (60, 'Magistrate Court', '/magistratecourt', null, 'gavel', null, false, 0),
     new Menu (70, 'Supreme Court', null, null, 'gavel', null, true, 0),
     new Menu (71, 'Registrar', '/criminalregistry', null, 'gavel', null, false, 70),
-    new Menu (72, 'Judicial Portal', '/supreme_judge', null, 'gavel', null, false, 70),
+    new Menu (73, 'Judicial Portal', '/supreme_judge', null, 'gavel', null, false, 70),
+    new Menu (80, 'Suretor Admin', '/surtor-admin', null, 'money', null, false, 0),
     new Menu (110, 'Admin', 'admin', null, 'gear', null, false, 0),
+
 ]
 
 export const horizontalMenuItems = [
