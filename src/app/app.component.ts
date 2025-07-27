@@ -37,9 +37,10 @@ export class AppComponent implements OnInit, OnDestroy {
         filter(event => event instanceof NavigationEnd)
       ).subscribe((event: NavigationEnd) => {
         if (event.urlAfterRedirects === '/clogin') {
+          this.zoomLevel$ = this._localZoomLevel.asObservable();
           this._localZoomLevel.next(UiStateService.getDefaultZoom());
         } else {
-          this._localZoomLevel.next(this.uiStateService.getCurrentZoom());
+          this.zoomLevel$ = this.uiStateService.zoomLevel$;
         }
       });
     }

@@ -18,6 +18,7 @@ import {
 } from "../../../models/suretor";
 import { Timestamp } from '@angular/fire/firestore';
 import Quill from 'quill';
+import * as moment from "moment";
 
 @Component({
   selector: 'app-bail-app-table',
@@ -44,6 +45,7 @@ export class BailAppTableComponent implements OnInit {
 
   orderHTML = ``;
   private quillEditor: Quill;
+  locations: string;
 
   constructor(private hs: HearingServiceService, private af: AngularFirestore, private storage: AngularFireStorage) {
   }
@@ -475,7 +477,6 @@ export class BailAppTableComponent implements OnInit {
       if (createBondControl) {
         // Moved to target
         createBondControl.controlComment = 'Click to open the bond editor';
-        this.openBondEditor();
       } else {
         // Moved to source
         if (this.hearings.bondHtml) {
@@ -497,7 +498,7 @@ export class BailAppTableComponent implements OnInit {
               Swal.fire('Deleted!', 'The bond form has been deleted.', 'success');
             } else if (result.dismiss === Swal.DismissReason.cancel) {
               // Move it back to target
-              const bondControlInSource = this.sourceControls.find(c => c.id === '8');
+              const bondControlInSource = this.sourceControls.find(c => c.id === '9');
               if (bondControlInSource) {
                 const index = this.sourceControls.indexOf(bondControlInSource);
                 this.sourceControls.splice(index, 1);
@@ -511,16 +512,16 @@ export class BailAppTableComponent implements OnInit {
     }
 
     if (control.items[0].id == '10') { // Issue Bond
-      const issueBond = this.targetControls.find((c) => c.id === '9');
+      const issueBond = this.targetControls.find((c) => c.id === '10');
       if (issueBond) {
         issueBond.controlComment = 'Click to upload signed bond';
+        Swal.fire({
+          title: 'Upload Signed Bond',
+          text: 'Click on the "Issue Bond" control again to open the upload dialog.',
+          icon: 'info',
+          confirmButtonText: 'Ok'
+        });
       }
-      Swal.fire({
-        title: 'Upload Signed Bond',
-        text: 'Click on the "Issue Bond" control again to open the upload dialog.',
-        icon: 'info',
-        confirmButtonText: 'Ok'
-      });
     }
 
     if (control.items[0].id == '12') {
@@ -797,19 +798,28 @@ export class BailAppTableComponent implements OnInit {
           this.editSuretorInfo(control.id);
           break;
         case '6':
-          this.showReasonDenied();
+          if (this.hearings.deniedBailChecked) {
+            this.showReasonDenied();
+          }
           break;
         case '8':
-          this.openBondEditor();
+          this.showOrder = true;
           break;
         case '9':
+          this.openBondEditor();
+          break;
+        case '10':
           this.doIssueBond();
           break;
-        case '12':
-          this.showTermination = true;
+        case '11':
+          // Bond Variation - Not implemented yet
           break;
         case '12':
-          this.doShowBailBond();
+          if (control.controlModule === 'terminateApp') {
+            this.showTermination = true;
+          } else if (control.controlModule === 'viewBailBond') {
+            this.doShowBailBond();
+          }
           break;
       }
     }
@@ -874,7 +884,7 @@ export class BailAppTableComponent implements OnInit {
 
             Swal.fire('Bond Uploaded', 'The signed bond has been successfully uploaded.', 'success');
 
-            const issueBondControl = this.targetControls.find((c) => c.id === '9');
+            const issueBondControl = this.targetControls.find((c) => c.id === '10');
             const index = this.targetControls.indexOf(issueBondControl);
             if (index > -1) {
               this.targetControls.splice(index, 1);
@@ -901,9 +911,268 @@ export class BailAppTableComponent implements OnInit {
   }
 
   getPoliceStation(option: string): string {
-    // Logic remains the same...
-    return '';
+    switch (option) {
+      case 'any':
+        return 'Any Police Station with a Kiosk';
+      case 'central':
+        return 'Central Police Station (Nassau)';
+      case 'cablebeach':
+        return 'Cable Beach Police Station';
+      case 'southwestern':
+        return 'Southwestern Division Police Station';
+      case 'eastern':
+        return 'Eastern Division Police Station';
+      case 'southcentral':
+        return 'South Central Division Police Station';
+      case 'northeastern':
+        return 'Northeastern Division Police Station';
+      case 'carmichael':
+        return 'Carmichael Division Police Station';
+      case 'mobile':
+        return 'Mobile Division Police Station';
+      case 'ranson':
+        return 'Ranson Division Police Station';
+      case 'wulff':
+        return 'Wulff Road Police Station';
+      case 'hawthorne':
+        return 'Hawthorne Road Police Station';
+      case 'winton':
+        return 'Winton Police Station';
+      case 'flamingo':
+        return 'Flamingo Gardens Police Station';
+      case 'englerston':
+        return 'Englerston Police Station';
+      case 'southbeach':
+        return 'South Beach Police Station';
+      case 'grove':
+        return 'Grove Police Station';
+      case 'coralharbour':
+        return 'Coral Harbour Police Station';
+      case 'rockcrusher':
+        return 'Rock Crusher Police Station';
+      case 'columbus':
+        return 'Columbus Division Police Station';
+      case 'elizabeth':
+        return 'Elizabeth Police Station';
+      case 'freeport':
+        return 'Freeport Police Station';
+      default:
+        return;
+    }
   }
+
+  getPoliceStationsNames() {
+    const htmlContainer = Swal.getHtmlContainer();
+    if (!htmlContainer) return;
+    // Get all of the locations that are checked in the document between the div tag with the id of 'locationChecks' and if the checkbox is checked, add it to an array
+    const locationChecks = htmlContainer.querySelector('#locationChecks') as HTMLDivElement;
+    const locationCheckboxes = locationChecks.getElementsByTagName('input');
+    const locationArray = [];
+    for (let i = 0; i < locationCheckboxes.length; i++) {
+      if (locationCheckboxes[i].checked) {
+        locationArray.push(locationCheckboxes[i].value);
+      }
+    }
+    // Using the getPoliceStation function, convert each location in the locationArray to the actual name of the police station
+    for (let i = 0; i < locationArray.length; i++) {
+      locationArray[i] = this.getPoliceStation(locationArray[i]);
+    }
+    // Take the locationArray and convert it to a string separated by commas and put the work 'and' before the last item in the array
+    const locationString = locationArray.join(', ').replace(/, ([^,]*)$/, ' or $1');
+    this.locations = locationString;
+    const locationsDisplay = htmlContainer.querySelector('#locations-display') as HTMLSpanElement;
+    if(locationsDisplay) {
+      locationsDisplay.innerText = this.locations;
+    }
+  }
+
+  enterBailConditions() {
+    let currentStep = 0;
+    const steps = ['step1', 'step2', 'step3', 'step4', 'step5'];
+
+    Swal.fire({
+      title: 'Enter/Edit Bail Conditions',
+      html: `
+        <div id="step1">
+          <h5>Step 1: Check-in Location</h5>
+          <div id="locationChecks">
+            <div class="form-check"><input id="any" class="form-check-input" type="checkbox" value="any" /><label class="form-check-label" for="any">Any Police Station with a Kiosk (Default)</label></div>
+            <span style="font-weight: bold;">Kiosks Located on New Providence</span>
+            <div class="form-check"><input id="central" class="form-check-input" type="checkbox" value="central" /><label class="form-check-label" for="central">Central Police Station</label></div>
+            <div class="form-check"><input id="southbeach" class="form-check-input" type="checkbox" value="southbeach" /><label class="form-check-label" for="southbeach">South Beach Police Station</label></div>
+            <div class="form-check"><input id="elizabeth" class="form-check-input" type="checkbox" value="elizabeth" /><label class="form-check-label" for="elizabeth">Elizabeth Police Station</label></div>
+            <div class="form-check"><input id="carmichael" class="form-check-input" type="checkbox" value="carmichael" /><label class="form-check-label" for="carmichael">Carmichael Police Station</label></div>
+            <div class="form-check"><input id="grove" class="form-check-input" type="checkbox" value="grove" /><label class="form-check-label" for="grove">Grove Police Station</label></div>
+            <span style="font-weight: bold;">Kiosks Located on Grand Bahamas</span>
+            <div class="form-check"><input id="freeport" class="form-check-input" type="checkbox" value="freeport" /><label class="form-check-label" for="freeport">Freeport Police Station</label></div>
+          </div>
+          <div class="h5 text-danger mt-2">Currently Selected Location: <span id="locations-display"></span></div>
+        </div>
+        <div id="step2" style="display: none;">
+          <h5>Step 2: Check-in Days & Time</h5>
+          <div class="row">
+            <div class="col" style="background: #f9ebeb;"><span style="font-weight: bold;">Check-In Days (Select all that Apply)</span>
+              <div class="form-check"><input id="formCheck-1" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-1">Sunday</label></div>
+              <div class="form-check"><input id="formCheck-2" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-2">Monday</label></div>
+              <div class="form-check"><input id="formCheck-7" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-7">Tuesday</label></div>
+              <div class="form-check"><input id="formCheck-6" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-6">Wednesday</label></div>
+              <div class="form-check"><input id="formCheck-5" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-5">Thursday</label></div>
+              <div class="form-check"><input id="formCheck-4" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-4">Friday</label></div>
+              <div class="form-check"><input id="formCheck-3" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-3">Saturday</label></div>
+            </div>
+            <div class="col" style="background: #ddf8cd;"><span style="font-weight: bold;">Must check-in BEFORE (Select 1 Only)</span>
+              <div class="form-check"><input id="formCheck-9" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-9">3pm</label></div>
+              <div class="form-check"><input id="formCheck-10" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-10">4pm</label></div>
+              <div class="form-check"><input id="formCheck-11" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-11">5pm</label></div>
+              <div class="form-check"><input id="formCheck-12" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-12">6pm</label></div>
+              <div class="form-check"><input id="formCheck-13" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-13">7pm</label></div>
+              <div class="form-check"><input id="formCheck-14" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-14">8pm</label></div>
+              <div class="form-check"><input id="formCheck-15" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-15">9pm</label></div>
+              <div class="form-check"><input id="formCheck-16" class="form-check-input" type="checkbox" /><label class="form-check-label" for="formCheck-16">10pm</label></div>
+            </div>
+          </div>
+        </div>
+        <div id="step3" style="display: none;">
+          <h5>Step 3: Surety Information</h5>
+          <textarea id="suretyReq" class="form-control" rows="5"></textarea>
+          <div class="form-group m-2 d-flex flex-row">
+            <input type="checkbox" class="form-check-input" id="formCheck-20" style="scale: 1.5" />
+            <label class="form-check-label font-weight-bold" for="formCheck-20">Check to Release on Own Recognizance - Provide Instructions Above</label>
+          </div>
+        </div>
+        <div id="step4" style="display: none;">
+          <h5>Step 4: Written Conditions</h5>
+          <textarea id="additionalConditions" class="form-control" rows="5"></textarea>
+        </div>
+        <div id="step5" style="display: none;">
+          <h5>Step 5: Additional Conditions & Comments</h5>
+          <input id="surrenderPassportChecked" type="checkbox" class="custom-checkbox">&nbsp; <label>Must Surrender Passport to Criminal Registry</label><br>
+          <input id="elecMonitorChecked" type="checkbox" class="custom-checkbox">&nbsp; <label>Must be placed on Electronic Monitoring before release on Bond</label>
+          <h5 class="mt-3">Comments</h5>
+          <textarea id="judicialNotes" class="form-control" rows="5"></textarea>
+        </div>
+      `,
+      showCancelButton: true,
+      showConfirmButton: true,
+      confirmButtonText: 'Next',
+      cancelButtonText: 'Cancel',
+      didOpen: () => {
+        const confirmButton = Swal.getConfirmButton();
+        const cancelButton = Swal.getCancelButton();
+        const htmlContainer = Swal.getHtmlContainer();
+
+        const showStep = (stepIndex) => {
+          steps.forEach((step, index) => {
+            const stepElement = htmlContainer.querySelector('#' + step) as HTMLElement;
+            if (stepElement) {
+              stepElement.style.display = index === stepIndex ? 'block' : 'none';
+            }
+          });
+          currentStep = stepIndex;
+
+          if (currentStep === 0) {
+            cancelButton.innerText = 'Cancel';
+          } else {
+            cancelButton.innerText = 'Back';
+          }
+
+          if (currentStep === steps.length - 1) {
+            confirmButton.innerText = 'Submit';
+          } else {
+            confirmButton.innerText = 'Next';
+          }
+        };
+
+        // Initial setup
+        showStep(0);
+
+        // Step 1 Initialization
+        const locationChecks = htmlContainer.querySelector('#locationChecks') as HTMLDivElement;
+        const locationCheckboxes = locationChecks.getElementsByTagName('input');
+        for (let i = 0; i < locationCheckboxes.length; i++) {
+          locationCheckboxes[i].addEventListener('click', () => this.getPoliceStationsNames());
+          if (this.hearings.bailReportLocation?.includes(this.getPoliceStation(locationCheckboxes[i].value))) {
+            locationCheckboxes[i].checked = true;
+          }
+        }
+        this.getPoliceStationsNames();
+
+        // Step 2 Initialization
+        (htmlContainer.querySelector('#formCheck-1') as HTMLInputElement).checked = this.hearings.sundayChecked;
+        (htmlContainer.querySelector('#formCheck-2') as HTMLInputElement).checked = this.hearings.mondayChecked;
+        (htmlContainer.querySelector('#formCheck-7') as HTMLInputElement).checked = this.hearings.tuesdayChecked;
+        (htmlContainer.querySelector('#formCheck-6') as HTMLInputElement).checked = this.hearings.wednesdayChecked;
+        (htmlContainer.querySelector('#formCheck-5') as HTMLInputElement).checked = this.hearings.thursdayChecked;
+        (htmlContainer.querySelector('#formCheck-4') as HTMLInputElement).checked = this.hearings.fridayChecked;
+        (htmlContainer.querySelector('#formCheck-3') as HTMLInputElement).checked = this.hearings.saturdayChecked;
+        (htmlContainer.querySelector('#formCheck-9') as HTMLInputElement).checked = this.hearings.threepmChecked;
+        (htmlContainer.querySelector('#formCheck-10') as HTMLInputElement).checked = this.hearings.fourpmChecked;
+        (htmlContainer.querySelector('#formCheck-11') as HTMLInputElement).checked = this.hearings.fivepmChecked;
+        (htmlContainer.querySelector('#formCheck-12') as HTMLInputElement).checked = this.hearings.sixpmChecked;
+        (htmlContainer.querySelector('#formCheck-13') as HTMLInputElement).checked = this.hearings.sevenpmChecked;
+        (htmlContainer.querySelector('#formCheck-14') as HTMLInputElement).checked = this.hearings.eightpmChecked;
+        (htmlContainer.querySelector('#formCheck-15') as HTMLInputElement).checked = this.hearings.ninepmChecked;
+        (htmlContainer.querySelector('#formCheck-16') as HTMLInputElement).checked = this.hearings.tenpmChecked;
+
+        // Step 3 Initialization
+        (htmlContainer.querySelector('#suretyReq') as HTMLTextAreaElement).value = this.hearings.suretyReq || '';
+        (htmlContainer.querySelector('#formCheck-20') as HTMLInputElement).checked = this.hearings.releaseOnRecognizance;
+
+        // Step 4 Initialization
+        (htmlContainer.querySelector('#additionalConditions') as HTMLTextAreaElement).value = this.hearings.additionalConditions || '';
+
+        // Step 5 Initialization
+        (htmlContainer.querySelector('#surrenderPassportChecked') as HTMLInputElement).checked = this.hearings.surrenderPassportChecked;
+        (htmlContainer.querySelector('#elecMonitorChecked') as HTMLInputElement).checked = this.hearings.elecMonitorChecked;
+        (htmlContainer.querySelector('#judicialNotes') as HTMLTextAreaElement).value = this.hearings.judicialNotes || '';
+
+        // Override button actions
+        confirmButton.onclick = () => {
+          if (currentStep < steps.length - 1) {
+            showStep(currentStep + 1);
+          } else {
+            // Submit logic
+            this.hearings.bailReportLocation = this.locations;
+            this.hearings.sundayChecked = (htmlContainer.querySelector('#formCheck-1') as HTMLInputElement).checked;
+            this.hearings.mondayChecked = (htmlContainer.querySelector('#formCheck-2') as HTMLInputElement).checked;
+            this.hearings.tuesdayChecked = (htmlContainer.querySelector('#formCheck-7') as HTMLInputElement).checked;
+            this.hearings.wednesdayChecked = (htmlContainer.querySelector('#formCheck-6') as HTMLInputElement).checked;
+            this.hearings.thursdayChecked = (htmlContainer.querySelector('#formCheck-5') as HTMLInputElement).checked;
+            this.hearings.fridayChecked = (htmlContainer.querySelector('#formCheck-4') as HTMLInputElement).checked;
+            this.hearings.saturdayChecked = (htmlContainer.querySelector('#formCheck-3') as HTMLInputElement).checked;
+            this.hearings.threepmChecked = (htmlContainer.querySelector('#formCheck-9') as HTMLInputElement).checked;
+            this.hearings.fourpmChecked = (htmlContainer.querySelector('#formCheck-10') as HTMLInputElement).checked;
+            this.hearings.fivepmChecked = (htmlContainer.querySelector('#formCheck-11') as HTMLInputElement).checked;
+            this.hearings.sixpmChecked = (htmlContainer.querySelector('#formCheck-12') as HTMLInputElement).checked;
+            this.hearings.sevenpmChecked = (htmlContainer.querySelector('#formCheck-13') as HTMLInputElement).checked;
+            this.hearings.eightpmChecked = (htmlContainer.querySelector('#formCheck-14') as HTMLInputElement).checked;
+            this.hearings.ninepmChecked = (htmlContainer.querySelector('#formCheck-15') as HTMLInputElement).checked;
+            this.hearings.tenpmChecked = (htmlContainer.querySelector('#formCheck-16') as HTMLInputElement).checked;
+            this.hearings.suretyReq = (htmlContainer.querySelector('#suretyReq') as HTMLTextAreaElement).value;
+            this.hearings.releaseOnRecognizance = (htmlContainer.querySelector('#formCheck-20') as HTMLInputElement).checked;
+            this.hearings.additionalConditions = (htmlContainer.querySelector('#additionalConditions') as HTMLTextAreaElement).value;
+            this.hearings.surrenderPassportChecked = (htmlContainer.querySelector('#surrenderPassportChecked') as HTMLInputElement).checked;
+            this.hearings.elecMonitorChecked = (htmlContainer.querySelector('#elecMonitorChecked') as HTMLInputElement).checked;
+            this.hearings.judicialNotes = (htmlContainer.querySelector('#judicialNotes') as HTMLTextAreaElement).value;
+            this.hearings.grantBailChecked = true;
+            this.hearings.hearingDateUnix = moment().unix().toString();
+            this.updateHearing(this.hearings);
+            Swal.close();
+            Swal.fire('Success', 'Bail conditions have been updated.', 'success');
+          }
+        };
+
+        cancelButton.onclick = () => {
+          if (currentStep > 0) {
+            showStep(currentStep - 1);
+          } else {
+            Swal.close();
+          }
+        };
+      }
+    });
+  }
+
 
   closeTermination(event) {
     if (event == false) {
@@ -982,6 +1251,9 @@ export class BailAppTableComponent implements OnInit {
       reportingClause = `APPLICANT TO REPORT TO THE ${reportingLocation}, EVERY ${reportingDays === 'N/A' ? '_____' : reportingDays} BEFORE ${reportingTime === 'N/A' ? '_____' : reportingTime}`;
     }
 
+    const bondAmountMatch = this.hearings.suretyReq ? this.hearings.suretyReq.match(/\(([^)]+)\)/) : null;
+    const bondAmount = bondAmountMatch ? bondAmountMatch[1] : '$0.00';
+
 
     const data = {
       partiesList: partiesList,
@@ -990,7 +1262,7 @@ export class BailAppTableComponent implements OnInit {
       surety2Name: surety2Formatted || 'N/A',
       assistantRegistrarName: '-- ASSISTANT REGISTRAR NAME --',
       bondAmountWords: this.hearings.suretyReq ? this.hearings.suretyReq.split('(')[0].trim() : 'Written Amount Here',
-      bondAmount: this.hearings.suretyReq ? this.hearings.suretyReq.match(/\(([^)]+)\)/)[1] : '$0000.00',
+      bondAmount: bondAmount,
       bondDate: `${formatDateWithOrdinal(today)}`,
       bondDateFull: `${formatDateWithOrdinal(today).split(',')[0]}, A.D.${today.getFullYear()}`,
       courtName: 'SUPREME COURT',
@@ -1025,6 +1297,9 @@ export class BailAppTableComponent implements OnInit {
 
   async openBondEditor() {
     const bondHtml = this.hearings.bondHtml ? this.hearings.bondHtml : await this.getBondHtml();
+
+    // Fetch the Quill stylesheet
+    const quillStyles = await fetch('node_modules/quill/dist/quill.snow.css').then(res => res.text());
 
     Swal.fire({
       title: 'Bail Bond Editor',
@@ -1064,14 +1339,7 @@ export class BailAppTableComponent implements OnInit {
           const printContent = this.quillEditor.root.innerHTML;
           const printWindow = window.open('', '', 'height=800,width=850');
           printWindow.document.write('<html><head><title>Print Bail Bond</title>');
-          printWindow.document.write(`
-            <style>
-              body { font-family: 'Times New Roman', Times, serif; margin: 0.5in; }
-              @media print {
-                body { margin: 0.5in; }
-              }
-            </style>
-          `);
+          printWindow.document.write(`<style>${quillStyles}</style>`);
           printWindow.document.write('</head><body>');
           printWindow.document.write(printContent);
           printWindow.document.write('</body></html>');
