@@ -9,6 +9,7 @@ export const verticalMenuItems = [
     new Menu (71, 'Registrar', '/criminalregistry', null, 'gavel', null, false, 70),
     new Menu (73, 'Judicial Portal', '/supreme_judge', null, 'gavel', null, false, 70),
     new Menu (80, 'Suretor Admin', '/surtor-admin', null, 'money', null, false, 0),
+    new Menu (90, 'Messaging', '/email', null, 'envelope-o', null, false, 0),
     new Menu (110, 'Admin', 'admin', null, 'gear', null, false, 0),
 
 ]

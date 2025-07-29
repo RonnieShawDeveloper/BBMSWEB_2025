@@ -7,6 +7,7 @@ import {AngularFireAuth} from "@angular/fire/compat/auth";
 import firebase from "firebase/compat/app";
 import {Table} from "primeng/table";
 import { Timeline, DataSet } from 'vis';
+import { ChartData, ChartOptions } from 'chart.js';
 
 @Component({
   selector: 'app-admin',
@@ -25,6 +26,97 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   showLoggedInTodayOnly = false;
   subscriptions: any[] = [];
   dt1: Table | undefined;
+
+  // Chart data properties
+  roleDistributionData: ChartData<'doughnut'> = {
+    labels: ['Admin', 'Judge', 'Judicial Clerk', 'Magistrate', 'Magistrate Clerk', 'Private Attorney', 'DPP Office', 'Registrar', 'Registrar Staff'],
+    datasets: [
+      {
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        backgroundColor: [
+          '#3498db', // Admin
+          '#2c3e50', // Judge
+          '#9b59b6', // Judicial Clerk
+          '#e74c3c', // Magistrate
+          '#f39c12', // Magistrate Clerk
+          '#1abc9c', // Private Attorney
+          '#d35400', // DPP Office
+          '#27ae60', // Registrar
+          '#16a085'  // Registrar Staff
+        ]
+      }
+    ]
+  };
+
+  chartOptions: ChartOptions<'doughnut'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'right',
+        labels: {
+          boxWidth: 15,
+          font: {
+            size: 12
+          }
+        }
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const label = context.label || '';
+            const value = context.raw as number;
+            const total = context.dataset.data.reduce((a, b) => (a as number) + (b as number), 0) as number;
+            const percentage = Math.round((value / total) * 100);
+            return `${label}: ${value} (${percentage}%)`;
+          }
+        }
+      }
+    }
+  };
+
+  // Today's logins by role chart data
+  todayLoginsByRoleData: ChartData<'bar'> = {
+    labels: ['Admin', 'Judge', 'Judicial Clerk', 'Magistrate', 'Magistrate Clerk',
+             'Private Attorney', 'DPP Office', 'Registrar', 'Registrar Staff'],
+    datasets: [
+      {
+        label: 'Logged in Today',
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        backgroundColor: [
+          '#3498db', '#2c3e50', '#9b59b6', '#e74c3c', '#f39c12',
+          '#1abc9c', '#d35400', '#27ae60', '#16a085'
+        ]
+      }
+    ]
+  };
+
+  barChartOptions: ChartOptions<'bar'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y',  // Makes it a horizontal bar chart
+    scales: {
+      x: {
+        beginAtZero: true,
+        ticks: {
+          precision: 0
+        }
+      }
+    },
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const value = context.raw as number;
+            return `${value} user${value !== 1 ? 's' : ''}`;
+          }
+        }
+      }
+    }
+  };
 
   constructor(private db: AngularFirestore, private router: Router, private auth: AngularFireAuth) {
     console.log('currentMember',this.currentMember)
@@ -71,18 +163,22 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
         return 0;
       })
       // Check for duplicate email addresses
-      this.checkDuplicates();
+      // this.checkDuplicates();
       this.originalAllMembers = [...this.allMembers]; // Create a backup of the original list
       if (this.showLoggedInTodayOnly) {
         this.applyTodayFilter(); // Re-apply the filter if it was active
       }
+
+      // Update dashboard charts and statistics with the latest data
+      this.updateChartData();
+      this.updateTodayLoginsByRole();
     }));
   }
 
-  
+
 
   ngAfterViewInit(): void {
-   
+
   }
 
   localTime(timestamp: any): string {
@@ -98,7 +194,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
     const inputValue = inputElement.value; // Safe to access value now
     this.dt1.filterGlobal(inputValue, 'contains');
   }
-  
+
   checkTime(timestamp: any): boolean {
     // Check if the time is 'No Data' or null and if so, return 'No Data'
     if(timestamp == 'No Data' || timestamp == null) {
@@ -159,6 +255,97 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   ngOnInit(): void {
+    // Initialize the charts when component loads
+    this.updateChartData();
+    this.updateTodayLoginsByRole();
+  }
+
+  // Statistics methods for dashboard
+  getTotalUsers(): number {
+    return this.originalAllMembers.length;
+  }
+
+  getActiveUsers(): number {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    return this.originalAllMembers.filter(member => {
+      if (!member.lastLogin || member.lastLogin === 'No Data') {
+        return false;
+      }
+      const loginDate = new Date(member.lastLogin);
+      return loginDate >= thirtyDaysAgo;
+    }).length;
+  }
+
+  getLoggedInToday(): number {
+    const today = new Date();
+    return this.originalAllMembers.filter(member => {
+      if (!member.lastLogin || member.lastLogin === 'No Data') {
+        return false;
+      }
+      const loginDate = new Date(member.lastLogin);
+      return loginDate.getFullYear() === today.getFullYear() &&
+             loginDate.getMonth() === today.getMonth() &&
+             loginDate.getDate() === today.getDate();
+    }).length;
+  }
+
+  getPendingApprovals(): number {
+    return this.originalAllMembers.filter(member => member.status === 'New').length;
+  }
+
+  // Update chart data based on current user information
+  updateChartData(): void {
+    // Count users with each role
+    const roleCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+    this.originalAllMembers.forEach(member => {
+      if (member.authAdmin) roleCounts[0]++;
+      if (member.authJudge) roleCounts[1]++;
+      if (member.authJudgeClerk) roleCounts[2]++;
+      if (member.authMagistrate) roleCounts[3]++;
+      if (member.authMagistrateClerk) roleCounts[4]++;
+      if (member.authPrivAttorney) roleCounts[5]++;
+      if (member.authAttorney) roleCounts[6]++;
+      if (member.authRegistrar) roleCounts[7]++;
+      if (member.authRegistrarClerk) roleCounts[8]++;
+    });
+
+    // Update the chart data
+    this.roleDistributionData.datasets[0].data = roleCounts;
+  }
+
+  // Update today's logins by role chart data
+  updateTodayLoginsByRole(): void {
+    const today = new Date();
+    const roleCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+    this.originalAllMembers.forEach(member => {
+      // Check if the user logged in today
+      if (member.lastLogin && member.lastLogin !== 'No Data') {
+        const loginDate = new Date(member.lastLogin);
+        const isLoggedInToday = loginDate.getFullYear() === today.getFullYear() &&
+                              loginDate.getMonth() === today.getMonth() &&
+                              loginDate.getDate() === today.getDate();
+
+        if (isLoggedInToday) {
+          // Count by role
+          if (member.authAdmin) roleCounts[0]++;
+          if (member.authJudge) roleCounts[1]++;
+          if (member.authJudgeClerk) roleCounts[2]++;
+          if (member.authMagistrate) roleCounts[3]++;
+          if (member.authMagistrateClerk) roleCounts[4]++;
+          if (member.authPrivAttorney) roleCounts[5]++;
+          if (member.authAttorney) roleCounts[6]++;
+          if (member.authRegistrar) roleCounts[7]++;
+          if (member.authRegistrarClerk) roleCounts[8]++;
+        }
+      }
+    });
+
+    // Update the chart data
+    this.todayLoginsByRoleData.datasets[0].data = roleCounts;
   }
 
   getStyle(status: string) {

@@ -5,6 +5,7 @@ import { AdminRoutingModule } from './admin-routing.module';
 import { AdminComponent } from './admin.component';
 import {TableModule} from "primeng/table";
 import {InputTextModule} from "primeng/inputtext";
+import {BaseChartDirective} from "ng2-charts";
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import {InputTextModule} from "primeng/inputtext";
         CommonModule,
         AdminRoutingModule,
         TableModule,
-        InputTextModule
+        InputTextModule,
+        BaseChartDirective
     ]
 })
 export class AdminModule { }

@@ -1,86 +1,199 @@
-<div class="container-fluid">
-  
-  <p-table #dt1 [value]="allMembers" styleClass="p-datatable-striped"
-         [paginator]="true"
-         [rows]="10"
-         [showCurrentPageReport]="true"
-         [tableStyle]="{ 'min-width': '50rem' }"
-         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-         [rowsPerPageOptions]="[10, 25, 50]"
-         [globalFilterFields]="['lName', 'email', 'fName']">
-  <ng-template pTemplate="caption">
-    <div class="d-flex flex-row my-3 align-items-center">
-      <div class="btn btn-outline-danger" (click)="clear(dt1)"><i class="fa fa-stop-circle"></i> CLEAR FILTERS</div>
-      <span class="ml-auto d-flex align-items-center">
-        <button class="btn btn-info" style="margin-right: 5px;" (click)="toggleLoggedInTodayFilter()">
-          <span *ngIf="!showLoggedInTodayOnly">Show Logged In Today</span>
-          <span *ngIf="showLoggedInTodayOnly">Show All Users</span>
-        </button>
-        <span class="p-input-icon-right">
-          <input 
-            id="searchBox" 
-            pInputText 
-            class="form-control" 
-            type="text" 
-            (input)="dt1.filterGlobal($event.target.value, 'contains')" 
-            placeholder="Search Name/Email" />
-        </span>
-      </span>
+<div class="admin-dashboard">
+  <!-- Header Section with Stats -->
+  <div class="dashboard-header">
+    <div class="header-title">
+      <h2>Administration Control Center</h2>
+      <p>User Management & Role Assignment Portal</p>
     </div>
-  </ng-template>
+    <div class="stats-cards">
+      <div class="stat-card">
+        <div class="stat-value">{{getTotalUsers()}}</div>
+        <div class="stat-label">Total Users</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{getActiveUsers()}}</div>
+        <div class="stat-label">Active in Last 30 Days</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{getLoggedInToday()}}</div>
+        <div class="stat-label">Active Today</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{getPendingApprovals()}}</div>
+        <div class="stat-label">Pending Approval</div>
+      </div>
+    </div>
+  </div>
 
-  <ng-template pTemplate="header">
-    <tr>
-      <th pSortableColumn="lName">Last, First Middle <p-sortIcon field="lName"></p-sortIcon></th>
-      <th pSortableColumn="email">Email Address <p-sortIcon field="email"></p-sortIcon></th>
-      <th>Roles (Click to Assign or Remove)</th>
-      <th>Status</th>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-member>
-    <tr>
-      <td [style]="getWarnings(member)"><div class="small text-muted font-weight-bold">Registered Name</div>{{ member.lName}}, {{ member.fName}} {{ member.mName}}<br>
-        <div class="small text-muted font-weight-bold">Screen Name</div>{{member.name}}</td>
-      <td><span style="font-size: 11px">{{ member.email }}</span><br>
-        <span *ngIf="member.emailVerified" class="badge badge-pill badge-success small p-1 m-1">Email Verified</span>
-        <span *ngIf="!member.emailVerified" class="badge badge-pill badge-danger small p-1 m-1">Email Not Verified</span>
-      </td>
-      <td>
-        <div style="background-color: lightgrey; padding-top:2px; padding-bottom: 2px">
-          <span *ngIf="member.authAdmin" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('admin', member)">Admin</span>
-          <span *ngIf="!member.authAdmin" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('admin', member)">Admin</span>
-          <span *ngIf="member.authJudge" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('judge', member)">Judge</span>
-          <span *ngIf="!member.authJudge" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('judge', member)">Judge</span>
-          <span *ngIf="member.authJudgeClerk" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('judgeClerk', member)">Judicial Clerk</span>
-          <span *ngIf="!member.authJudgeClerk" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('judgeClerk', member)">Judicial Clerk</span>
-          <span *ngIf="member.authMagistrate" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('magistrate', member)">Magistrate</span>
-          <span *ngIf="!member.authMagistrate" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('magistrate', member)">Magistrate</span>
-          <span *ngIf="member.authMagistrateClerk" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('magistrateClerk', member)">Magistrate Clerk</span>
-          <span *ngIf="!member.authMagistrateClerk" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('magistrateClerk', member)">Magistrate Clerk</span>
-          <span *ngIf="member.authPrivAttorney" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('private', member)">Private Attorney</span>
-          <span *ngIf="!member.authPrivAttorney" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('private', member)">Private Attorney</span>
-          <span *ngIf="member.authAttorney" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('dpp', member)">DPP Office</span>
-          <span *ngIf="!member.authAttorney" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('dpp', member)">DPP Office</span>
-          <span *ngIf="member.authRegistrar" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('registrar', member)">Registrar/Deputy</span>
-          <span *ngIf="!member.authRegistrar" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('registrar', member)">Registrar/Deputy</span>
-          <span *ngIf="member.authRegistrarClerk" class="badge badge-pill badge-success p-1 m-1" (click)="doRole('registrarClerk', member)">Registrar Staff</span>
-          <span *ngIf="!member.authRegistrarClerk" class="badge badge-pill badge-white p-1 m-1" (click)="doRole('registrarClerk', member)">Registrar Staff</span>
-        </div>
-        <div class="small text-muted"><b>Position:</b> {{member.position}} | <b>Requested:</b> {{member.requested}}</div>
-        <div class="small text-muted"><b>Comments:</b> {{member.comments}}<br>
-          <b>Account Created:</b> {{localTime(member.memberSince)}} | <b>Last Login:</b> {{localTime(member.lastLogin)}} | <span *ngIf="checkTime(member.lastLogin)" class="bg-warning text-white small p-1 rounded">LOGGED IN TODAY</span>
-        </div>
-      </td>
-      <td>
-        <select (change)="doStatusChange($event, member)" class="custom-select" [value]="member.status" [style]="getStyle(member.status)">
-          <option value="New">NEW MEMBER</option>
-          <option value="Approved">ACTIVE</option>
-          <option value="Disapproved">INACTIVE</option>
-        </select>
+  <!-- Enhanced Filter Controls -->
+  <div class="filter-controls">
+    <div class="search-box">
+      <i class="fa fa-search"></i>
+      <input id="searchBox" type="text" (input)="dt1.filterGlobal($event.target.value, 'contains')" placeholder="Search users by name or email...">
+    </div>
+    <div class="filter-actions">
+      <button class="btn-filter" [class.active]="showLoggedInTodayOnly" (click)="toggleLoggedInTodayFilter()">
+        <i class="fa fa-clock-o"></i>
+        <span>{{showLoggedInTodayOnly ? 'Show All Users' : 'Show Active Today'}}</span>
+      </button>
+      <button class="btn-filter" (click)="clear(dt1)">
+        <i class="fa fa-refresh"></i>
+        <span>Reset Filters</span>
+      </button>
+    </div>
+  </div>
 
-      </td>
+  <!-- User Table Container -->
+  <div class="user-table-container">
+    <p-table #dt1 [value]="allMembers" styleClass="user-table"
+           [paginator]="true"
+           [rows]="10"
+           [showCurrentPageReport]="true"
+           [tableStyle]="{ 'min-width': '50rem' }"
+           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+           [rowsPerPageOptions]="[10, 25, 50]"
+           [globalFilterFields]="['lName', 'email', 'fName']">
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="lName">User Information <p-sortIcon field="lName"></p-sortIcon></th>
+          <th pSortableColumn="email">Contact Details <p-sortIcon field="email"></p-sortIcon></th>
+          <th>Role Management</th>
+          <th>Account Status</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-member>
+        <tr class="alternate" style="border: 1px solid black;">
+          <td [style]="getWarnings(member)" class="user-info-cell">
+            <div class="user-avatar">
+              <div class="avatar-placeholder">{{member.fName?.charAt(0) || '?'}}{{member.lName?.charAt(0) || '?'}}</div>
+            </div>
+            <div class="user-details">
+              <div class="user-name">{{ member.lName}}, {{ member.fName}} {{ member.mName}}</div>
+              <div class="user-screen-name">{{member.name}}</div>
+            </div>
+          </td>
+          <td class="contact-info-cell">
+            <div class="email-container">
+              <i class="fa fa-envelope-o"></i>
+              <span class="email-text">{{ member.email }}</span>
+            </div>
+            <div class="verification-status">
+              <span *ngIf="member.emailVerified" class="verified"><i class="fa fa-check-circle"></i> Email Verified</span>
+              <span *ngIf="!member.emailVerified" class="not-verified"><i class="fa fa-exclamation-circle"></i> Email Not Verified</span>
+            </div>
+          </td>
+          <td>
+            <div class="role-management-panel">
+              <div class="role-badges">
+                <div class="role-category">
+                  <h4>Administrative</h4>
+                  <div class="role-group">
+                    <div [class]="member.authAdmin ? 'role-badge active' : 'role-badge inactive'" (click)="doRole('admin', member)">
+                      <i class="fa fa-shield"></i> Admin
+                    </div>
+                  </div>
+                </div>
 
-    </tr>
-  </ng-template>
-</p-table>
+                <div class="role-category">
+                  <h4>Judicial</h4>
+                  <div class="role-group">
+                    <div [class]="member.authJudge ? 'role-badge active' : 'role-badge inactive'" (click)="doRole('judge', member)">
+                      <i class="fa fa-gavel"></i> Judge
+                    </div>
+                    <div [class]="member.authJudgeClerk ? 'role-badge active' : 'role-badge inactive'" (click)="doRole('judgeClerk', member)">
+                      <i class="fa fa-balance-scale"></i> Judicial Clerk
+                    </div>
+                    <div [class]="member.authMagistrate ? 'role-badge active' : 'role-badge inactive'" (click)="doRole('magistrate', member)">
+                      <i class="fa fa-university"></i> Magistrate
+                    </div>
+                    <div [class]="member.authMagistrateClerk ? 'role-badge active' : 'role-badge inactive'" (click)="doRole('magistrateClerk', member)">
+                      <i class="fa fa-briefcase"></i> Magistrate Clerk
+                    </div>
+                  </div>
+                </div>
+
+                <div class="role-category">
+                  <h4>Legal</h4>
+                  <div class="role-group">
+                    <div [class]="member.authPrivAttorney ? 'role-badge active' : 'role-badge inactive'" (click)="doRole('private', member)">
+                      <i class="fa fa-user-circle"></i> Private Attorney
+                    </div>
+                    <div [class]="member.authAttorney ? 'role-badge active' : 'role-badge inactive'" (click)="doRole('dpp', member)">
+                      <i class="fa fa-institution"></i> DPP Office
+                    </div>
+                  </div>
+                </div>
+
+                <div class="role-category">
+                  <h4>Registry</h4>
+                  <div class="role-group">
+                    <div [class]="member.authRegistrar ? 'role-badge active' : 'role-badge inactive'" (click)="doRole('registrar', member)">
+                      <i class="fa fa-book"></i> Registrar/Deputy
+                    </div>
+                    <div [class]="member.authRegistrarClerk ? 'role-badge active' : 'role-badge inactive'" (click)="doRole('registrarClerk', member)">
+                      <i class="fa fa-pencil"></i> Registrar Staff
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="user-metadata">
+                <div class="metadata-item">
+                  <span class="label">Position:</span>
+                  <span class="value">{{member.position || 'Not specified'}}</span>
+                </div>
+                <div class="metadata-item">
+                  <span class="label">Requested:</span>
+                  <span class="value">{{member.requested || 'Not specified'}}</span>
+                </div>
+                <div class="metadata-item">
+                  <span class="label">Account Created:</span>
+                  <span class="value">{{localTime(member.memberSince)}}</span>
+                </div>
+                <div class="metadata-item">
+                  <span class="label">Last Login:</span>
+                  <span class="value">{{localTime(member.lastLogin)}}</span>
+                  <span *ngIf="checkTime(member.lastLogin)" class="login-today">LOGGED IN TODAY</span>
+                </div>
+                <div class="metadata-item full-width">
+                  <span class="label">Comments:</span>
+                  <span class="value">{{member.comments || 'No comments'}}</span>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="status-cell">
+            <div class="user-status">
+              <select (change)="doStatusChange($event, member)" [value]="member.status" [ngClass]="'status-' + member.status.toLowerCase()">
+                <option value="New">NEW MEMBER</option>
+                <option value="Approved">ACTIVE</option>
+                <option value="Disapproved">INACTIVE</option>
+              </select>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Dashboard Analytics Section -->
+  <div class="dashboard-analytics">
+    <div class="chart-container">
+      <h3>User Role Distribution</h3>
+      <canvas baseChart
+              [data]="roleDistributionData"
+              [type]="'doughnut'"
+              [options]="chartOptions">
+      </canvas>
+    </div>
+
+    <div class="chart-container">
+      <h3>Today's Logins by Role</h3>
+      <canvas baseChart
+              [data]="todayLoginsByRoleData"
+              [type]="'bar'"
+              [options]="barChartOptions">
+      </canvas>
+    </div>
+  </div>
 </div>

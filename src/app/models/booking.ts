@@ -6,12 +6,12 @@ export interface Booking {
   judgeID?: string;
   courtroom?: string;
   court?: string;
-  afisID?: string;
+  afisID?: string; // Links the booking to the offender
   offender?: string;
-  offenderName?: string;
-  lastName?: string;
-  firstName?: string;
-  middleName?: string;
+  offenderName?: string; // Full name of the offender
+  lastName?: string; // Last name of the offender
+  firstName?: string; // First name of the offender
+  middleName?: string; // Middle name of the offender
   dob?: string;
   address1?: string;
   address2?: string;
@@ -52,7 +52,7 @@ export interface Booking {
   gangHistory?: string;
   housingLoc?: string;
   gangAffil?: string;
-  bookingStatus?: string; // Open, Closed, Bond
+  bookingStatus?: string; // Open, Closed, Bond, Deleted
   bookingChargeDocs?: string;
   bookingCounts?: string;
   bailAppPending?: boolean;
@@ -111,14 +111,14 @@ export interface Booking {
   holdRulingEmail?: boolean;
   bailReportLocation?: string;
   bailReportDays?: string;
-  bailReportTime?: string;
-  sundayChecked?: any;
-  mondayChecked?: any;
-  tuesdayChecked?: any;
-  wednesdayChecked?: any;
-  thursdayChecked?: any;
-  fridayChecked?: any;
-  saturdayChecked?: any;
+  bailReportTime?: string; // Time offender must checkin before
+  sundayChecked?: any; // Sunday Bail report day
+  mondayChecked?: any; // Monday Bail report day
+  tuesdayChecked?: any; // Tuesday Bail report day
+  wednesdayChecked?: any; // Wednesday Bail report day
+  thursdayChecked?: any; // Thursday Bail report day
+  fridayChecked?: any; // Friday Bail report day
+  saturdayChecked?: any; // Saturday Bail report day
   suretyReq?: string;
   surrenderPassportChecked?: any;
   elecMonitorChecked?: any;
@@ -129,7 +129,7 @@ export interface Booking {
   signatureData?: string;
   active?: boolean; // pending, active, closed
   released?: boolean;
-  checkLocation?: string;
+  checkLocation?: string; // May say Any or Station Name
   bailstatus?: string;
   custodyStatus?: string;
   attorneyName?: string;

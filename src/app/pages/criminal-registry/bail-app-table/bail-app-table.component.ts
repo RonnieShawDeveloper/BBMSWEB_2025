@@ -121,11 +121,18 @@ export class BailAppTableComponent implements OnInit {
         controlModule: 'suretyApp'
       },
       {
-        id: '7',
+        id: '6',
         controlName: 'Revoke Bail',
         controlDescription: 'Bail Revoked',
         controlIcon: 'fa-ban',
         controlModule: 'bailRevoked'
+      },
+      {
+        id: '8',
+        controlName: 'Bail Conditions',
+        controlDescription: 'Bail Conditions',
+        controlIcon: 'fa-heartbeat',
+        controlModule: 'bailConditions',
       },
       {
         id: '9',
@@ -293,7 +300,7 @@ export class BailAppTableComponent implements OnInit {
       }
     }
 
-    // Surety 2
+    // Init Surety 2
     if (this.hearings.suretor2NIB) {
       const suretyControl = this.sourceControls.find((control) => control.controlName === 'Surety 2');
       if (suretyControl) {
@@ -366,6 +373,7 @@ export class BailAppTableComponent implements OnInit {
     }
   }
 
+  // This method is called when a control is dropped from the target to the source
   doDrop(control) {
     this.sortControls();
     if (control.items[0].id == '1') {
@@ -539,36 +547,263 @@ export class BailAppTableComponent implements OnInit {
     }
   }
 
-  private async assignSurety(controlId: string): Promise<void> {
+// NOTE TO SELF: New helper function to handle Suretor assignment logic, including conversion
+  private assignSurety(controlId: string): void {
     const isSurety1 = controlId === '4';
     const suretyControlName = isSurety1 ? 'Surety 1' : 'Surety 2';
 
-    const { value: formValues } = await Swal.fire({
+    Swal.fire({
       title: `Assign ${suretyControlName}`,
       html: '<input id="swal-input1" class="swal2-input" placeholder="Surety NIB">',
       focusConfirm: false,
       showCancelButton: true,
       preConfirm: () => {
-        return {
-          suretorNIB: (document.getElementById('swal-input1') as HTMLInputElement).value
-        };
+        const suretorNIB = (<HTMLInputElement>document.getElementById('swal-input1')).value;
+        return {suretorNIB: suretorNIB};
       }
+    } as any).then(async (result) => { // Use async here for await
+      if (!result.isConfirmed || !result.value.suretorNIB) {
+        this.revertSuretyDrag(controlId); // Revert drag if cancelled or NIB not entered
+        return;
+      }
+
+      const inputNIB = result.value.suretorNIB.trim();
+
+      if (!/^\d+$/.test(inputNIB)) { // Simple numeric validation for NIB
+        Swal.fire({
+          title: 'Invalid NIB',
+          text: 'The Suretor NIB is invalid. Please enter a valid NIB (numbers only).',
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+        this.revertSuretyDrag(controlId);
+        return;
+      }
+
+      // --- START NEW SURETOR CONFLICT CHECK ---
+      let conflictingCases: string[] = [];
+
+      // 1. Check Supreme Court (hearings collection)
+      const supremeCourtQuery1 = this.af.collection('hearings', ref =>
+        ref.where('suretorNIB', '==', inputNIB).where('active', '==', true)
+      ).get().pipe(take(1));
+      const supremeCourtQuery2 = this.af.collection('hearings', ref =>
+        ref.where('suretor2NIB', '==', inputNIB).where('active', '==', true)
+      ).get().pipe(take(1));
+
+      const [supremeSnapshot1, supremeSnapshot2] = await Promise.all([
+        supremeCourtQuery1.toPromise(),
+        supremeCourtQuery2.toPromise()
+      ]);
+
+      if (supremeSnapshot1 && !supremeSnapshot1.empty) {
+        supremeSnapshot1.docs.forEach(doc => {
+          const hearing = doc.data() as Hearings;
+          // Exclude the current hearing being processed
+          if (hearing.id !== this.hearings.id) {
+            conflictingCases.push(`Supreme Court (Offender: ${hearing.offenderName})`);
+          }
+        });
+      }
+      if (supremeSnapshot2 && !supremeSnapshot2.empty) {
+        supremeSnapshot2.docs.forEach(doc => {
+          const hearing = doc.data() as Hearings;
+          // Exclude the current hearing being processed
+          if (hearing.id !== this.hearings.id) {
+            conflictingCases.push(`Supreme Court (Offender: ${hearing.offenderName})`);
+          }
+        });
+      }
+
+      // 2. Check Magistrate Court (magistrateBookings collection)
+      const magistrateCourtQuery1 = this.af.collection('magistrateBookings', ref =>
+        ref.where('suretorNIB', '==', inputNIB).where('bookingStatus', '==', 'Open')
+      ).get().pipe(take(1));
+      const magistrateCourtQuery2 = this.af.collection('magistrateBookings', ref =>
+        ref.where('suretorNIB2', '==', inputNIB).where('bookingStatus', '==', 'Open')
+      ).get().pipe(take(1));
+
+      const [magistrateSnapshot1, magistrateSnapshot2] = await Promise.all([
+        magistrateCourtQuery1.toPromise(),
+        magistrateCourtQuery2.toPromise()
+      ]);
+
+      if (magistrateSnapshot1 && !magistrateSnapshot1.empty) {
+        magistrateSnapshot1.docs.forEach(doc => {
+          const booking = doc.data() as Booking;
+          // Construct full name for Magistrate Court records
+          const offenderFullName = `${booking.lastName || ''}, ${booking.firstName || ''} ${booking.middleName || ''}`.trim();
+          conflictingCases.push(`Magistrate Court (Offender: ${offenderFullName})`);
+        });
+      }
+      if (magistrateSnapshot2 && !magistrateSnapshot2.empty) {
+        magistrateSnapshot2.docs.forEach(doc => {
+            const booking = doc.data() as Booking;
+            // Construct full name for Magistrate Court records
+            const offenderFullName = `${booking.lastName || ''}, ${booking.firstName || ''} ${booking.middleName || ''}`.trim();
+            conflictingCases.push(`Magistrate Court (Offender: ${offenderFullName})`);
+          }
+        );
+      }
+
+      // If conflicts found, show warning and revert
+      if (conflictingCases.length > 0) {
+        const conflictList = conflictingCases.map(c => `<li>${c}</li>`).join('');
+        Swal.fire({
+          title: 'Suretor Already Assigned!',
+          html: `The Suretor with NIB ${inputNIB} was found on the following ACTIVE case(s):<br><ul>${conflictList}</ul><br>A Suretor can only be assigned to one active/open case at a time.`,
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+        this.revertSuretyDrag(controlId);
+        return;
+      }
+      // --- END NEW SURETOR CONFLICT CHECK ---
+
+
+      // NOTE TO SELF: Fetch the Suretor document from the 'suretors' collection
+      const suretorDoc = await this.af.collection('suretors').doc(inputNIB).get().pipe(take(1)).toPromise();
+
+      if (!suretorDoc?.exists) {
+        Swal.fire({
+          title: 'Suretor Not Found',
+          text: 'The Suretor does not exist in the system with this NIB. Please have the Suretor complete the Digital Application first!',
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+        this.revertSuretyDrag(controlId);
+        return;
+      }
+
+      // NOTE TO SELF: Determine if it's old or new format and convert if necessary
+      let suretorData: Suretor | SuretyApplication = suretorDoc.data() as any; // Use 'any' for initial type flexibility
+      let suretorToAssign: Surety; // This will hold the Surety object from either format
+      let suretorFullName: string;
+
+      // Detection: Check for the 'surety' nested object, which is unique to the new format
+      if ((suretorData as SuretyApplication).surety?.nib) {
+        // NOTE TO SELF: It's the new SuretyApplication format
+        console.log('NOTE TO SELF: Detected new SuretyApplication format.');
+        const newSuretyApp = suretorData as SuretyApplication;
+        suretorToAssign = newSuretyApp.surety;
+
+        // Ensure fullName is present, construct if not
+        if (!suretorToAssign.fullName || suretorToAssign.fullName.trim() === '') {
+          suretorFullName = `${suretorToAssign.lastName || ''}, ${suretorToAssign.firstName || ''} ${suretorToAssign.middleName || ''}`.trim();
+          // Optionally, update the suretorData in Firestore with the generated fullName
+          await this.af.collection('suretors').doc(inputNIB).update({ 'surety.fullName': suretorFullName })
+            .then(() => console.log('NOTE TO SELF: Updated fullName in new SuretyApplication format.'))
+            .catch(error => console.error('NOTE TO SELF: Error updating fullName in new SuretyApplication:', error));
+        } else {
+          suretorFullName = suretorToAssign.fullName;
+        }
+      } else {
+        // NOTE TO SELF: It's the old Suretor format. Perform on-the-fly conversion.
+        console.log('NOTE TO SELF: Detected old Suretor format. Converting to new SuretyApplication.');
+        const oldSuretor = suretorData as Suretor;
+
+        // Construct the new Surety object from the old Suretor data
+        const newSurety: Surety = {
+          // Always construct fullName during conversion for old format
+          fullName: `${oldSuretor.lastName || ''}, ${oldSuretor.firstName || ''} ${oldSuretor.middleName || ''}`.trim(),
+          firstName: oldSuretor.firstName || '',
+          middleName: oldSuretor.middleName || '',
+          lastName: oldSuretor.lastName || '',
+          address: oldSuretor.addressFull || '',
+          nib: oldSuretor.NIB || '', // Map old NIB to new nib
+          dob: null, // Old format doesn't have DOB, default to null
+          email: oldSuretor.email || '',
+          phone: oldSuretor.phone || '',
+          phone2: oldSuretor.phone2 || '',
+          poBox: oldSuretor.poBox || '',
+          spn: oldSuretor.spn || '',
+          empName: oldSuretor.empName || '',
+          empAddress: oldSuretor.empAddress || '',
+          empPhone: oldSuretor.empPhone || '',
+          immovableProperty: { // Default empty immovable property
+            particulars: oldSuretor.immovablePropDesc || '',
+            estimatedValue: parseFloat(oldSuretor.immovablePropValue || '0') || 0.0
+          },
+          bankAccount: { // Default empty bank account
+            bankName: oldSuretor.bankName || '',
+            accountType: oldSuretor.bankAccountType || '',
+            accountBalance: parseFloat(oldSuretor.bankBalance || '0') || 0.0
+          },
+          otherMoveableProperty: [] // Old format has movablePropAdditional as string, new has list. Default to empty.
+        };
+
+        // Construct the full new SuretyApplication object
+        const newSuretyApplication: SuretyApplication = {
+          applicationId: suretorDoc.id, // Use NIB as applicationId for converted records
+          caseDetails: { // Default empty CaseDetails
+            defendantName: '',
+            defendantAddress: '',
+            bondAmount: 0.0,
+            court: ''
+          },
+          surety: newSurety,
+          declarations: { // Default empty Declarations
+            encumbranceStatus: '',
+            mortgageHolder: null,
+            priorSuretyCases: '',
+            hasPendingCriminalCharges: false,
+            isCurrentlySurety: false
+          },
+          execution: { // Default Execution with current date
+            suretySignatureUrl: '',
+            dateSigned: Timestamp.now(),
+            attestingOfficialName: ''
+          },
+          metadata: { // Default Metadata
+            status: 'Legacy Converted', // Indicate this was converted
+            scannedAt: Timestamp.now(),
+            scannedByUserId: 'system-conversion', // Indicate system conversion
+            reviewedAt: null,
+            reviewedByUserId: null,
+            originalImageUrls: []
+          },
+          aiComments: { 'conversion': 'Automatically converted from old Suretor format.' },
+          approval: 'pending' // Default approval status
+        };
+
+        // NOTE TO SELF: Overwrite the old document in Firestore with the new format
+        await this.af.collection('suretors').doc(inputNIB).set(newSuretyApplication)
+          .then(() => console.log('NOTE TO SELF: Successfully converted and saved old Suretor to new SuretyApplication format.'))
+          .catch(error => console.error('NOTE TO SELF: Error converting and saving old Suretor:', error));
+
+        suretorToAssign = newSurety; // Use the newly constructed Surety object
+        suretorFullName = newSurety.fullName; // Use the constructed fullName
+        suretorData = newSuretyApplication; // Update suretorData to the new format for consistency
+      }
+
+      // NOTE TO SELF: Assign the Suretor to the current hearing
+      if (isSurety1) {
+        this.hearings.suretorNIB = suretorToAssign.nib;
+        this.hearings.suretorName = suretorFullName;
+        // NOTE TO SELF: Optionally store the full SuretyApplication ID if needed for deeper linking
+        // this.hearings.suretor1ApplicationId = (suretorData as SuretyApplication).applicationId;
+      } else {
+        this.hearings.suretor2NIB = suretorToAssign.nib;
+        this.hearings.suretor2Name = suretorFullName;
+        // this.hearings.suretor2ApplicationId = (suretorData as SuretyApplication).applicationId;
+      }
+      this.hs.updateHearing(this.hearings);
+
+      // NOTE TO SELF: Update the control comment in the UI
+      const suretyControl = this.targetControls.find((c) => c.id === controlId);
+      if (suretyControl) {
+        suretyControl.controlComment = `Surety ${suretorFullName} assigned to this hearing. Click to edit Suretor.`;
+      }
+
+      Swal.fire({
+        title: 'Suretor Added',
+        text: `The Suretor (${suretorFullName}) has been added to this Bail Application`,
+        icon: 'success',
+        confirmButtonText: 'Ok'
+      }).then(() => {
+        this.refreshPickList();
+      });
     });
-
-    if (!formValues || !formValues.suretorNIB) {
-      this.revertSuretyDrag(controlId);
-      return;
-    }
-
-    const inputNIB = formValues.suretorNIB.trim();
-
-    if (!/^\d+$/.test(inputNIB)) {
-      Swal.fire('Invalid NIB', 'The Suretor NIB is invalid. Please enter a valid NIB (numbers only).', 'error');
-      this.revertSuretyDrag(controlId);
-      return;
-    }
-
-    // Conflict check logic remains the same...
   }
 
   sortControls() {
@@ -1254,36 +1489,132 @@ export class BailAppTableComponent implements OnInit {
     const bondAmountMatch = this.hearings.suretyReq ? this.hearings.suretyReq.match(/\(([^)]+)\)/) : null;
     const bondAmount = bondAmountMatch ? bondAmountMatch[1] : '$0.00';
 
+    // Initialize suretor data with empty strings (not 'N/A')
+    let surety1Data = {
+      address: '',
+      poBox: '',
+      phone: '',
+      empName: '',
+      empAddress: '',
+      empPhone: '',
+      empPosition: ''
+    };
+
+    let surety2Data = {
+      address: '',
+      poBox: '',
+      phone: '',
+      empName: '',
+      empAddress: '',
+      empPhone: '',
+      empPosition: ''
+    };
+
+    // Fetch Suretor 1 data if available
+    if (this.hearings.suretorNIB) {
+      try {
+        const suretorDoc = await this.af.collection('suretors').doc(this.hearings.suretorNIB).get().pipe(take(1)).toPromise();
+        if (suretorDoc?.exists) {
+          const suretorData = suretorDoc.data();
+          if (suretorData && (suretorData as SuretyApplication).surety) {
+            // New format with nested surety object
+            const newSurety = (suretorData as SuretyApplication).surety;
+            surety1Data = {
+              address: newSurety.address || '',
+              poBox: newSurety.poBox || '',
+              phone: newSurety.phone || '',
+              empName: newSurety.empName || '',
+              empAddress: newSurety.empAddress || '',
+              empPhone: newSurety.empPhone || '',
+              empPosition: ''  // Not available in new format
+            };
+          } else if (suretorData && (suretorData as Suretor).firstName) {
+            // Old format with direct properties
+            const oldSuretor = suretorData as Suretor;
+            surety1Data = {
+              address: oldSuretor.addressFull || '',
+              poBox: oldSuretor.poBox || '',
+              phone: oldSuretor.phone || '',
+              empName: oldSuretor.empName || '',
+              empAddress: oldSuretor.empAddress || '',
+              empPhone: oldSuretor.empPhone || '',
+              empPosition: oldSuretor.empPosition || ''
+            };
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching suretor 1 data:', error);
+      }
+    }
+
+    // Fetch Suretor 2 data if available
+    if (this.hearings.suretor2NIB) {
+      try {
+        const suretorDoc = await this.af.collection('suretors').doc(this.hearings.suretor2NIB).get().pipe(take(1)).toPromise();
+        if (suretorDoc?.exists) {
+          const suretorData = suretorDoc.data();
+          if (suretorData && (suretorData as SuretyApplication).surety) {
+            // New format with nested surety object
+            const newSurety = (suretorData as SuretyApplication).surety;
+            surety2Data = {
+              address: newSurety.address || '',
+              poBox: newSurety.poBox || '',
+              phone: newSurety.phone || '',
+              empName: newSurety.empName || '',
+              empAddress: newSurety.empAddress || '',
+              empPhone: newSurety.empPhone || '',
+              empPosition: ''  // Not available in new format
+            };
+          } else if (suretorData && (suretorData as Suretor).firstName) {
+            // Old format with direct properties
+            const oldSuretor = suretorData as Suretor;
+            surety2Data = {
+              address: oldSuretor.addressFull || '',
+              poBox: oldSuretor.poBox || '',
+              phone: oldSuretor.phone || '',
+              empName: oldSuretor.empName || '',
+              empAddress: oldSuretor.empAddress || '',
+              empPhone: oldSuretor.empPhone || '',
+              empPosition: oldSuretor.empPosition || ''
+            };
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching suretor 2 data:', error);
+      }
+    }
 
     const data = {
       partiesList: partiesList,
       offenderName: offenderFormatted,
-      surety1Name: surety1Formatted || 'N/A',
-      surety2Name: surety2Formatted || 'N/A',
+      surety1Name: surety1Formatted || '',  // Changed from 'N/A' to empty string
+      surety2Name: surety2Formatted || '',  // Changed from 'N/A' to empty string
       assistantRegistrarName: '-- ASSISTANT REGISTRAR NAME --',
       bondAmountWords: this.hearings.suretyReq ? this.hearings.suretyReq.split('(')[0].trim() : 'Written Amount Here',
       bondAmount: bondAmount,
       bondDate: `${formatDateWithOrdinal(today)}`,
       bondDateFull: `${formatDateWithOrdinal(today).split(',')[0]}, A.D.${today.getFullYear()}`,
       courtName: 'SUPREME COURT',
-      charges: this.counts.map(c => c.countCharge).join(', ') || 'N/A',
-      surety1Address: 'N/A',
-      surety1PoBox: 'N/A',
-      surety1Telephone: 'N/A',
-      surety1Workplace: 'N/A',
-      surety1WorkplaceAddress: 'N/A',
-      surety1WorkplaceTelephone: 'N/A',
-      surety1Position: 'N/A',
-      surety2Address: 'N/A',
-      surety2PoBox: 'N/A',
-      surety2Telephone: 'N/A',
-      surety2Workplace: 'N/A',
-      surety2WorkplaceAddress: 'N/A',
-      surety2WorkplaceTelephone: 'N/A',
-      surety2Position: 'N/A',
+      charges: this.counts.map(c => c.countCharge).join(', ') || '',  // Changed from 'N/A' to empty string
+      // Suretor 1 information
+      surety1Address: surety1Data.address,
+      surety1PoBox: surety1Data.poBox,
+      surety1Telephone: surety1Data.phone,
+      surety1Workplace: surety1Data.empName,
+      surety1WorkplaceAddress: surety1Data.empAddress,
+      surety1WorkplaceTelephone: surety1Data.empPhone,
+      surety1Position: surety1Data.empPosition,
+      // Suretor 2 information
+      surety2Address: surety2Data.address,
+      surety2PoBox: surety2Data.poBox,
+      surety2Telephone: surety2Data.phone,
+      surety2Workplace: surety2Data.empName,
+      surety2WorkplaceAddress: surety2Data.empAddress,
+      surety2WorkplaceTelephone: surety2Data.empPhone,
+      surety2Position: surety2Data.empPosition,
       reportingClause: reportingClause,
-      judgeName: this.hearings.judgeName || 'N/A',
-      orderGrantingBailDate: this.hearings.hearingDateUnix ? this.convertUnixDate(this.hearings.hearingDateUnix) : 'N/A',
+      judgeName: this.hearings.judgeName || '',  // Changed from 'N/A' to empty string
+      orderGrantingBailDate: this.hearings.hearingDateUnix ? this.convertUnixDate(this.hearings.hearingDateUnix) : '',  // Changed from 'N/A' to empty string
       signatureDate: signatureDate,
       clerkName: '____________________'
     };

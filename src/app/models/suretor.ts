@@ -9,6 +9,7 @@ export interface Suretor {
   addressFull?: string;
   poBox?: string;
   phone?: string;
+  phone2?: string; // Optional second phone number
   email?: string;
   locality?: string;
   island?: string;

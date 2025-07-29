@@ -25,6 +25,7 @@ export const routes: Routes = [
       { path: 'magistratecourt', loadChildren: () => import('./pages/magistrate-court/magistrate-court.module').then(m => m.MagistrateCourtModule), canActivate: [AuthGuard], data: { breadcrumb: 'Magistrate Court' }},
       { path: 'phonereport', loadChildren: () => import('./pages/reports/phonechekinreport/phonechekinreport.module').then(m => m.PhonechekinreportModule), canActivate: [AuthGuard], data: { breadcrumb: 'Phone Checkin Report' }},
       { path: 'surtor-admin', loadChildren: () => import('./pages/surtor-admin/surtor-admin.module').then(m => m.SurtorAdminModule), canActivate: [AuthGuard], data: { breadcrumb: 'Suretor Administration' }},
+      { path: 'email', loadChildren: () => import('./pages/email/email.module').then(m => m.EmailModule), canActivate: [AuthGuard], data: { breadcrumb: 'In-House email' }},
       { path: 'forms', loadChildren: () => import('./pages/forms/forms.module').then(m => m.FormsModule), canActivate: [AuthGuard], data: { breadcrumb: 'Approved Forms' } },
       { path: 'blank', component: BlankComponent, canActivate: [AuthGuard], data: { breadcrumb: 'Blank page' } },
       { path: 'search', component: SearchComponent, canActivate: [AuthGuard], data: { breadcrumb: 'Search' } }

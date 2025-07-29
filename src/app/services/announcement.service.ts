@@ -7,20 +7,17 @@ export class AnnouncementService {
 
   // To create a new announcement, change the ID and update the content.
   private readonly currentAnnouncement = {
-    id: 3, // Increment this for new announcements
-    title: 'NEW! Suretor Administration Interface',
+    id: 4, // Increment this for new announcements
+    title: 'NEW MESSAGE SYSTEM ANNOUNCEMENT',
     html: `
-      <p>We are excited to announce the launch of the new Suretor Administration Interface!</p>
-      <p>This interface is designed to streamline your administrative tasks and enhance your overall experience.</p>
-      <p>Key features include:</p>
-      <ul>
-        <li>Improved user interface—All Suretor Functions located on one page</li>
-        <li>Enhanced security features—tracking of Suretors across all courts</li>
-        <li>Faster access to critical information</li>
-        <li>Customizable sorting</li>
-      </ul>
-      <p>We encourage you to explore the new interface and provide feedback. Your input is invaluable in helping us improve our services.</p>
-      <p>BBMS Development</p>
+      <p>I want to let everyone know that we now have a message system (In-House Email)
+      built into the BBMS. Members will be instantly notified that they have a new email
+      and will have the option to read it or read it later if they are in the middle of
+      a task. Unread emails notification will appear at the top of the page in the header
+      above. </p>
+      <p>Play around with the features, and all messages are end-to-end encrypted and will
+      not be decrypted until they are clicked on to read. If you have any questions or to
+      report a bug, please use the message service to send a question to Ronnie Shaw (Development)</p>
     `
   };
 

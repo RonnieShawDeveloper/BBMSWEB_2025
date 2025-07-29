@@ -20,54 +20,289 @@ export class DashboardComponent implements OnInit {
   // Arrays to store bookings data
   private magistrateBookings: any[] = [];
 
+  // Chart theme colors
+  private chartColors = {
+    background: [
+      'rgba(0, 240, 255, 0.7)',   // Cyan
+      'rgba(0, 123, 255, 0.7)',   // Blue
+      'rgba(0, 255, 157, 0.7)',   // Green
+      'rgba(255, 56, 96, 0.7)',   // Red
+      'rgba(255, 221, 87, 0.7)',  // Yellow
+      'rgba(138, 43, 226, 0.7)',  // Purple
+      'rgba(255, 165, 0, 0.7)',   // Orange
+      'rgba(233, 30, 99, 0.7)',   // Pink
+      'rgba(156, 39, 176, 0.7)',  // Deep Purple
+      'rgba(63, 81, 181, 0.7)'    // Indigo
+    ],
+    border: [
+      'rgba(0, 240, 255, 1)',     // Cyan
+      'rgba(0, 123, 255, 1)',     // Blue
+      'rgba(0, 255, 157, 1)',     // Green
+      'rgba(255, 56, 96, 1)',     // Red
+      'rgba(255, 221, 87, 1)',    // Yellow
+      'rgba(138, 43, 226, 1)',    // Purple
+      'rgba(255, 165, 0, 1)',     // Orange
+      'rgba(233, 30, 99, 1)',     // Pink
+      'rgba(156, 39, 176, 1)',    // Deep Purple
+      'rgba(63, 81, 181, 1)'      // Indigo
+    ],
+    line: [
+      'rgba(0, 240, 255, 1)',     // Cyan
+      'rgba(0, 123, 255, 1)',     // Blue
+      'rgba(0, 255, 157, 1)',     // Green
+      'rgba(255, 56, 96, 1)'      // Red
+    ]
+  };
+
+  // Global chart options
+  private globalChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#1a2a4a', // Dark color for better visibility in light mode
+          font: {
+            family: "'Roboto Mono', monospace",
+            size: 12
+          }
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(10, 17, 40, 0.8)',
+        titleColor: 'rgba(0, 240, 255, 1)',
+        bodyColor: 'rgba(255, 255, 255, 0.9)',
+        borderColor: 'rgba(0, 240, 255, 0.5)',
+        borderWidth: 1,
+        padding: 10,
+        titleFont: {
+          family: "'Roboto Mono', monospace",
+          size: 14,
+          weight: 'bold'
+        },
+        bodyFont: {
+          family: "'Roboto Mono', monospace",
+          size: 12
+        },
+        displayColors: true,
+        boxPadding: 3
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          color: 'rgba(0, 240, 255, 0.1)'
+        },
+        ticks: {
+          color: '#1a2a4a', // Dark color for better visibility in light mode
+          font: {
+            family: "'Roboto Mono', monospace"
+          }
+        }
+      },
+      y: {
+        grid: {
+          color: 'rgba(0, 240, 255, 0.1)'
+        },
+        ticks: {
+          color: '#1a2a4a', // Dark color for better visibility in light mode
+          font: {
+            family: "'Roboto Mono', monospace"
+          }
+        }
+      }
+    }
+  };
+
   // Line chart properties for case progression
   public magistrateCaseProgressionData: ChartData<'line'>;
   public magistrateCaseProgressionChartType: ChartType = 'line';
+  public magistrateCaseProgressionOptions: any = {
+    ...this.globalChartOptions,
+    elements: {
+      line: {
+        tension: 0.3,
+        borderWidth: 2
+      },
+      point: {
+        radius: 4,
+        hoverRadius: 6,
+        borderWidth: 2,
+        backgroundColor: 'rgba(10, 17, 40, 1)'
+      }
+    }
+  };
 
   // Pie chart properties for bail status
   public magistrateBailStatusChartData: ChartData<'pie', number[], string>;
   public magistrateBailStatusChartType: ChartType = 'pie';
+  public magistrateBailStatusOptions: any = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'right',
+        labels: {
+          color: 'rgba(255, 255, 255, 0.7)',
+          font: {
+            family: "'Roboto Mono', monospace",
+            size: 12
+          }
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(10, 17, 40, 0.8)',
+        titleColor: 'rgba(0, 240, 255, 1)',
+        bodyColor: 'rgba(255, 255, 255, 0.9)',
+        borderColor: 'rgba(0, 240, 255, 0.5)',
+        borderWidth: 1
+      }
+    }
+  };
 
   // Horizontal bar chart properties for top 20 charges
   public topChargesData: ChartData<'bar'>;
   public topChargesChartType: ChartType = 'bar';
-  public topChargesChartOptions: any; // Options for datalabels
+  public topChargesChartOptions: any = {
+    ...this.globalChartOptions,
+    indexAxis: 'y',
+    plugins: {
+      ...this.globalChartOptions.plugins,
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+        color: '#1a2a4a', // Dark color for better visibility in light mode
+        font: {
+          family: "'Roboto Mono', monospace",
+          weight: 'bold'
+        },
+        formatter: (value) => value
+      }
+    }
+  };
 
   // Horizontal bar chart properties for Honorable Mentions (Top 10 offenders by bail amount)
   public honorableMentionsData: ChartData<'bar'>;
   public honorableMentionsChartType: ChartType = 'bar';
-  public honorableMentionsChartOptions: any; // Options for datalabels
+  public honorableMentionsChartOptions: any = {
+    ...this.globalChartOptions,
+    indexAxis: 'y',
+    plugins: {
+      ...this.globalChartOptions.plugins,
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+        color: '#1a2a4a', // Dark color for better visibility in light mode
+        font: {
+          family: "'Roboto Mono', monospace",
+          weight: 'bold'
+        },
+        formatter: (value) => value
+      }
+    }
+  };
 
   // Lists for oldest and youngest offenders
   public oldestOffenders: { name: string; age: number }[] = [];
   public youngestOffenders: { name: string; age: number }[] = [];
 
+  // Magistrate case counts chart
   public magistrateCaseCountsData: ChartData<'bar'>;
   public magistrateCaseCountsChartType: ChartType = 'bar';
-  public magistrateCaseCountsChartOptions: any; // Options for datalabels
+  public magistrateCaseCountsChartOptions: any = {
+    ...this.globalChartOptions,
+    indexAxis: 'y',
+    plugins: {
+      ...this.globalChartOptions.plugins,
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+        color: '#1a2a4a', // Dark color for better visibility in light mode
+        font: {
+          family: "'Roboto Mono', monospace",
+          weight: 'bold'
+        },
+        formatter: (value) => value
+      }
+    }
+  };
 
-  // New properties for Top Islands Chart
+  // Top Islands Chart
   public topIslandsData: ChartData<'bar'>;
   public topIslandsChartType: ChartType = 'bar';
-  public topIslandsChartOptions: any; // Options for datalabels
+  public topIslandsChartOptions: any = {
+    ...this.globalChartOptions,
+    indexAxis: 'y',
+    plugins: {
+      ...this.globalChartOptions.plugins,
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+        color: '#1a2a4a', // Dark color for better visibility in light mode
+        font: {
+          family: "'Roboto Mono', monospace",
+          weight: 'bold'
+        },
+        formatter: (value) => value
+      }
+    }
+  };
 
   public startDate: string;
   public endDate: string;
+  public isDarkTheme: boolean = false; // Set to false for light mode by default
 
   constructor(private af: AngularFirestore, private announcementService: AnnouncementService) {
     Chart.register(ChartDataLabels); // Register the datalabels plugin globally
   }
 
+
   ngOnInit(): void {
+    // Always initialize with light theme
+    document.body.classList.add('light-theme');
+
     this.showAnnouncement();
-    // Initialize chart options for datalabels
+    // Initialize chart options for Top 10 Charges chart
     this.topChargesChartOptions = {
+      ...this.globalChartOptions,
       indexAxis: 'y',
+      barPercentage: 0.8,
+      categoryPercentage: 0.9,
+      scales: {
+        ...this.globalChartOptions.scales,
+        y: {
+          ...this.globalChartOptions.scales.y,
+          ticks: {
+            ...this.globalChartOptions.scales.y.ticks,
+            padding: 10,
+            autoSkip: false,
+            font: {
+              ...this.globalChartOptions.scales.y.ticks.font,
+              size: 11
+            }
+          }
+        },
+        x: {
+          ...this.globalChartOptions.scales.x,
+          grid: {
+            ...this.globalChartOptions.scales.x.grid,
+            display: true
+          }
+        }
+      },
       plugins: {
+        ...this.globalChartOptions.plugins,
         datalabels: {
-          anchor: 'center',
-          align: 'center',
-          formatter: (value) => value // Display the value directly
+          anchor: 'end',
+          align: 'end',
+          color: '#1a2a4a', // Dark color for better visibility in light mode
+          font: {
+            family: "'Roboto Mono', monospace",
+            weight: 'bold',
+            size: 11
+          },
+          formatter: (value) => value,
+          padding: 6
         }
       }
     };
@@ -156,9 +391,18 @@ export class DashboardComponent implements OnInit {
     const labels = Object.keys(bailStatusCounts);
     const data = Object.values(bailStatusCounts);
 
+    // Create background colors array based on number of statuses
+    const backgroundColors = this.chartColors.background.slice(0, labels.length);
+    const borderColors = this.chartColors.border.slice(0, labels.length);
+
     this.magistrateBailStatusChartData = {
       labels: labels,
-      datasets: [{ data: data, backgroundColor: 'rgba(54, 162, 235, 0.6)' }]
+      datasets: [{
+        data: data,
+        backgroundColor: backgroundColors,
+        borderColor: borderColors,
+        borderWidth: 1
+      }]
     };
   }
 
@@ -222,11 +466,46 @@ export class DashboardComponent implements OnInit {
     this.magistrateCaseProgressionData = {
       labels: labels,
       datasets: [
-        { data: openCasesData, label: 'Total Open Cases', borderColor: 'blue', backgroundColor: 'rgba(0, 0, 255, 0.2)', fill: true },
-        { data: newCasesData, label: 'New Cases', borderColor: 'red', backgroundColor: 'rgba(255, 0, 0, 0.2)', fill: true },
-        { data: approvedData, label: 'Bail Approved', borderColor: 'green', backgroundColor: 'rgba(0, 255, 0, 0.2)', fill: true },
-        { data: deniedData, label: 'Bail Denied', borderColor: 'purple', backgroundColor: 'rgba(128, 0, 128, 0.2)', fill: true },
-        { data: totalCasesData, label: 'Total Cases', borderColor: 'orange', backgroundColor: 'rgba(255, 165, 0, 0.2)', fill: true }
+        {
+          data: openCasesData,
+          label: 'Total Open Cases',
+          borderColor: this.chartColors.line[0], // Cyan
+          backgroundColor: 'rgba(0, 240, 255, 0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          data: newCasesData,
+          label: 'New Cases',
+          borderColor: this.chartColors.line[1], // Blue
+          backgroundColor: 'rgba(0, 123, 255, 0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          data: approvedData,
+          label: 'Bail Approved',
+          borderColor: this.chartColors.line[2], // Green
+          backgroundColor: 'rgba(0, 255, 157, 0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          data: deniedData,
+          label: 'Bail Denied',
+          borderColor: this.chartColors.line[3], // Red
+          backgroundColor: 'rgba(255, 56, 96, 0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          data: totalCasesData,
+          label: 'Total Cases',
+          borderColor: 'rgba(255, 221, 87, 1)', // Yellow
+          backgroundColor: 'rgba(255, 221, 87, 0.1)',
+          fill: true,
+          tension: 0.3
+        }
       ]
     };
   }
@@ -247,7 +526,7 @@ export class DashboardComponent implements OnInit {
 
     const sortedCharges = Object.entries(chargeCounts)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 20);
+      .slice(0, 10); // Changed from 20 to 10 charges
 
     const labels = sortedCharges.map(([chargeName]) => chargeName);
     const data = sortedCharges.map(([, count]) => count);
@@ -255,7 +534,13 @@ export class DashboardComponent implements OnInit {
     this.topChargesData = {
       labels: labels,
       datasets: [
-        { data: data, label: 'Top 20 Charges', backgroundColor: 'rgba(54, 162, 235, 0.6)' }
+        {
+          data: data,
+          label: 'Top 10 Charges',
+          backgroundColor: this.chartColors.background.slice(0, data.length),
+          borderColor: this.chartColors.border.slice(0, data.length),
+          borderWidth: 1
+        }
       ]
     };
   }
@@ -287,7 +572,13 @@ export class DashboardComponent implements OnInit {
     this.honorableMentionsData = {
       labels: labels,
       datasets: [
-        { data: data, label: 'Top 10 Highest Bail Amounts', backgroundColor: 'rgba(255, 99, 132, 0.6)' }
+        {
+          data: data,
+          label: 'Top 10 Highest Bail Amounts',
+          backgroundColor: this.chartColors.background.slice(0, data.length),
+          borderColor: this.chartColors.border.slice(0, data.length),
+          borderWidth: 1
+        }
       ]
     };
   }
@@ -354,7 +645,13 @@ export class DashboardComponent implements OnInit {
     this.magistrateCaseCountsData = {
       labels: labels,
       datasets: [
-        { data: data, label: 'Total Cases', backgroundColor: 'rgba(75, 192, 192, 0.6)' }
+        {
+          data: data,
+          label: 'Total Cases',
+          backgroundColor: this.chartColors.background.slice(0, data.length),
+          borderColor: this.chartColors.border.slice(0, data.length),
+          borderWidth: 1
+        }
       ]
     };
   }
@@ -387,7 +684,13 @@ export class DashboardComponent implements OnInit {
     this.topIslandsData = {
       labels: labels,
       datasets: [
-        { data: data, label: 'Top 5 Islands', backgroundColor: 'rgba(153, 102, 255, 0.6)' } // Example color
+        {
+          data: data,
+          label: 'Top 5 Islands',
+          backgroundColor: this.chartColors.background.slice(0, data.length),
+          borderColor: this.chartColors.border.slice(0, data.length),
+          borderWidth: 1
+        }
       ]
     };
   }

@@ -1,9 +1,9 @@
 export interface Offender {
   id?: string;
   alias?: string;
-  lName?: string;
-  fName?: string;
-  mName?: string;
+  lName?: string; // Last name of the offender
+  fName?: string; // First name of the offender
+  mName?: string; // Middle name of the offender
   alerts?: string;
   addLine1?: string;
   addLine2?: string;
@@ -35,8 +35,8 @@ export interface Offender {
   homePhone?: string;
   profileNotes?: string;
   race?: string;
-  spn?: string;
-  nib?: string;
+  spn?: string; // afisID used to identify the offender in the system
+  nib?: string; // National Insurance Number may be used to link some offender records
   state?: string;
   status?: any;
   visible?: string;

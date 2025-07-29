@@ -20,7 +20,20 @@
             </div>
 
             <div class="top-rigth-icons ml-auto">
-                <span
+              <span class="mr-2">
+                <button class="btn btn-outline-light btn-sm position-relative"
+                        style="padding: 3px 4px; font-size: 14px; border-radius: 8px; line-height: 19px"
+                        (click)="goToEmails()"
+                        title="Go to Messages">
+                  <i class="fa fa-envelope" aria-hidden="true"></i>
+                  <span *ngIf="unreadEmailCount > 0"
+                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                        style="top: -5px; right: -5px; font-size: 10px; background-color: #dc3545 !important;">
+                    {{ unreadEmailCount > 99 ? '99+' : unreadEmailCount }}
+                  </span>
+                </button>
+              </span>
+              <span
                   *ngIf="updateAvailable"
                   class="mb-1 mt-0 mr-1 btn btn-danger btn-sm text-white"
                   style="padding: 0px 2px; font-size: 14px; border-radius: 8px; line-height: 19px"

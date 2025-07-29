@@ -1,0 +1,241 @@
+<div class="row pl-3 pr-3 mail-container">
+  <div class="col-md-4 bg-white p-1">
+    <div class="form-group mb-0 pt-1 pb-1">
+      <div class="input-group">
+                <span class="input-group-prepend">
+                    <span class="input-group-text bg-transparent border-0"><i class="fa fa-search ml-2 mr-1"></i></span>
+                </span>
+        <input class="form-control border-0" type="text" [(ngModel)]="searchText" placeholder="Search mail...">
+        <div class="btn-group">
+          <button type="button" class="btn dropdown-toggle no-caret bg-transparent border-0 box-shadow-none" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-bars"></i>
+          </button>
+          <div class="dropdown-menu dropdown-menu-right box-shadow rounded-0">
+            <a class="dropdown-item" href="javascript:void(0);" (click)="type = 'inbox';getMails();">Inbox</a>
+            <a class="dropdown-item" href="javascript:void(0);" (click)="type = 'starred';getMails();">Starred</a>
+            <a class="dropdown-item" href="javascript:void(0);" (click)="type = 'sent';getMails();">Sent</a>
+            <a class="dropdown-item" href="javascript:void(0);" (click)="type = 'drafts';getMails();">Drafts</a>
+            <a class="dropdown-item" href="javascript:void(0);" (click)="type = 'trash';getMails();">Trash</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header showing current message type -->
+    <div class="bg-light p-2 mb-1 border-bottom">
+      <h5 class="m-0 font-weight-bold">
+        @if (type === 'inbox') {
+          Inbox Messages <span class="font-weight-normal">(Messages are Encrypted)</span>
+        } @else if (type === 'starred') {
+          Starred Messages <span class="font-weight-normal">(Messages are Encrypted)</span>
+        } @else if (type === 'sent') {
+          Sent Messages <span class="font-weight-normal">(Messages are Encrypted)</span>
+        } @else if (type === 'drafts') {
+          Draft Messages <span class="font-weight-normal">(Messages are Encrypted)</span>
+        } @else if (type === 'trash') {
+          Deleted Messages <span class="font-weight-normal">(Messages are Encrypted)</span>
+        } @else {
+          Messages <span class="font-weight-normal">(Messages are Encrypted)</span>
+        }
+      </h5>
+    </div>
+
+    <div class="mail-list">
+      <ng-scrollbar pointerEventsMethod="scrollbar">
+        @for (mail of mails | MailSearch : searchText; track mail.id) {
+          <div class="mail-list-item pb-2 pt-2 pl-1 pr-2 transititon" (click)="viewDetail(mail)" [ngClass]="{'unread': mail.unread, 'selected': mail.selected}">
+            <div class="media">
+              <div class="media-body overflow-hidden">
+                <div class="d-flex justify-content-between">
+                  <h6 class="text-truncate mail-sender">
+                    <!-- Show recipient names for sent emails, sender name for other types -->
+                    @if (type === 'sent') {
+                      {{getDisplayNameForSentMail(mail)}}
+                      <i class="fa fa-circle ml-1" [ngClass]="{'text-success': !mail.unread, 'text-muted': mail.unread}"
+                         title="{{mail.unread ? 'Not read' : 'Read'}}"></i>
+                    } @else {
+                      {{mail.sender}}
+                    }
+                  </h6>
+                  <small class="mail-date">{{mail.date | date:'short'}}</small>
+                </div>
+                <p class="mail-subject mb-0 text-truncate">{{mail.subject}}</p>
+              </div>
+            </div>
+          </div>
+        }
+      </ng-scrollbar>
+    </div>
+  </div>
+
+  <div class="col-md-8 bg-white mail-view-container">
+    <div class="d-flex">
+      <div class="mail-view-icons pt-2 pb-2">
+        <button class="btn btn-secondary rounded-0 mr-1" (click)="compose()"><i class="fa fa-plus"></i></button>
+        @if (mail && type !='trash') {
+          <button class="btn btn-secondary rounded-0 mr-1" (click)="reply()"><i class="fa fa-reply" aria-hidden="true"></i></button>
+          <button class="btn btn-secondary rounded-0 mr-1" (click)="replyAll()"><i class="fa fa-reply-all" aria-hidden="true"></i></button>
+        }
+        @if (newMail || replyMail || replyAllMail) {
+          <button class="btn btn-secondary rounded-0 mr-1" (click)="resetForm()"><i class="fa fa-arrow-left"></i></button>
+        }
+        @if (mail && type !='trash') {
+          <button class="btn btn-secondary rounded-0 mr-1" (click)="changeStarStatus()"><i class="fa" [ngClass]="{'fa-star': mail.starred, 'fa-star-o': !mail.starred}"></i></button>
+        }
+        @if (mail && type=='trash') {
+          <button class="btn btn-secondary rounded-0 mr-1" (click)="restore()"><i class="fa fa-undo"></i></button>
+        }
+        @if (mail) {
+          <button class="btn btn-secondary rounded-0 mr-1"><i class="fa fa-exclamation-circle"></i></button>
+        }
+        @if (mail && type !='trash') {
+          <button class="btn btn-secondary rounded-0 mr-1" (click)="delete()"><i class="fa fa-trash"></i></button>
+        }
+        <button class="btn btn-secondary rounded-0 mr-1" (click)="getMails()"><i class="fa fa-refresh"></i></button>
+        @if (mail) {
+          <div class="btn-group d-inline-block">
+            <button class="btn btn-secondary dropdown-toggle rounded-0" id="dropdownMenuLink" data-toggle="dropdown" type="button" aria-expanded="false" aria-haspopup="true" >
+              More
+            </button>
+            <div class="dropdown-menu dropdown-menu-right box-shadow rounded-0" aria-labelledby="dropdownMenuLink">
+              <a class="dropdown-item" href="javascript:void(0);" (click)="setAsRead()">Mark as read</a>
+              <a class="dropdown-item" href="javascript:void(0);" (click)="setAsUnRead()">Mark as unread</a>
+              <a class="dropdown-item" href="javascript:void(0);" (click)="delete()">Delete</a>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="mail-view pr-2">
+      <ng-scrollbar pointerEventsMethod="scrollbar">
+        @if (mail) {
+          <div class="mail-content">
+            <div class="d-flex justify-content-between pt-3">
+              <h4 class="pull-left">{{mail.subject}}</h4>
+              <a href="javascript:void(0);" class="pull-right"><i class="fa fa-print text-gray"></i></a>
+            </div>
+            <hr/>
+            <div class="d-flex justify-content-between mb-3">
+              <div class="d-flex align-items-center">
+                <div>
+                  <strong>{{mail.sender}}</strong>
+                  <br>
+                  <span class="receiver">to
+                    @for (recipient of mail.recipientNames; track $index) {
+                      <span>
+                        {{recipient}}
+                        <!-- Show read status icon for each recipient -->
+                        @if (isRecipientRead(mail, $index)) {
+                          <i class="fa fa-check-circle text-success ml-1"
+                             [title]="getReadTimestamp(mail, $index)"></i>
+                        } @else {
+                          <i class="fa fa-circle-o text-muted ml-1" title="Not read yet"></i>
+                        }
+                        @if ($index < mail.recipientNames.length - 1) {, }
+                      </span>
+                    }
+                  </span>
+                </div>
+              </div>
+              <span class="mail-date">{{mail.date | date:'medium'}} </span>
+            </div>
+            <!-- Show encrypted content first -->
+            @if (showEncrypted) {
+              <div class="encrypted-content">
+                <div class="alert alert-warning">
+                  <i class="fa fa-lock mr-2"></i> Encrypted Message
+                </div>
+                <div class="encrypted-text">
+                  {{ encryptedContent }}
+                </div>
+              </div>
+            }
+
+            <!-- Show decryption animation -->
+            @if (decrypting) {
+              <div class="decrypting-animation text-center p-4">
+                <i class="fa fa-cog fa-spin fa-3x"></i>
+                <p class="mt-2">Decrypting message...</p>
+              </div>
+            }
+
+            <!-- Show decrypted content -->
+            @if (!showEncrypted && !decrypting) {
+              <!-- Quill viewer container for properly styled email content -->
+              <div #quillViewer class="quill-viewer"></div>
+            }
+
+
+            @if (mail.attachments && mail.attachments.length) {
+              <div class="mail-attachments">
+                <hr/>
+                <p>
+                  <strong>{{mail.attachments.length}} attachments</strong> &nbsp;-&nbsp;
+                  <a href="javascript:void(0);">Download all attachments</a>
+                </p>
+                @for (attachment of mail.attachments; track i; let i = $index) {
+                  <section class="attachment">
+                    <h5 class="title">attachment-{{i + 1}}</h5>
+                    <p>
+                      <a href="javascript:void(0);">Download</a>
+                    </p>
+                  </section>
+                }
+              </div>
+            }
+          </div>
+        }
+        @if (!mail && !newMail && !replyMail && !replyAllMail) {
+          <div class="d-flex flex-column align-items-center justify-content-center h-100 empty">
+            <i class="fa fa-envelope-o" aria-hidden="true"></i>
+            <p class="text-gray">Select an item to read</p>
+          </div>
+        }
+        @if (newMail || replyMail || replyAllMail) {
+          <form method="get" action="#" class="pt-4">
+            <div class="form-group">
+              <mat-form-field class="w-100">
+                <mat-label>To</mat-label>
+                <mat-chip-grid #chipGrid>
+                  @for (recipient of selectedRecipients; track recipient.id) {
+                    <mat-chip-row (removed)="removeRecipient(recipient)">
+                      {{recipient.fName}} {{recipient.lName}}
+                      <button matChipRemove><i class="fa fa-times"></i></button>
+                    </mat-chip-row>
+                  }
+                </mat-chip-grid>
+                <input
+                  placeholder="Type at least 3 letters..."
+                  [formControl]="recipientControl"
+                  [matAutocomplete]="auto"
+                  [matChipInputFor]="chipGrid">
+                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addRecipient($event.option.value)">
+                  @for (member of filteredMembers | async; track member.id) {
+                    <mat-option [value]="member">{{member.fName}} {{member.lName}}</mat-option>
+                  }
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+            @if (!replyMail && !replyAllMail) {
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Subject" [(ngModel)]="subject" name="subject">
+              </div>
+            }
+            <div class="form-group">
+              <!-- Quill editor container -->
+              <div #quillEditor class="quill-editor"></div>
+              <!-- Hidden textarea to maintain ngModel binding -->
+              <textarea class="d-none" [(ngModel)]="body" name="body"></textarea>
+            </div>
+            <div class="form-group pull-right">
+              <a (click)="resetForm()" href="javascript:void(0)" class="btn btn-secondary mr-1">Cancel</a>
+              <button class="btn btn-secondary mr-1" type="button" (click)="saveDraft()">Save Draft</button>
+              <button class="btn btn-main" type="button" (click)="sendEmail()">Send</button>
+            </div>
+          </form>
+        }
+      </ng-scrollbar>
+    </div>
+  </div>
+</div>
