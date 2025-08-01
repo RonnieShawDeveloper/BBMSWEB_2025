@@ -17,6 +17,7 @@ export const routes: Routes = [
       { path: '' , loadChildren: () => import('./pages/dashboard/dashboard.module').then(m => m.DashboardModule), canActivate: [AuthGuard], data: { breadcrumb: 'Dashboard' }  },
       { path: 'intake', loadChildren: () => import('./pages/intake/intake.module').then(m => m.IntakeModule), canActivate: [AuthGuard], data: { breadcrumb: 'Intake' }  },
       { path: 'bookings', loadChildren: () => import('./pages/bookings/bookings.module').then(m => m.BookingsModule), canActivate: [AuthGuard], data: { breadcrumb: 'Bookings' }  },
+      { path: 'intake-records', loadChildren: () => import('./pages/intake-records/intake-records.module').then(m => m.IntakeRecordsModule), canActivate: [AuthGuard], data: { breadcrumb: 'Offender Intake and Booking Record' }  },
       { path: 'criminalregistry', canActivate: [AuthGuard, CriminalRegistryGuard], loadChildren: () => import('./pages/criminal-registry/criminal-registry.module').then(m => m.CriminalRegistryModule), data: { breadcrumb: 'Criminal Registry' }   },
       { path: 'supreme_judge', canActivate: [AuthGuard, JusticeGuard], loadChildren: () => import('./pages/supremecourt/supremecourt.module').then(m => m.SupremecourtModule), data: { breadcrumb: 'Supreme Court Bail Hearings' }},
       { path: 'admin', loadChildren: () => import('./pages/admin/admin.module').then(m => m.AdminModule), canActivate: [AuthGuard], data: { breadcrumb: 'BBMS Administration' }},

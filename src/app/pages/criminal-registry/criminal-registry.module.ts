@@ -6,6 +6,7 @@ import { CriminalRegistryComponent } from './criminal-registry.component';
 import { TableModule} from "primeng/table";
 import { PickListModule } from 'primeng/picklist';
 import { BailAppTableComponent } from './bail-app-table/bail-app-table.component';
+import { CaseManagementComponent } from './case-management/case-management.component';
 import { TerminationComponent } from './termination/termination.component';
 import {FormsModule} from "@angular/forms";
 import {CardModule} from "primeng/card";
@@ -17,6 +18,7 @@ import {ButtonDirective} from "primeng/button";
   declarations: [
     CriminalRegistryComponent,
     BailAppTableComponent,
+    CaseManagementComponent,
     TerminationComponent
   ],
   imports: [

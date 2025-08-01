@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UntypedFormGroup, UntypedFormControl, AbstractControl, UntypedFormBuilder, Validators} from '@angular/forms';
 import {AuthService} from "../../services/auth.service";
@@ -10,11 +10,12 @@ import Swal from "sweetalert2";
   styleUrls: ['./login.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   public router: Router;
   public form:UntypedFormGroup;
   public email:AbstractControl;
   public password:AbstractControl;
+  public showPassword: boolean = false;
 
   constructor(router:Router, fb:UntypedFormBuilder, private authService:AuthService) {
       this.router = router;
@@ -43,8 +44,19 @@ export class LoginComponent {
       }
   }
 
+  ngOnInit() {
+      // Initialize any animations or additional functionality here
+  }
+
   ngAfterViewInit(){
       document.getElementById('preloader').classList.add('hide');
+  }
+
+  /**
+   * Toggles the visibility of the password field
+   */
+  togglePasswordVisibility() {
+      this.showPassword = !this.showPassword;
   }
 
   doForgotPassword() {

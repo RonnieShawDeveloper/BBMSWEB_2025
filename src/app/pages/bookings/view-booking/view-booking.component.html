@@ -142,13 +142,12 @@
                 <a class="font-weight-bold" style="cursor: pointer" (click)="goToLink(i.link)"> VIEW APPLICATION</a>
               </div>
               <!-- Note -->
-              <div *ngIf="i.type=='note'" style="margin-top: 2px!important; margin-bottom: 2px!important;"
+              <div *ngIf="i.type=='note'" style="margin-top: 2px!important; margin-bottom: 2px!important; cursor: pointer!important" (click)="doViewNote(i.description)"
                    class="my-1 p-1 bg-white rounded rounded-lg" data-toggle="tooltip" data-placement="top"
                    title="{{i.description}}">
                 <i class="fa fa-sticky-note-o text-success font-weight-bold mr-1"></i> <span
-                class="font-weight-bold">{{i.date}} {{i.title}}</span> <span class="font-weight-bold ml-3 text-primary"
-                                                                             style="cursor: pointer"
-                                                                             (click)="doViewNote(i.description)">VIEW NOTE</span>
+                class="font-weight-bold">{{i.date}} {{i.title}}</span>
+                <span class="font-weight-bold ml-3 text-primary">VIEW NOTE</span>
               </div>
               <!-- Judge Assigned -->
               <div *ngIf="i.type=='judgeAssigned'" style="margin-top: 2px!important; margin-bottom: 2px!important;"

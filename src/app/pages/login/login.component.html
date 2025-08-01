@@ -1,78 +1,108 @@
-<section class="container">
-  <div style="text-align: center;font-weight: bold;font-size: 24px;color: rgb(217,197,17);background: #0b004d;border-radius: 13px;margin-top: 6px;"><span>BAHAMAS BAIL MANAGEMENT SYSTEM</span></div>
-  <div class="d-lg-flex justify-content-lg-center align-items-lg-center" style="height: 70vh;">
-    <div class="row" style="margin-top: 7px;margin-right: 0px;margin-left: 0px;">
-      <div class="col d-lg-flex justify-content-lg-center align-items-lg-center" style="background: url(/assets/img/app/login_background.jpg) center / contain no-repeat;">
-        <p style="background: rgba(255,255,255,0.72);margin: 0px;padding: 17px;font-weight: bold;"><br><span style="color: rgb(52, 58, 64);">Unauthorized use of this system is prohibited and may result in disciplinary action and/or civil and criminal penalties. By accessing this system, you agree to comply with all applicable laws and regulations. Your IP address is being tracked. Any unauthorized access or attempts to modify information on this system are strictly prohibited and may be subject to legal action. All activities on this system are logged and monitored.</span><br><strong><span style="color: rgb(52, 58, 64);">Notice:</span></strong><span style="color: rgb(52, 58, 64);">&nbsp;Any changes, deletions, additions, or modifications to data within this system are recorded. These logs are subject to periodic reviews for security and operational purposes.</span><br><br><span style="color: rgb(52, 58, 64);">BBMS Management Team</span><br><br></p>
-      </div>
-      <div class="col d-lg-flex justify-content-lg-center align-items-lg-center" style="background: #e6e6e6;border-radius: 14px;border-width: 1px;border-style: solid;">
-        <div style="text-align: center;">
-          <p style="background: #f42c3f;color: var(--white);font-weight: bold;border-radius: 10px;box-shadow: 3px 3px 5px var(--gray-dark);">OFFICIAL USE ONLY</p><span style="font-weight: bold;margin-bottom: 0px;">LOGIN USING YOUR USERNAME AND PASSWORD</span>
-          <div style="margin-top: 27px;">
-            <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="text-left mt-4">
-              <div class="form-group">
-                <input [formControl]="email" class="form-control validation-field" placeholder="Email" type="text">
-                <small class="text-danger" *ngIf="form.get('email').touched && form.get('email').hasError('required')">Email is required</small>
-                <small class="text-danger" *ngIf="form.get('email').touched && form.get('email').hasError('email')">Invalid email address</small>
+<div class="login-page-container">
+  <!-- Animated Background Elements -->
+  <div class="background-waves"></div>
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="login-content">
+    <!-- Left Panel -->
+    <div class="left-panel">
+      <img src="assets/img/app/coatofarms.png" alt="Bahamas Coat of Arms" class="coat-of-arms">
+      <h1 class="system-title">BAHAMAS BAIL MANAGEMENT SYSTEM</h1>
+      <p class="system-subtitle">Secure access to the official Bail Management System</p>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+      <div class="login-card">
+        <div class="login-header">
+          <h2>User Login</h2>
+          <p>Please enter your credentials</p>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)">
+          <div class="form-group">
+            <label for="email">Username</label>
+            <div class="input-container">
+              <input
+                [formControl]="email"
+                id="email"
+                type="text"
+                placeholder="Enter your username"
+                autocomplete="username">
+              <div class="icon-container">
+                <i class="fa fa-envelope"></i>
               </div>
-              <div class="form-group">
-                <input [formControl]="password" class="form-control validation-field" placeholder="Password" type="password">
-                <small class="text-danger" *ngIf="form.get('password').touched && form.get('password').hasError('required')">Password is required</small>
-                <small class="text-danger" *ngIf="form.get('password').touched && form.get('password').hasError('minlength')">Password isn't long enough, minimum of 6 characters</small>
-              </div>
-              <div class="form-group">
-                <button [disabled]="!form.valid" class="btn btn-block" type="submit">Sign in</button>
-              </div>
-            </form>
+            </div>
+            <div class="validation-message" *ngIf="email.touched && email.hasError('required')">
+              Username is required
+            </div>
+            <div class="validation-message" *ngIf="email.touched && email.hasError('invalidEmail')">
+              Invalid email address
+            </div>
           </div>
-          <div><button (click)="doForgotPassword()" class="btn btn-secondary btn-sm" type="button" style="margin: 3px;font-size: 10px;padding: 1px 8px;padding-right: 2px;padding-left: 2px;">FORGOT PASSWORD?</button><button routerLink="/register" class="btn btn-info btn-sm" type="button" style="margin: 3px;font-size: 10px;padding: 1px 8px;padding-right: 2px;padding-left: 2px;">REGISTER FOR ACCESS</button></div>
-        </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-container">
+              <input
+                [formControl]="password"
+                id="password"
+                [type]="showPassword ? 'text' : 'password'"
+                placeholder="Enter your password"
+                autocomplete="current-password">
+              <div class="icon-container" (click)="togglePasswordVisibility()">
+                <i class="fa" [ngClass]="showPassword ? 'fa-eye' : 'fa-eye-slash'"></i>
+              </div>
+            </div>
+            <div class="validation-message" *ngIf="password.touched && password.hasError('required')">
+              Password is required
+            </div>
+            <div class="validation-message" *ngIf="password.touched && password.hasError('minlength')">
+              Password must be at least 6 characters
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="login-button"
+            [disabled]="!form.valid">
+            Sign In
+          </button>
+
+          <div class="additional-options">
+            <button type="button" (click)="doForgotPassword()">Forgot Password?</button>
+            <button type="button" routerLink="/register">Register</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-</section>
-<div class="row">
-  <div class="col" style="text-align: center;"><img src="assets/img/app/poweredbyaws.png" width="100px" style="margin-top: 23px;">
-    <div>
-      <p style="font-size: 10px;margin-bottom: 0px;"><span style="color: rgb(86, 86, 86); background-color: rgba(255, 255, 255, 0.9);">This site is Powered and Protected by</span><br><span style="color: rgb(86, 86, 86); background-color: rgba(255, 255, 255, 0.9);">AWS Amplify, AWS GATEWAY (GWLB) AND APPLICATION (ALB) LOAD BALANCERS,</span><br><span style="color: rgb(86, 86, 86); background-color: rgba(255, 255, 255, 0.9);">AWS CLOUDFRONT, AWS WAF, AWS SHIELD ADVANCED, CLOUD FORMATION, AWS LAMBDA,</span><br><span style="color: rgb(86, 86, 86); background-color: rgba(255, 255, 255, 0.9);">and is maintained by AWS Certified Professionals.</span></p>
-      <p style="font-size: 10px;"><strong><span style="color: rgb(86, 86, 86);">ALL DATA, IN-FLIGHT OR AT REST, IS END TO END ENCRYPTED USING AES-256ENCRYPTION</span></strong><br><strong><span style="color: rgb(86, 86, 86);">ALL DATA IS BACKED UP DAILY AND STORED IN MULTIPLE REGIONS</span></strong></p>
-    </div>
+
+  <!-- Security Notice -->
+  <div class="security-notice">
+    <h4>OFFICIAL USE ONLY</h4>
+    <p>Unauthorized use of this system is prohibited and may result in disciplinary action and/or civil and criminal penalties. By accessing this system, you agree to comply with all applicable laws and regulations. Your IP address is being tracked. Any unauthorized access or attempts to modify information on this system are strictly prohibited and may be subject to legal action. All activities on this system are logged and monitored.</p>
+    <p><strong>Notice:</strong> Any changes, deletions, additions, or modifications to data within this system are recorded. These logs are subject to periodic reviews for security and operational purposes.</p>
+    <p>BBMS Management Team</p>
+  </div>
+
+  <!-- Footer -->
+  <div class="login-footer">
+    <img src="assets/img/app/poweredbyaws.png" alt="Powered by AWS">
+    <p>This site is Powered and Protected by AWS Amplify, AWS GATEWAY (GWLB) AND APPLICATION (ALB) LOAD BALANCERS,</p>
+    <p>AWS CLOUDFRONT, AWS WAF, AWS SHIELD ADVANCED, CLOUD FORMATION, AWS LAMBDA,</p>
+    <p>and is maintained by AWS Certified Professionals.</p>
+    <p class="highlight">ALL DATA, IN-FLIGHT OR AT REST, IS END TO END ENCRYPTED USING AES-256 ENCRYPTION</p>
+    <p class="highlight">ALL DATA IS BACKED UP DAILY AND STORED IN MULTIPLE REGIONS</p>
   </div>
 </div>
 
-<!--<div class="d-flex justify-content-center align-items-center w-100 h-100 login-container"
-     style="background-image: url('/assets/img/app/hero-banner-left2.jpg'); background-position: center; background-size: cover" >
-    <div class="col-xl-4 col-md-6 col-10">
-        <div class="card border rounded border-white box-shadow">
-            <div class="card-header d-flex justify-content-center align-items-center border-0 box-shadow">
-                <i class="fa fa-sign-in" aria-hidden="true"></i>
-            </div>
-            <div class="card-body text-center pb-1">
-                <h1>Bahamas Bail<br>Management System</h1>
-              <h4 class="m-3">Member Login</h4>
-                <a routerLink="/register" class="transition top-navbar p-1 rounded">Don't have an account? Register Here!</a>
-
-                <form [formGroup]="form" (ngSubmit)="onSubmit(form.value)" class="text-left mt-4">
-                    <div class="form-group">
-                        <input [formControl]="email" class="form-control validation-field" placeholder="Email" type="text">
-                        <small class="text-danger" *ngIf="form.get('email').touched && form.get('email').hasError('required')">Email is required</small>
-                        <small class="text-danger" *ngIf="form.get('email').touched && form.get('email').hasError('email')">Invalid email address</small>
-                    </div>
-                    <div class="form-group">
-                        <input [formControl]="password" class="form-control validation-field" placeholder="Password" type="password">
-                        <small class="text-danger" *ngIf="form.get('password').touched && form.get('password').hasError('required')">Password is required</small>
-                        <small class="text-danger" *ngIf="form.get('password').touched && form.get('password').hasError('minlength')">Password isn't long enough, minimum of 6 characters</small>
-                    </div>
-                    <div class="form-group d-flex justify-content-right">
-                        <a class="text-white transition pull-right float-right" href="javascript:void(0);" (click)="doForgotPassword()">Forgot password?</a>
-                    </div>
-                    <div class="form-group">
-                        <button [disabled]="!form.valid" class="btn btn-block" type="submit">Sign in</button>
-                    </div>
-                </form>
-            </div>
-
-        </div>
-    </div>
-</div>
--->
+<!-- Preloader element that gets hidden after view init -->
+<div id="preloader"></div>

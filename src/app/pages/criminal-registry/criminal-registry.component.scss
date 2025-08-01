@@ -34,3 +34,9 @@
   background-color: red;
   color: white;
 }
+
+:host ::ng-deep .p-datatable-table tr:nth-child(even) {
+  background-color: lightgrey!important; /* Light gray for even rows */
+  border: 2px solid #5a595c!important; /* Optional: Add border for better visibility */
+}
+

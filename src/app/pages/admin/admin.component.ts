@@ -27,6 +27,9 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   subscriptions: any[] = [];
   dt1: Table | undefined;
 
+  // Flag to track if data is loaded
+  dataLoaded = false;
+
   // Chart data properties
   roleDistributionData: ChartData<'doughnut'> = {
     labels: ['Admin', 'Judge', 'Judicial Clerk', 'Magistrate', 'Magistrate Clerk', 'Private Attorney', 'DPP Office', 'Registrar', 'Registrar Staff'],
@@ -172,13 +175,31 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       // Update dashboard charts and statistics with the latest data
       this.updateChartData();
       this.updateTodayLoginsByRole();
+
+      // Set the data loaded flag to true
+      this.dataLoaded = true;
+
+      // Add a small delay to ensure charts are properly rendered
+      setTimeout(() => {
+        // Force update the charts again after a delay
+        this.updateChartData();
+        this.updateTodayLoginsByRole();
+      }, 100);
     }));
   }
 
 
 
   ngAfterViewInit(): void {
-
+    // Check if data is loaded but charts might not be rendered yet
+    if (this.dataLoaded) {
+      // Add a small delay to ensure the view is fully initialized
+      setTimeout(() => {
+        // Force update the charts again after the view is initialized
+        this.updateChartData();
+        this.updateTodayLoginsByRole();
+      }, 100);
+    }
   }
 
   localTime(timestamp: any): string {
@@ -255,9 +276,12 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   ngOnInit(): void {
-    // Initialize the charts when component loads
-    this.updateChartData();
-    this.updateTodayLoginsByRole();
+    // We'll initialize charts only if data is already loaded
+    // Otherwise, charts will be initialized when data is loaded in the constructor
+    if (this.dataLoaded) {
+      this.updateChartData();
+      this.updateTodayLoginsByRole();
+    }
   }
 
   // Statistics methods for dashboard

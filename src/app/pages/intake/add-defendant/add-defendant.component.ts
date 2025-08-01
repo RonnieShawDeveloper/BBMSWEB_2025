@@ -36,7 +36,7 @@ export class AddDefendantComponent {
     // Encode the date of birth for the url
     const encodedDOB = encodeURIComponent(formatedDOB);
     console.log('Last Name, DOB, Encoded DOB',formatedLastName, formatedDOB, encodedDOB)
-    // Search for a profile
+    // Search for a profile in the AFIS database using the last name and dob
     this.http.get(`https://us-central1-bbms-1283c.cloudfunctions.net/afis/getOffenderByName/${formatedLastName}/${encodedDOB}`).pipe(take(1)).subscribe((profile:Afis[]) => {
       // Sort the results by the datetime field
       profile.sort((a, b) => {

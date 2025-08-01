@@ -36,7 +36,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.routerSubscription = this.router.events.pipe(
         filter(event => event instanceof NavigationEnd)
       ).subscribe((event: NavigationEnd) => {
-        if (event.urlAfterRedirects === '/clogin') {
+        if (event.urlAfterRedirects === '/login') {
           this.zoomLevel$ = this._localZoomLevel.asObservable();
           this._localZoomLevel.next(UiStateService.getDefaultZoom());
         } else {

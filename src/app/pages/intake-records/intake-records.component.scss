@@ -1,0 +1,35 @@
+// Main container styling
+.container-fluid {
+  padding: 15px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+// Header styling
+.row {
+  margin-bottom: 20px;
+
+  &:first-child {
+    padding: 10px 0;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Title styling
+.col {
+  span {
+    color: #343a40;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .col {
+    span {
+      font-size: 20px;
+    }
+  }
+}

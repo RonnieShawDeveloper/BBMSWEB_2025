@@ -2,8 +2,9 @@ import { Menu } from './menu.model';
 
 export const verticalMenuItems = [
     new Menu (1, 'Dashboard', '/', null, 'tachometer', null, false, 0),
-    new Menu (40, 'Intake', '/intake', null, 'sign-in', null, false, 0),
-    new Menu (50, 'Bookings', '/bookings', null, 'file', null, false, 0),
+
+    new Menu (40, 'Offender Records', '/intake-records', null, 'sign-in', null, false, 0),
+//    new Menu (50, 'Bookings', '/bookings', null, 'file', null, false, 0),
     new Menu (60, 'Magistrate Court', '/magistratecourt', null, 'gavel', null, false, 0),
     new Menu (70, 'Supreme Court', null, null, 'gavel', null, true, 0),
     new Menu (71, 'Registrar', '/criminalregistry', null, 'gavel', null, false, 70),

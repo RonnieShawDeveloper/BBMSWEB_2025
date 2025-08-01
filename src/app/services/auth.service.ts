@@ -248,12 +248,12 @@ export class AuthService {
   async loginAI(email: string, password: string, handleOpenAIResponse: (message: string) => void): Promise<void> {
     try {
       const userCredential = await this.afAuth.signInWithEmailAndPassword(email, password);
-  
+
       // Handle successful login
       this.saveAuthExpiration();
       this.checkAuthExpiration();
       this.getSingleMember(userCredential.user.uid);
-  
+
       this.singleMember.pipe(take(1)).subscribe(async (data) => {
         if (data.length === 0) {
           handleOpenAIResponse(
@@ -261,26 +261,26 @@ export class AuthService {
           );
           return;
         }
-  
+
         let currentMember = data[0];
         currentMember.ipAddress = this.ipAddress;
         currentMember.lastLogin = new Date().toISOString(); // Update last login timestamp
         currentMember.memberSince = userCredential.user.metadata.creationTime;
-  
+
         // Check for email mismatch
         if (currentMember.email !== email && !currentMember.emailMismatch) {
           handleOpenAIResponse(
             `The email address you used (${email}) does not match our records (${currentMember.email}). Updating Current Email Address to ${email}.`
           );
-  
+
           // Mark email mismatch and optionally update
           currentMember.email = email;
-          await this.updateMemberRecord(currentMember);        
+          await this.updateMemberRecord(currentMember);
         }
-  
+
         // Update the member record
         await this.updateMemberRecord(currentMember);
-  
+
         // Check member status
         if (currentMember.status === 'New') {
           handleOpenAIResponse(
@@ -288,19 +288,19 @@ export class AuthService {
           );
           return;
         }
-  
+
         // Construct and send a success response
         const formattedLastLogin = new Date(currentMember.lastLogin).toLocaleString();
         const formattedMemberSince = new Date(currentMember.memberSince).toLocaleString();
-  
+
         handleOpenAIResponse(
           `Welcome back, ${currentMember.fName}! Your last login was on ${formattedLastLogin}, and you have been a member since ${formattedMemberSince}. I will now direct you to the Dashboard.`
         );
-  
+
         // Save the updated member record in localStorage
         localStorage.setItem('member', JSON.stringify(currentMember));
         localStorage.setItem('lastLogin', currentMember.lastLogin);
-  
+
         // Navigate to the dashboard after a delay
         setTimeout(() => {
           this.router.navigate(['/']);
@@ -311,7 +311,7 @@ export class AuthService {
       handleOpenAIResponse(errorMessage);
     }
   }
-  
+
 
   /**
    * Maps Firebase error codes to user-friendly messages
@@ -428,7 +428,7 @@ export class AuthService {
     return this.afAuth.signOut()
       .then(() => {
         localStorage.removeItem('authExpiration');
-        this.router.navigate(['/clogin']);
+        this.router.navigate(['/login']);
       })
       .catch((error) => {
         console.log(error);

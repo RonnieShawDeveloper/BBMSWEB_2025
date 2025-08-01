@@ -1,0 +1,121 @@
+// Search section styling
+.search-section {
+  margin-bottom: 20px;
+
+  .card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+
+    .card-header {
+      font-weight: bold;
+    }
+  }
+
+  .form-group {
+    label {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .input-group {
+      .form-control {
+        border: 1px solid #ced4da;
+
+        &:focus {
+          box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+          border-color: #80bdff;
+        }
+      }
+    }
+  }
+
+  .btn {
+    margin-right: 10px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+// Results table styling
+.table-responsive {
+  .table {
+    margin-bottom: 0;
+
+    thead {
+      th {
+        vertical-align: middle;
+        font-weight: 600;
+      }
+    }
+
+    tbody {
+      tr {
+        &:hover {
+          background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        td {
+          vertical-align: middle;
+
+          img.img-thumbnail {
+            border: 2px solid #dee2e6;
+            transition: all 0.2s ease-in-out;
+
+            &:hover {
+              transform: scale(1.05);
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+          }
+
+          .btn {
+            white-space: nowrap;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Loading indicator styling
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+// No results message styling
+.alert-warning {
+  border-left: 5px solid #ffc107;
+
+  .alert-heading {
+    color: #856404;
+    margin-bottom: 10px;
+  }
+
+  ul {
+    margin-bottom: 15px;
+  }
+
+  .btn {
+    margin-top: 10px;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .search-section {
+    .btn {
+      margin-bottom: 10px;
+      width: 100%;
+    }
+  }
+
+  .table-responsive {
+    .table {
+      td, th {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

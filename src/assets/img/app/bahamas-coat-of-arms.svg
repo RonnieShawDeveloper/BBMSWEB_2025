@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 600" width="500" height="600">
+  <!-- Simplified Bahamas Coat of Arms -->
+
+  <!-- Shield -->
+  <path d="M250,100 L100,150 L100,400 L250,500 L400,400 L400,150 Z" fill="#0b004d" stroke="#d9c511" stroke-width="10"/>
+
+  <!-- Shield Divisions -->
+  <path d="M250,100 L250,500" stroke="#d9c511" stroke-width="5"/>
+  <path d="M100,275 L400,275" stroke="#d9c511" stroke-width="5"/>
+
+  <!-- Santa Maria Ship (Top Left) -->
+  <path d="M130,200 L220,200 L220,180 L130,180 Z" fill="#d9c511"/>
+  <path d="M175,180 L175,150" stroke="#d9c511" stroke-width="3"/>
+  <path d="M175,150 L200,165 L175,180" fill="#ffffff"/>
+
+  <!-- Conch Shell (Top Right) -->
+  <path d="M350,200 C370,190 380,170 350,160 C320,150 310,190 350,200 Z" fill="#d9c511"/>
+
+  <!-- Flamingo (Bottom Left) -->
+  <path d="M150,350 L160,320 L170,350 L180,320 L190,350" stroke="#ff9999" stroke-width="8" fill="none"/>
+  <circle cx="170" cy="310" r="10" fill="#ff9999"/>
+
+  <!-- Marlin Fish (Bottom Right) -->
+  <path d="M320,350 L370,350 L350,330 L320,350 Z" fill="#d9c511"/>
+  <path d="M350,330 L380,310" stroke="#d9c511" stroke-width="3" fill="none"/>
+
+  <!-- Crown on top -->
+  <path d="M200,80 L300,80 L290,60 L270,70 L250,50 L230,70 L210,60 Z" fill="#d9c511"/>
+  <circle cx="250" cy="40" r="10" fill="#d9c511"/>
+
+  <!-- Banner -->
+  <path d="M150,520 L350,520 L370,540 L130,540 Z" fill="#d9c511"/>
+
+  <!-- Text on banner (simplified) -->
+  <text x="250" y="535" font-family="Arial" font-size="16" fill="#0b004d" text-anchor="middle">FORWARD UPWARD ONWARD TOGETHER</text>
+</svg>

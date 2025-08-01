@@ -205,7 +205,7 @@
                     </mat-chip-row>
                   }
                 </mat-chip-grid>
-                <input
+                <input id="recipient"
                   placeholder="Type at least 3 letters..."
                   [formControl]="recipientControl"
                   [matAutocomplete]="auto"
@@ -231,7 +231,7 @@
             <div class="form-group pull-right">
               <a (click)="resetForm()" href="javascript:void(0)" class="btn btn-secondary mr-1">Cancel</a>
               <button class="btn btn-secondary mr-1" type="button" (click)="saveDraft()">Save Draft</button>
-              <button class="btn btn-main" type="button" (click)="sendEmail()">Send</button>
+              <button class="btn btn-primary" type="button" (click)="sendEmail()">Send</button>
             </div>
           </form>
         }

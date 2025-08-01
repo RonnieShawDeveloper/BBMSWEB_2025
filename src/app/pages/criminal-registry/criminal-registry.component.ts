@@ -35,6 +35,7 @@ export class CriminalRegistryComponent implements OnInit, OnDestroy {
 
   showMainTable: boolean = true;
   showBailAppTable: boolean = false;
+  showCaseManagement: boolean = false;
   selectedHearing: Hearings;
   subscriptions: any[] = [];
 
@@ -215,12 +216,28 @@ export class CriminalRegistryComponent implements OnInit, OnDestroy {
   doBailAppTable(hearing: Hearings) {
     this.showMainTable = false;
     this.showBailAppTable = true;
+    this.showCaseManagement = false;
+    this.selectedHearing = hearing;
+  }
+
+  doCaseManagement(hearing: Hearings) {
+    this.showMainTable = false;
+    this.showBailAppTable = false;
+    this.showCaseManagement = true;
     this.selectedHearing = hearing;
   }
 
   calcelBailAppTable(event) {
     this.showMainTable = true;
     this.showBailAppTable = false;
+    this.showCaseManagement = false;
+    this.selectedHearing = null;
+  }
+
+  cancelCaseManagement(event) {
+    this.showMainTable = true;
+    this.showBailAppTable = false;
+    this.showCaseManagement = false;
     this.selectedHearing = null;
   }
 

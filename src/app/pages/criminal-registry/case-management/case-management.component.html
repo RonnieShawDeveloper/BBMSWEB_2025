@@ -1,0 +1,1010 @@
+<div class="case-management-container">
+  <!-- Header with offender name and exit button -->
+  <div class="header" [@fadeIn]>
+    <div class="row align-items-center">
+      <div class="col">
+        <h1 class="title">CASE MANAGEMENT: {{ hearings.offenderName.toUpperCase() }}</h1>
+      </div>
+      <div class="col-auto">
+        <button class="btn-exit" (click)="exit()">
+          <i class="fa fa-times"></i>
+          <span>EXIT</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main dashboard content -->
+  <div class="dashboard-content" [@fadeIn]>
+    <!-- Navigation sidebar -->
+    <div class="navigation-sidebar" [@slideInLeft]>
+      <div class="nav-item" [class.active]="activeSection === 'overview'"
+           (click)="setActiveSection('overview')">
+        <i class="fa fa-user"></i>
+        <span>Overview</span>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'documents'"
+           (click)="setActiveSection('documents')">
+        <i class="fa fa-file-text"></i>
+        <span>Documents</span>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'hearings'"
+           (click)="setActiveSection('hearings')">
+        <i class="fa fa-gavel"></i>
+        <span>Hearings</span>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'sureties'"
+           (click)="setActiveSection('sureties')">
+        <i class="fa fa-money"></i>
+        <span>Sureties</span>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'bail'"
+           (click)="setActiveSection('bail')">
+        <i class="fa fa-check-circle"></i>
+        <span>Bail</span>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'kioskMonitoring'"
+           (click)="setActiveSection('kioskMonitoring')">
+        <i class="fa fa-calendar-check-o"></i>
+        <span>Kiosk Monitoring</span>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'termination'"
+           (click)="setActiveSection('termination')">
+        <i class="fa fa-power-off"></i>
+        <span>Termination</span>
+      </div>
+    </div>
+
+    <!-- Main content area -->
+    <div class="main-content" [@slideInRight]>
+      <!-- Overview Section -->
+      <div class="content-section" *ngIf="activeSection === 'overview'">
+        <div class="section-header">
+          <h2>Offender Overview</h2>
+        </div>
+
+        <!-- Offender Information Card -->
+        <div class="card offender-card">
+          <div class="card-header">
+            <h3>Defendant Information</h3>
+            <div class="card-controls">
+              <button class="btn-toggle" (click)="togglePanel('offenderPanel')">
+                <i class="fa"
+                   [ngClass]="animationStates.offenderPanel === 'expanded' ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body" [@expandCollapse]="animationStates.offenderPanel">
+            <div class="row info-row">
+              <div class="col-3 info-label">Name</div>
+              <div class="col info-value">{{ hearings.offenderName }}</div>
+            </div>
+            <div class="row info-row">
+              <div class="col-3 info-label">Address</div>
+              <div class="col info-value d-flex align-items-center">
+                <ng-container *ngIf="!editingAddress">
+                  <span>{{ offender.addLine1 }} {{ offender.addLine2 }} {{ offender.city }} {{ offender.state }}</span>
+                  <button class="btn-edit ml-2" (click)="toggleAddressEdit()">
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                </ng-container>
+                <ng-container *ngIf="editingAddress">
+                  <input type="text" class="form-control" [(ngModel)]="tempAddress">
+                  <button class="btn-save ml-2" (click)="saveAddress()">
+                    <i class="fa fa-check"></i>
+                  </button>
+                  <button class="btn-cancel ml-2" (click)="cancelAddressEdit()">
+                    <i class="fa fa-times"></i>
+                  </button>
+                </ng-container>
+              </div>
+            </div>
+            <div class="row info-row">
+              <div class="col-3 info-label">Phone</div>
+              <div class="col info-value d-flex align-items-center">
+                <ng-container *ngIf="!editingPhone">
+                  <span>{{ offender.phone }}</span>
+                  <button class="btn-edit ml-2" (click)="togglePhoneEdit()">
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                </ng-container>
+                <ng-container *ngIf="editingPhone">
+                  <input type="text" class="form-control" [(ngModel)]="tempPhone">
+                  <button class="btn-save ml-2" (click)="savePhone()">
+                    <i class="fa fa-check"></i>
+                  </button>
+                  <button class="btn-cancel ml-2" (click)="cancelPhoneEdit()">
+                    <i class="fa fa-times"></i>
+                  </button>
+                </ng-container>
+              </div>
+            </div>
+            <div class="row info-row">
+              <div class="col-3 info-label">Date of Birth</div>
+              <div class="col info-value">{{ offender.dob }}</div>
+            </div>
+            <div class="row info-row">
+              <div class="col-3 info-label">NIB</div>
+              <div class="col info-value d-flex align-items-center">
+                <ng-container *ngIf="!editingNIB">
+                  <span>{{ offender.nib }}</span>
+                  <button class="btn-edit ml-2" (click)="toggleNIBEdit()">
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                </ng-container>
+                <ng-container *ngIf="editingNIB">
+                  <input type="text" class="form-control" [(ngModel)]="tempNIB">
+                  <button class="btn-save ml-2" (click)="saveNIB()">
+                    <i class="fa fa-check"></i>
+                  </button>
+                  <button class="btn-cancel ml-2" (click)="cancelNIBEdit()">
+                    <i class="fa fa-times"></i>
+                  </button>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charges Card -->
+        <div class="card charges-card">
+          <div class="card-header">
+            <h3>Charges</h3>
+          </div>
+          <div class="card-body">
+            <div *ngIf="counts.length === 0" class="alert alert-warning">
+              <i class="fa fa-exclamation-triangle"></i>
+              No charges have been entered! Please see booking.
+            </div>
+            <div *ngFor="let charge of counts" class="charge-item">
+              <div class="charge-number">Count {{ charge.countNo }}</div>
+              <div class="charge-description">{{ charge.countCharge }}</div>
+              <div class="charge-tags">
+                <span *ngIf="charge.isDrug" class="tag drug-tag">Drug</span>
+                <span *ngIf="charge.isAlcohol" class="tag alcohol-tag">Alcohol</span>
+                <span *ngIf="charge.isSexcrime" class="tag sex-tag">Sex Crime</span>
+                <span *ngIf="charge.isChildcrime" class="tag child-tag">Child Crime</span>
+                <span *ngIf="charge.isViolent" class="tag violent-tag">Violent</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Case Status Card -->
+        <div class="card status-card">
+          <div class="card-header">
+            <h3>Case Status</h3>
+          </div>
+          <div class="card-body">
+            <div class="status-item">
+              <div class="status-label">Bail Status</div>
+              <div class="status-value" [ngClass]="{
+                'status-granted': hearings.grantBailChecked,
+                'status-denied': hearings.deniedBailChecked,
+                'status-pending': !hearings.grantBailChecked && !hearings.deniedBailChecked
+              }">
+                <i class="fa" [ngClass]="{
+                  'fa-check-circle': hearings.grantBailChecked,
+                  'fa-times-circle': hearings.deniedBailChecked,
+                  'fa-clock-o': !hearings.grantBailChecked && !hearings.deniedBailChecked
+                }"></i>
+                <span *ngIf="hearings.grantBailChecked">Granted</span>
+                <span *ngIf="hearings.deniedBailChecked">Denied</span>
+                <span
+                  *ngIf="!hearings.grantBailChecked && !hearings.deniedBailChecked">Pending</span>
+              </div>
+            </div>
+            <div class="status-item">
+              <div class="status-label">Hearing Date</div>
+              <div class="status-value">
+                <i class="fa fa-calendar"></i>
+                <span>{{ hearings.hearingDateUnix ? convertUnixDate(hearings.hearingDateUnix) : 'Not Set' }}</span>
+              </div>
+            </div>
+            <div class="status-item">
+              <div class="status-label">Judge Assigned</div>
+              <div class="status-value">
+                <i class="fa fa-gavel"></i>
+                <span>{{ hearings.judgeName || 'Not Assigned' }}</span>
+              </div>
+            </div>
+            <div class="status-item">
+              <div class="status-label">Attorney</div>
+              <div class="status-value">
+                <i class="fa fa-briefcase"></i>
+                <span>{{ hearings.attorneyName || 'Not Assigned' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documents Section -->
+      <div class="content-section" *ngIf="activeSection === 'documents'">
+        <div class="section-header">
+          <h2>Case Documents</h2>
+        </div>
+
+        <div class="documents-grid">
+          <!-- Bail Application Document -->
+          <div class="document-card" (click)="showApplication()">
+            <div class="document-icon">
+              <i class="fa fa-file-text-o"></i>
+            </div>
+            <div class="document-info">
+              <h3>Bail Application</h3>
+              <p>View the original bail application</p>
+            </div>
+            <div class="document-action">
+              <button class="btn-view">
+                <i class="fa fa-eye"></i>
+                <span>View</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Remand Warrant Document -->
+          <div class="document-card" (click)="showRemandWarrant()">
+            <div class="document-icon">
+              <i class="fa fa-file-text-o"></i>
+            </div>
+            <div class="document-info">
+              <h3>Remand Warrant</h3>
+              <p>View the remand warrant document</p>
+            </div>
+            <div class="document-action">
+              <button class="btn-view" [class.disabled]="!remandLink">
+                <i class="fa fa-eye"></i>
+                <span>View</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- DPP Response Document -->
+          <div class="document-card" (click)="showDPPResponse()">
+            <div class="document-icon">
+              <i class="fa fa-file-text-o"></i>
+            </div>
+            <div class="document-info">
+              <h3>DPP Response</h3>
+              <p>View the DPP response document</p>
+            </div>
+            <div class="document-action">
+              <button class="btn-view" [class.disabled]="!dppLink">
+                <i class="fa fa-eye"></i>
+                <span>View</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bail Bond Document -->
+          <div class="document-card" *ngIf="hearings.bailBondLink">
+            <div class="document-icon">
+              <i class="fa fa-file-text-o"></i>
+            </div>
+            <div class="document-info">
+              <h3>Bail Bond</h3>
+              <p>View the signed bail bond document</p>
+            </div>
+            <div class="document-action">
+              <button class="btn-view">
+                <i class="fa fa-eye"></i>
+                <span>View</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hearings Section -->
+      <div class="content-section" *ngIf="activeSection === 'hearings'">
+        <div class="section-header">
+          <h2>Hearing Management</h2>
+        </div>
+
+        <!-- Judge Assignment Card -->
+        <div class="card judge-card">
+          <div class="card-header">
+            <h3>Judge Assignment</h3>
+          </div>
+          <div class="card-body">
+            <div class="current-assignment" *ngIf="hearings.judgeName">
+              <div class="assignment-label">Currently Assigned:</div>
+              <div class="assignment-value">{{ hearings.judgeName }}</div>
+            </div>
+            <div class="assignment-actions">
+              <button class="btn-primary" (click)="assignJudge()">
+                <i class="fa fa-gavel"></i>
+                <span>{{ hearings.judgeName ? 'Change Judge' : 'Assign Judge' }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hearing Date Card -->
+        <div class="card hearing-date-card">
+          <div class="card-header">
+            <h3>Hearing Date & Time</h3>
+          </div>
+          <div class="card-body">
+            <div class="current-date" *ngIf="hearings.hearingDateUnix">
+              <div class="date-label">Currently Scheduled:</div>
+              <div class="date-value">{{ convertUnixDate(hearings.hearingDateUnix) }}</div>
+            </div>
+            <div class="date-actions">
+              <button class="btn-primary" (click)="setHearingDateTime()">
+                <i class="fa fa-calendar"></i>
+                <span>{{ hearings.hearingDateUnix ? 'Change Date & Time' : 'Set Date & Time' }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bail Section -->
+      <div class="content-section" *ngIf="activeSection === 'bail'">
+        <div class="section-header">
+          <h2>Bail Management</h2>
+        </div>
+
+        <!-- Bail Status Card -->
+        <div class="card bail-status-card">
+          <div class="card-header">
+            <h3>Bail Status</h3>
+          </div>
+          <div class="card-body">
+            <div class="status-display">
+              <div class="status-icon" [ngClass]="{
+                'status-granted': hearings.grantBailChecked,
+                'status-denied': hearings.deniedBailChecked,
+                'status-pending': !hearings.grantBailChecked && !hearings.deniedBailChecked
+              }">
+                <i class="fa" [ngClass]="{
+                  'fa-check-circle': hearings.grantBailChecked,
+                  'fa-times-circle': hearings.deniedBailChecked,
+                  'fa-clock-o': !hearings.grantBailChecked && !hearings.deniedBailChecked
+                }"></i>
+              </div>
+              <div class="status-text">
+                <h4 *ngIf="hearings.grantBailChecked">Bail Granted</h4>
+                <h4 *ngIf="hearings.deniedBailChecked">Bail Denied</h4>
+                <h4 *ngIf="!hearings.grantBailChecked && !hearings.deniedBailChecked">Bail
+                  Pending</h4>
+                <p *ngIf="hearings.deniedBailChecked && hearings.deniedBailReason">
+                  Reason: {{ hearings.deniedBailReason }}
+                </p>
+
+                <!-- Notice for bail status -->
+                <div class="bail-notice" *ngIf="!hearings.grantBailChecked && !hearings.deniedBailChecked">
+                  <div class="alert alert-warning">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    <span>Bail has not been granted or denied yet. Please make a decision below.</span>
+                  </div>
+                </div>
+
+                <div class="bail-notice" *ngIf="hearings.grantBailChecked && !hearings.suretyReq && !hearings.bailReportLocation">
+                  <div class="alert alert-info">
+                    <i class="fa fa-info-circle"></i>
+                    <span>Bail has been granted but conditions have not been set yet. Please set conditions using the "Edit Bail Conditions" button below.</span>
+                  </div>
+                </div>
+
+                <!-- Bail decision buttons (only shown when bail is pending) -->
+                <div class="bail-actions" *ngIf="!hearings.grantBailChecked && !hearings.deniedBailChecked">
+                  <button class="btn-success" (click)="grantBail()">
+                    <i class="fa fa-check"></i>
+                    <span>Grant Bail</span>
+                  </button>
+
+                  <button class="btn-danger" (click)="denyBail()">
+                    <i class="fa fa-times"></i>
+                    <span>Deny Bail</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bail Conditions Card -->
+        <div class="card bail-conditions-card" *ngIf="hearings.grantBailChecked">
+          <div class="card-header">
+            <h3>Bail Conditions</h3>
+          </div>
+          <div class="card-body">
+            <div class="conditions-section">
+              <h4>Surety Requirements</h4>
+              <p>{{ hearings.suretyReq || 'No surety requirements specified.' }}</p>
+            </div>
+
+            <div class="conditions-section">
+              <h4>Check-in Requirements</h4>
+              <p>Location: {{ getPoliceStation(hearings.bailReportLocation) }}</p>
+              <div class="check-in-days">
+                <div class="day-item" [class.active]="hearings.sundayChecked">Sun</div>
+                <div class="day-item" [class.active]="hearings.mondayChecked">Mon</div>
+                <div class="day-item" [class.active]="hearings.tuesdayChecked">Tue</div>
+                <div class="day-item" [class.active]="hearings.wednesdayChecked">Wed</div>
+                <div class="day-item" [class.active]="hearings.thursdayChecked">Thu</div>
+                <div class="day-item" [class.active]="hearings.fridayChecked">Fri</div>
+                <div class="day-item" [class.active]="hearings.saturdayChecked">Sat</div>
+              </div>
+              <p>
+                Check-in before:
+                <span *ngIf="hearings.threepmChecked">3 PM</span>
+                <span *ngIf="hearings.fourpmChecked">4 PM</span>
+                <span *ngIf="hearings.fivepmChecked">5 PM</span>
+                <span *ngIf="hearings.sixpmChecked">6 PM</span>
+                <span *ngIf="hearings.sevenpmChecked">7 PM</span>
+                <span *ngIf="hearings.eightpmChecked">8 PM</span>
+                <span *ngIf="hearings.ninepmChecked">9 PM</span>
+                <span *ngIf="hearings.tenpmChecked">10 PM</span>
+              </p>
+            </div>
+
+            <div class="conditions-section">
+              <h4>Additional Requirements</h4>
+              <div *ngIf="hearings.surrenderPassportChecked" class="requirement-item">
+                <i class="fa fa-passport"></i>
+                <span>Must surrender passport</span>
+              </div>
+              <div *ngIf="hearings.elecMonitorChecked" class="requirement-item">
+                <i class="fa fa-broadcast-tower"></i>
+                <span>Electronic monitoring required</span>
+              </div>
+              <p>{{ hearings.additionalConditions || 'No additional requirements specified.' }}</p>
+            </div>
+
+            <div class="conditions-actions">
+              <button class="btn-primary" (click)="enterBailConditions()">
+                <i class="fa fa-edit"></i>
+                <span>Edit Bail Conditions</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bail Bond Card -->
+        <div class="card bail-bond-card">
+          <div class="card-header">
+            <h3>Bail Bond Management</h3>
+          </div>
+          <div class="card-body">
+            <div class="bond-status">
+              <div *ngIf="hearings.bondHtml" class="status-item">
+                <div class="status-label">Bond Status:</div>
+                <div class="status-value status-success">
+                  <i class="fa fa-check-circle"></i>
+                  <span>Bond Created</span>
+                </div>
+              </div>
+              <div *ngIf="hearings.bailBondLink" class="status-item">
+                <div class="status-label">Signed Bond:</div>
+                <div class="status-value status-success">
+                  <i class="fa fa-check-circle"></i>
+                  <span>Bond Issued on {{ hearings.bailBondIssueDateUnix ? convertUnixDate(hearings.bailBondIssueDateUnix) : 'Unknown Date' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bond-actions">
+              <button class="btn-primary" (click)="openBondEditor()">
+                <i class="fa fa-file-text-o"></i>
+                <span>{{ hearings.bondHtml ? 'Edit Bond' : 'Create Bond' }}</span>
+              </button>
+
+              <button class="btn-success" (click)="doIssueBond()" [disabled]="!hearings.bondHtml">
+                <i class="fa fa-upload"></i>
+                <span>Upload Signed Bond</span>
+              </button>
+
+              <button class="btn-info" (click)="doShowBailBond()" *ngIf="hearings.bailBondLink">
+                <i class="fa fa-eye"></i>
+                <span>View Signed Bond</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sureties Section -->
+      <div class="content-section" *ngIf="activeSection === 'sureties'">
+        <div class="section-header">
+          <h2>Surety Management</h2>
+        </div>
+
+        <div class="card surety-card">
+          <div class="card-header">
+            <h1>Surety 1</h1>
+          </div>
+          <div class="card-body">
+            <div *ngIf="hearings.suretorNIB && surety1Data" class="surety-info">
+              <div class="surety-header">
+                <div class="surety-name">{{ surety1Data.fullName }}</div>
+                <div class="surety-nib">NIB: {{ surety1Data.nib }}</div>
+              </div>
+
+              <div class="surety-details">
+                <div class="detail-section">
+                  <h4 class="section-title">Contact Information</h4>
+                  <div class="detail-row">
+                    <div class="detail-label">Address:</div>
+                    <div class="detail-value">{{ surety1Data.address }}</div>
+                  </div>
+                  <div class="detail-row" *ngIf="surety1Data.poBox">
+                    <div class="detail-label">P.O. Box:</div>
+                    <div class="detail-value">{{ surety1Data.poBox }}</div>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-label">Phone:</div>
+                    <div class="detail-value">{{ surety1Data.phone }}</div>
+                  </div>
+                  <div class="detail-row" *ngIf="surety1Data.phone2">
+                    <div class="detail-label">Alt. Phone:</div>
+                    <div class="detail-value">{{ surety1Data.phone2 }}</div>
+                  </div>
+                  <div class="detail-row" *ngIf="surety1Data.email">
+                    <div class="detail-label">Email:</div>
+                    <div class="detail-value">{{ surety1Data.email }}</div>
+                  </div>
+                  <div class="detail-row" *ngIf="surety1Data.dob">
+                    <div class="detail-label">Date of Birth:</div>
+                    <div class="detail-value">{{ surety1Data.dob }}</div>
+                  </div>
+                </div>
+
+                <div class="detail-section" *ngIf="surety1Data.employment?.name">
+                  <h4 class="section-title">Employment Information</h4>
+                  <div class="detail-row">
+                    <div class="detail-label">Employer:</div>
+                    <div class="detail-value">{{ surety1Data.employment.name }}</div>
+                  </div>
+                  <div class="detail-row" *ngIf="surety1Data.employment.address">
+                    <div class="detail-label">Work Address:</div>
+                    <div class="detail-value">{{ surety1Data.employment.address }}</div>
+                  </div>
+                  <div class="detail-row" *ngIf="surety1Data.employment.phone">
+                    <div class="detail-label">Work Phone:</div>
+                    <div class="detail-value">{{ surety1Data.employment.phone }}</div>
+                  </div>
+                </div>
+
+                <div class="detail-section"
+                     *ngIf="surety1Data.bankAccount?.bankName || surety1Data.property?.description">
+                  <h4 class="section-title">Financial Information</h4>
+                  <div *ngIf="surety1Data.bankAccount?.bankName">
+                    <div class="detail-row">
+                      <div class="detail-label">Bank:</div>
+                      <div class="detail-value">{{ surety1Data.bankAccount.bankName }}</div>
+                    </div>
+                    <div class="detail-row" *ngIf="surety1Data.bankAccount.accountType">
+                      <div class="detail-label">Account Type:</div>
+                      <div class="detail-value">{{ surety1Data.bankAccount.accountType }}</div>
+                    </div>
+                    <div class="detail-row" *ngIf="surety1Data.bankAccount.balance">
+                      <div class="detail-label">Balance:</div>
+                      <div class="detail-value">
+                        ${{ surety1Data.bankAccount.balance.toFixed(2) }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div *ngIf="surety1Data.property?.description">
+                    <div class="detail-row">
+                      <div class="detail-label">Property:</div>
+                      <div class="detail-value">{{ surety1Data.property.description }}</div>
+                    </div>
+                    <div class="detail-row" *ngIf="surety1Data.property.value">
+                      <div class="detail-label">Est. Value:</div>
+                      <div class="detail-value">${{ surety1Data.property.value.toFixed(2) }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="hearings.suretorNIB && !surety1Data" class="surety-info">
+            <div class="surety-name">{{ hearings.suretorName }}</div>
+            <div class="surety-nib">NIB: {{ hearings.suretorNIB }}</div>
+            <div class="loading-indicator">
+              <i class="fa fa-spinner fa-spin"></i>
+              <span>Loading surety details...</span>
+            </div>
+          </div>
+
+          <div *ngIf="!hearings.suretorNIB" class="surety-empty">
+            <i class="fa fa-user-plus"></i>
+            <span>No surety assigned</span>
+          </div>
+
+          <div class="surety-actions">
+            <button class="btn-primary" (click)="assignSurety(false)">
+              <i class="fa" [ngClass]="hearings.suretorNIB ? 'fa-edit' : 'fa-plus'"></i>
+              <span>{{ hearings.suretorNIB ? 'Edit Surety' : 'Assign Surety' }}</span>
+            </button>
+            <button *ngIf="hearings.suretorNIB" class="btn-danger" (click)="removeSurety(false)">
+              <i class="fa fa-trash"></i>
+              <span>Remove Surety</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Surety 2 Card -->
+        <div class="card surety-card">
+          <div class="card-header">
+            <h1>Surety 2</h1>
+          </div>
+          <div class="card-body">
+            <div *ngIf="hearings.suretor2NIB && surety2Data" class="surety-info">
+              <div class="surety-header">
+                <div class="surety-name">{{ surety2Data.fullName }}</div>
+                <div class="surety-nib">NIB: {{ surety2Data.nib }}</div>
+              </div>
+
+              <div class="surety-details">
+                <div class="detail-section">
+                  <h4 class="section-title">Contact Information</h4>
+                  <div class="detail-row">
+                    <div class="detail-label">Address:</div>
+                    <div class="detail-value">{{ surety2Data.address }}</div>
+                  </div>
+                  <div class="detail-row" *ngIf="surety2Data.poBox">
+                    <div class="detail-label">P.O. Box:</div>
+                    <div class="detail-value">{{ surety2Data.poBox }}</div>
+                  </div>
+                  <div class="detail-row">
+                    <div class="detail-label">Phone:</div>
+                    <div class="detail-value">{{ surety2Data.phone }}</div>
+                  </div>
+                  <div class="detail-row" *ngIf="surety2Data.phone2">
+                    <div class="detail-label">Alt. Phone:</div>
+                    <div class="detail-value">{{ surety2Data.phone2 }}</div>
+                  </div>
+                  <div class="detail-row" *ngIf="surety2Data.email">
+                    <div class="detail-label">Email:</div>
+                    <div class="detail-value">{{ surety2Data.email }}</div>
+                  </div>
+                  <div class="detail-row" *ngIf="surety2Data.dob">
+                    <div class="detail-label">Date of Birth:</div>
+                    <div class="detail-value">{{ surety2Data.dob }}</div>
+                  </div>
+                </div>
+
+                <div class="detail-section" *ngIf="surety2Data.employment?.name">
+                  <h4 class="section-title">Employment Information</h4>
+                  <div class="detail-row">
+                    <div class="detail-label">Employer:</div>
+                    <div class="detail-value">{{ surety2Data.employment.name }}</div>
+                  </div>
+                  <div class="detail-row" *ngIf="surety2Data.employment.address">
+                    <div class="detail-label">Work Address:</div>
+                    <div class="detail-value">{{ surety2Data.employment.address }}</div>
+                  </div>
+                  <div class="detail-row" *ngIf="surety2Data.employment.phone">
+                    <div class="detail-label">Work Phone:</div>
+                    <div class="detail-value">{{ surety2Data.employment.phone }}</div>
+                  </div>
+                </div>
+
+                <div class="detail-section"
+                     *ngIf="surety2Data.bankAccount?.bankName || surety2Data.property?.description">
+                  <h4 class="section-title">Financial Information</h4>
+                  <div *ngIf="surety2Data.bankAccount?.bankName">
+                    <div class="detail-row">
+                      <div class="detail-label">Bank:</div>
+                      <div class="detail-value">{{ surety2Data.bankAccount.bankName }}</div>
+                    </div>
+                    <div class="detail-row" *ngIf="surety2Data.bankAccount.accountType">
+                      <div class="detail-label">Account Type:</div>
+                      <div class="detail-value">{{ surety2Data.bankAccount.accountType }}</div>
+                    </div>
+                    <div class="detail-row" *ngIf="surety2Data.bankAccount.balance">
+                      <div class="detail-label">Balance:</div>
+                      <div class="detail-value">
+                        ${{ surety2Data.bankAccount.balance.toFixed(2) }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div *ngIf="surety2Data.property?.description">
+                    <div class="detail-row">
+                      <div class="detail-label">Property:</div>
+                      <div class="detail-value">{{ surety2Data.property.description }}</div>
+                    </div>
+                    <div class="detail-row" *ngIf="surety2Data.property.value">
+                      <div class="detail-label">Est. Value:</div>
+                      <div class="detail-value">${{ surety2Data.property.value.toFixed(2) }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="hearings.suretor2NIB && !surety2Data" class="surety-info">
+            <div class="surety-name">{{ hearings.suretor2Name }}</div>
+            <div class="surety-nib">NIB: {{ hearings.suretor2NIB }}</div>
+            <div class="loading-indicator">
+              <i class="fa fa-spinner fa-spin"></i>
+              <span>Loading surety details...</span>
+            </div>
+          </div>
+
+          <div *ngIf="!hearings.suretor2NIB" class="surety-empty">
+            <i class="fa fa-user-plus"></i>
+            <span>No surety assigned</span>
+          </div>
+
+          <div class="surety-actions">
+            <button class="btn-primary" (click)="assignSurety(false)">
+              <i class="fa" [ngClass]="hearings.suretor2NIB ? 'fa-edit' : 'fa-plus'"></i>
+              <span>{{ hearings.suretor2NIB ? 'Edit Surety' : 'Assign Surety' }}</span>
+            </button>
+            <button *ngIf="hearings.suretor2NIB" class="btn-danger" (click)="removeSurety(false)">
+              <i class="fa fa-trash"></i>
+              <span>Remove Surety</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Kiosk Monitoring Section -->
+      <div class="content-section" *ngIf="activeSection === 'kioskMonitoring'">
+        <div class="section-header">
+          <h2>Kiosk Monitoring</h2>
+        </div>
+
+        <!-- Bail Status Card -->
+        <div class="card bail-status-card">
+          <div class="card-header">
+            <h3>Bail Status</h3>
+            <div class="card-controls">
+              <button class="btn-toggle" (click)="togglePanel('kioskPanel')">
+                <i class="fa" [ngClass]="animationStates.kioskPanel === 'expanded' ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body" [@expandCollapse]="animationStates.kioskPanel">
+            <div *ngIf="hearings.bailBondIssueDateUnix" class="status-item">
+              <div class="status-label">Bail Status:</div>
+              <div class="status-value status-success">
+                <i class="fa fa-check-circle"></i>
+                <span>Bail Issued on {{ convertUnixDate(hearings.bailBondIssueDateUnix) }}</span>
+              </div>
+            </div>
+            <div *ngIf="!hearings.bailBondIssueDateUnix" class="status-item">
+              <div class="status-label">Bail Status:</div>
+              <div class="status-value status-warning">
+                <i class="fa fa-exclamation-triangle"></i>
+                <span>Bail has not been issued in this matter</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Check-in Requirements Card -->
+        <div class="card check-in-requirements-card">
+          <div class="card-header">
+            <h3>Check-in Requirements</h3>
+          </div>
+          <div class="card-body">
+            <div *ngIf="!hearings.sundayChecked && !hearings.mondayChecked && !hearings.tuesdayChecked &&
+                        !hearings.wednesdayChecked && !hearings.thursdayChecked && !hearings.fridayChecked &&
+                        !hearings.saturdayChecked" class="alert alert-warning">
+              <i class="fa fa-exclamation-triangle"></i>
+              <span>No check-in days have been set. Please set bail conditions first.</span>
+            </div>
+
+            <div *ngIf="hearings.sundayChecked || hearings.mondayChecked || hearings.tuesdayChecked ||
+                        hearings.wednesdayChecked || hearings.thursdayChecked || hearings.fridayChecked ||
+                        hearings.saturdayChecked">
+              <div class="requirements-section">
+                <h4>Check-in Location</h4>
+                <p>{{ hearings.bailReportLocation || 'No location specified' }}</p>
+              </div>
+
+              <div class="requirements-section">
+                <h4>Check-in Days</h4>
+                <div class="check-in-days">
+                  <div class="day-item" [class.active]="hearings.sundayChecked">Sun</div>
+                  <div class="day-item" [class.active]="hearings.mondayChecked">Mon</div>
+                  <div class="day-item" [class.active]="hearings.tuesdayChecked">Tue</div>
+                  <div class="day-item" [class.active]="hearings.wednesdayChecked">Wed</div>
+                  <div class="day-item" [class.active]="hearings.thursdayChecked">Thu</div>
+                  <div class="day-item" [class.active]="hearings.fridayChecked">Fri</div>
+                  <div class="day-item" [class.active]="hearings.saturdayChecked">Sat</div>
+                </div>
+              </div>
+
+              <div class="requirements-section">
+                <h4>Check-in Time</h4>
+                <p>
+                  Must check-in before:
+                  <span *ngIf="hearings.threepmChecked">3:00 PM</span>
+                  <span *ngIf="hearings.fourpmChecked">4:00 PM</span>
+                  <span *ngIf="hearings.fivepmChecked">5:00 PM</span>
+                  <span *ngIf="hearings.sixpmChecked">6:00 PM</span>
+                  <span *ngIf="hearings.sevenpmChecked">7:00 PM</span>
+                  <span *ngIf="hearings.eightpmChecked">8:00 PM</span>
+                  <span *ngIf="hearings.ninepmChecked">9:00 PM</span>
+                  <span *ngIf="hearings.tenpmChecked">10:00 PM</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Check-in History Card -->
+        <div class="card check-in-history-card">
+          <div class="card-header">
+            <h3>Check-in History</h3>
+          </div>
+          <div class="card-body">
+            <div *ngIf="isLoadingCheckins" class="loading-indicator">
+              <i class="fa fa-spinner fa-spin"></i>
+              <span>Loading check-in data...</span>
+            </div>
+
+            <div *ngIf="!isLoadingCheckins && kioskCheckins.length === 0" class="alert alert-info">
+              <i class="fa fa-info-circle"></i>
+              <span>No check-ins found for this offender.</span>
+            </div>
+
+            <div *ngIf="!isLoadingCheckins && kioskCheckins.length > 0" class="check-in-list">
+              <div *ngFor="let checkin of kioskCheckins" class="check-in-item" [ngClass]="{'compliant': checkin['isCompliant'], 'non-compliant': !checkin['isCompliant']}">
+                <div class="check-in-status">
+                  <i class="fa" [ngClass]="checkin['isCompliant'] ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                </div>
+                <div class="check-in-details">
+                  <div class="check-in-date">{{ convertUnixDate(checkin.unix) }}</div>
+                  <div class="check-in-location">{{ checkin.location }}</div>
+                </div>
+                <div class="check-in-compliance">
+                  <span *ngIf="checkin['isCompliant']" class="badge badge-success">Compliant</span>
+                  <span *ngIf="!checkin['isCompliant']" class="badge badge-danger">Non-Compliant</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Missed Check-ins Card -->
+        <div class="card missed-check-ins-card" *ngIf="!isLoadingCheckins && missedCheckins.length > 0">
+          <div class="card-header">
+            <h3>Missed Check-ins</h3>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-danger">
+              <i class="fa fa-exclamation-circle"></i>
+              <span>The offender has missed {{ missedCheckins.length }} required check-in(s).</span>
+            </div>
+
+            <div class="missed-check-in-list">
+              <div *ngFor="let missed of missedCheckins" class="missed-check-in-item">
+                <div class="missed-check-in-icon">
+                  <i class="fa fa-calendar-times-o"></i>
+                </div>
+                <div class="missed-check-in-details">
+                  <div class="missed-check-in-date">{{ missed.date | date:'mediumDate' }}</div>
+                  <div class="missed-check-in-day">{{ missed.day }}</div>
+                  <div class="missed-check-in-time">Required before: {{ missed.requiredTime }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Termination Section -->
+      <div class="content-section" *ngIf="activeSection === 'termination'">
+        <div class="section-header">
+          <h2>Application Termination</h2>
+        </div>
+
+        <div class="card termination-card">
+          <div class="card-header">
+            <h3>Terminate Bail Application</h3>
+          </div>
+          <div class="card-body">
+            <div class="termination-warning">
+              <i class="fa fa-exclamation-triangle"></i>
+              <p>Terminating a bail application is a permanent action. This will close the
+                application and mark it as terminated.</p>
+            </div>
+            <div class="termination-actions">
+              <button class="btn-danger" (click)="showTermination = true">
+                <i class="fa fa-power-off"></i>
+                <span>Terminate Application</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Bail Order Modal -->
+<section (click)="closeOrder()" *ngIf="showOrder" class="order-modal">
+  <div class="order-modal-header">CLICK TO CLOSE ORDER</div>
+  <div class="order-modal-content">
+    <div class="text-left font-weight-bold">
+      IN THE SUPREME COURT<BR>
+      COMMONWEALTH OF THE BAHAMAS<br>
+      CRIMINAL DIVISION
+    </div>
+    <div class="row mt-3">
+      <div class="col-6">
+        <div>
+          <div class="font-weight-bold">DEFENDANT</div>
+          {{ offender.lName }}, {{ offender.fName }} {{ offender.mName }}<br>
+          {{ offender.addLine1 }} {{ offender.addLine2 }}<br>
+          {{ offender.city }} {{ offender.state }} {{ offender.zip }}
+        </div>
+      </div>
+    </div>
+    <div class="text-center font-weight-bold h3 mt-3">RELEASE ORDER - ORDER GRANTING BAIL</div>
+    <div class="p-3">
+      The above named individual came before this court on
+      this {{ convertUnixDate(hearings.hearingDateUnix) }} for a bail hearing,
+      <span *ngIf="hearings.attorneyName"> and is represented by {{ hearings.attorneyName }}, a private attorney</span>
+      <span *ngIf="!hearings.attorneyName"> and was not represented by a private attorney</span>.
+      The following are conditions of which the Defendant must meet to be released on bail and the
+      conditions the Defendant
+      must adhere to while on bail. If these conditions are not met, the Defendant shall remain in
+      the custody of the Bahamas Department
+      of Corrections. If any condition is broken while on bail, the defendant will be remanded to
+      the custody of the Bahamas Department of Corrections.
+    </div>
+    <div class="px-3 py-1">
+      <div class="font-weight-bold h4">SURETY CONDITIONS</div>
+      <div class="">{{ hearings.suretyReq }}</div>
+    </div>
+    <div class="px-3 py-1">
+      <div class="font-weight-bold h4">KIOSK CHECK-IN REQUIREMENTS</div>
+      <div class="">Upon release, the Defendant <b>must check-in
+        at {{ getPoliceStation(hearings.bailReportLocation) }}</b>
+        and use the biometric kiosk. If the biometric kiosk is not available, the Defendant must
+        check-in with an officer who will
+        electronically submit the check-in to the bail management system.
+        <div class="font-weight-bold mt-1">CHECK IN DAYS AND TIME</div>
+        The Defendant must check in on the following days before
+        <span *ngIf="hearings.threepmChecked">3 PM:</span>
+        <span *ngIf="hearings.fourpmChecked">4 PM:</span>
+        <span *ngIf="hearings.fivepmChecked">5 PM:</span>
+        <span *ngIf="hearings.sixpmChecked">6 PM:</span>
+        <span *ngIf="hearings.sevenpmChecked">7 PM:</span>
+        <span *ngIf="hearings.eightpmChecked">8 PM:</span>
+        <span *ngIf="hearings.ninepmChecked">9 PM:</span>
+        <span *ngIf="hearings.tenpmChecked">10 PM:</span>
+        <br>
+        <ul>
+          <li *ngIf="hearings.sundayChecked">Every Sunday</li>
+          <li *ngIf="hearings.mondayChecked">Every Monday</li>
+          <li *ngIf="hearings.tuesdayChecked">Every Tuesday</li>
+          <li *ngIf="hearings.wednesdayChecked">Every Wednesday</li>
+          <li *ngIf="hearings.thursdayChecked">Every Thursday</li>
+          <li *ngIf="hearings.fridayChecked">Every Friday</li>
+          <li *ngIf="hearings.saturdayChecked">Every Saturday</li>
+        </ul>
+      </div>
+      <div class="h3 font-weight-bold mt-1">ADDITIONAL REQUIREMENTS</div>
+      The following additional requirements must also be met by the Defendant:<br>
+      <div *ngIf="hearings.surrenderPassportChecked" class="text-danger font-weight-bold">THE
+        DEFENDANT MUST SURRENDER HIS/HER PASSPORT.
+      </div>
+      <div *ngIf="hearings.elecMonitorChecked" class="text-danger font-weight-bold">THE DEFENDANT
+        WILL BE PLACED ON ELECTRONIC MONITORING AND MUST ADHERE TO ALL RULES FOR THIS PURPOSE.
+      </div>
+      <div class="">{{ hearings.additionalConditions }}</div>
+    </div>
+  </div>
+  <div class="order-modal-footer">CLICK TO CLOSE ORDER</div>
+</section>
+
+<!-- Termination Component -->
+<app-termination [hearing]="hearings" (closeMenu)="closeTermination($event)"
+                 *ngIf="showTermination"></app-termination>

@@ -1,0 +1,1363 @@
+// Variables
+$primary-color: #1a73e8;
+$secondary-color: #5f6368;
+$accent-color: #4285f4;
+$success-color: #0f9d58;
+$warning-color: #f4b400;
+$danger-color: #db4437;
+$dark-color: #000040;
+$light-color: #ffffff;
+$gray-50: #f9fafb;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #6c757d;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
+
+$border-radius: 8px;
+$card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+$transition-speed: 0.3s;
+
+// Mixins
+@mixin glassmorphism {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+@mixin card {
+  background: $light-color;
+  border-radius: $border-radius;
+  box-shadow: $card-shadow;
+  transition: transform $transition-speed, box-shadow $transition-speed;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+  }
+}
+
+// Main Container
+.case-management-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: $gray-800;
+  font-family: 'Roboto', sans-serif;
+  overflow: hidden;
+}
+
+// Header
+.header {
+  background: $dark-color;
+  color: $light-color;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+
+  .title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-exit {
+    background: $danger-color;
+    color: $light-color;
+    border: none;
+    border-radius: $border-radius;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background-color $transition-speed;
+
+    &:hover {
+      background: darken($danger-color, 10%);
+    }
+
+    i {
+      font-size: 1rem;
+    }
+  }
+}
+
+// Dashboard Content
+.dashboard-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+// Navigation Sidebar
+.navigation-sidebar {
+  width: 220px;
+  background: $dark-color;
+  color: $light-color;
+  padding: 1.5rem 0;
+  overflow-y: auto;
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: background-color $transition-speed;
+    border-left: 3px solid transparent;
+
+    &:hover {
+      background: rgba(0, 0, 255, 0.3);
+    }
+
+    &.active {
+      background: rgba(255, 255, 255, 0.15);
+      border-left: 3px solid $primary-color;
+    }
+
+    i {
+      font-size: 1.25rem;
+      margin-right: 1rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    span {
+      font-weight: 500;
+    }
+  }
+}
+
+// Main Content Area
+.main-content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  background: $gray-100;
+}
+
+// Section Header
+.section-header {
+  margin-bottom: 1.5rem;
+
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: $dark-color;
+    margin: 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid $primary-color;
+    display: inline-block;
+  }
+}
+
+// Cards
+.card {
+  @include card;
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: $gray-100;
+    border-bottom: 1px solid $gray-200;
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin: 0;
+      color: $dark-color;
+    }
+
+    .card-controls {
+      .btn-toggle {
+        background: none;
+        border: none;
+        color: $gray-600;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0.25rem;
+        transition: color $transition-speed;
+
+        &:hover {
+          color: $primary-color;
+        }
+      }
+    }
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+// Offender Card
+.offender-card {
+  .info-row {
+    margin-bottom: 0.75rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .info-label {
+      font-weight: 500;
+      color: $gray-700;
+      background: $gray-100;
+      padding: 0.5rem;
+      border-radius: $border-radius 0 0 $border-radius;
+    }
+
+    .info-value {
+      padding: 0.5rem;
+      background: $gray-50;
+      border-radius: 0 $border-radius $border-radius 0;
+
+      // Edit mode styling
+      &.d-flex {
+        display: flex;
+        align-items: center;
+
+        span {
+          flex: 1;
+        }
+
+        .form-control {
+          flex: 1;
+          padding: 0.25rem 0.5rem;
+          border: 1px solid $primary-color;
+          border-radius: 4px;
+          font-size: 0.9rem;
+
+          &:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba($primary-color, 0.25);
+          }
+        }
+
+        // Edit button
+        .btn-edit {
+          background: none;
+          border: none;
+          color: $primary-color;
+          cursor: pointer;
+          padding: 0.25rem;
+          border-radius: 4px;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: rgba($primary-color, 0.1);
+            color: darken($primary-color, 10%);
+          }
+
+          i {
+            font-size: 0.9rem;
+          }
+        }
+
+        // Save button
+        .btn-save {
+          background: $success-color;
+          border: none;
+          color: white;
+          cursor: pointer;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: darken($success-color, 10%);
+          }
+
+          i {
+            font-size: 0.9rem;
+          }
+        }
+
+        // Cancel button
+        .btn-cancel {
+          background: $danger-color;
+          border: none;
+          color: white;
+          cursor: pointer;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: darken($danger-color, 10%);
+          }
+
+          i {
+            font-size: 0.9rem;
+          }
+        }
+
+        // Spacing between buttons
+        .ml-2 {
+          margin-left: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+// Charges Card
+.charges-card {
+  .charge-item {
+    padding: 1rem;
+    border-bottom: 1px solid $gray-200;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .charge-number {
+      font-weight: 500;
+      color: $gray-700;
+      margin-bottom: 0.25rem;
+    }
+
+    .charge-description {
+      margin-bottom: 0.5rem;
+    }
+
+    .charge-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      .tag {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-weight: 500;
+      }
+
+      .drug-tag {
+        background: rgba($danger-color, 0.1);
+        color: $danger-color;
+      }
+
+      .alcohol-tag {
+        background: rgba($warning-color, 0.1);
+        color: darken($warning-color, 15%);
+      }
+
+      .sex-tag {
+        background: rgba(#9c27b0, 0.1);
+        color: #9c27b0;
+      }
+
+      .child-tag {
+        background: rgba(#e91e63, 0.1);
+        color: #e91e63;
+      }
+
+      .violent-tag {
+        background: rgba($danger-color, 0.1);
+        color: $danger-color;
+      }
+    }
+  }
+}
+
+// Status Card
+.status-card {
+  .status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid $gray-200;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .status-label {
+      font-weight: 500;
+      color: $gray-700;
+    }
+
+    .status-value {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      i {
+        font-size: 1.25rem;
+      }
+
+      &.status-granted {
+        color: $success-color;
+      }
+
+      &.status-denied {
+        color: $danger-color;
+      }
+
+      &.status-pending {
+        color: $warning-color;
+      }
+    }
+  }
+}
+
+// Documents Grid
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+
+  .document-card {
+    @include card;
+    display: flex;
+    padding: 1.5rem;
+    cursor: pointer;
+
+    .document-icon {
+      font-size: 2.5rem;
+      color: $primary-color;
+      margin-right: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .document-info {
+      flex: 1;
+
+      h3 {
+        font-size: 1.25rem;
+        margin: 0 0 0.5rem 0;
+        color: $dark-color;
+      }
+
+      p {
+        color: $gray-600;
+        margin: 0;
+        font-size: 0.875rem;
+      }
+    }
+
+    .document-action {
+      display: flex;
+      align-items: center;
+
+      .btn-view {
+        background: $primary-color;
+        color: $light-color;
+        border: none;
+        border-radius: $border-radius;
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: background-color $transition-speed;
+
+        &:hover {
+          background: darken($primary-color, 10%);
+        }
+
+        &.disabled {
+          background: $gray-400;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+// Judge Card & Hearing Date Card
+.judge-card, .hearing-date-card {
+  .current-assignment, .current-date {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: $gray-100;
+    border-radius: $border-radius;
+
+    .assignment-label, .date-label {
+      font-weight: 500;
+      color: $gray-700;
+      margin-bottom: 0.5rem;
+    }
+
+    .assignment-value, .date-value {
+      font-size: 1.25rem;
+      color: $dark-color;
+    }
+  }
+
+  .assignment-actions, .date-actions {
+    display: flex;
+    justify-content: flex-end;
+
+    .btn-primary {
+      background: $primary-color;
+      color: $light-color;
+      border: none;
+      border-radius: $border-radius;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: background-color $transition-speed;
+
+      &:hover {
+        background: darken($primary-color, 10%);
+      }
+
+      i {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+// Bail Status Card
+.bail-status-card {
+  .status-display {
+    display: flex;
+    align-items: flex-start;
+    padding: 1.5rem;
+
+    .status-icon {
+      font-size: 3rem;
+      margin-right: 1.5rem;
+
+      &.status-granted {
+        color: $success-color;
+      }
+
+      &.status-denied {
+        color: $danger-color;
+      }
+
+      &.status-pending {
+        color: $warning-color;
+      }
+    }
+
+    .status-text {
+      flex: 1;
+
+      h4 {
+        font-size: 1.5rem;
+        margin: 0 0 0.5rem 0;
+      }
+
+      p {
+        margin: 0 0 1rem 0;
+        color: $gray-600;
+      }
+
+      .bail-notice {
+        margin: 1rem 0;
+
+        .alert {
+          display: flex;
+          align-items: center;
+          padding: 1rem;
+          border-radius: $border-radius;
+
+          &.alert-warning {
+            background-color: rgba($warning-color, 0.1);
+            border-left: 4px solid $warning-color;
+            color: darken($warning-color, 20%);
+          }
+
+          &.alert-info {
+            background-color: rgba($primary-color, 0.1);
+            border-left: 4px solid $primary-color;
+            color: darken($primary-color, 10%);
+          }
+
+          i {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+          }
+
+          span {
+            flex: 1;
+          }
+        }
+      }
+
+      .bail-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+
+        button {
+          flex: 1;
+          border: none;
+          border-radius: $border-radius;
+          padding: 0.75rem 1.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          cursor: pointer;
+          transition: background-color $transition-speed;
+          color: $light-color;
+          font-weight: 500;
+
+          &.btn-success {
+            background: $success-color;
+
+            &:hover {
+              background: darken($success-color, 10%);
+            }
+          }
+
+          &.btn-danger {
+            background: $danger-color;
+
+            &:hover {
+              background: darken($danger-color, 10%);
+            }
+          }
+
+          i {
+            font-size: 1.25rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Bail Conditions Card
+.bail-conditions-card {
+  .conditions-section {
+    margin-bottom: 1.5rem;
+
+    h4 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin: 0 0 0.75rem 0;
+      color: $dark-color;
+      border-bottom: 1px solid $gray-300;
+      padding-bottom: 0.5rem;
+    }
+
+    .check-in-days {
+      display: flex;
+      gap: 0.5rem;
+      margin: 0.75rem 0;
+
+      .day-item {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: $gray-200;
+        color: $gray-600;
+        font-weight: 500;
+        font-size: 0.875rem;
+
+        &.active {
+          background: $primary-color;
+          color: $light-color;
+        }
+      }
+    }
+
+    .requirement-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      padding: 0.75rem;
+      background: rgba($warning-color, 0.1);
+      border-radius: $border-radius;
+      color: darken($warning-color, 15%);
+
+      i {
+        font-size: 1.25rem;
+      }
+    }
+  }
+
+  .conditions-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+
+    .btn-primary {
+      background: $primary-color;
+      color: $light-color;
+      border: none;
+      border-radius: $border-radius;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: background-color $transition-speed;
+
+      &:hover {
+        background: darken($primary-color, 10%);
+      }
+    }
+  }
+}
+
+// Bail Bond Card
+.bail-bond-card {
+  .bond-status {
+    margin-bottom: 1.5rem;
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      background: $gray-100;
+      border-radius: $border-radius;
+      margin-bottom: 0.75rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .status-label {
+        font-weight: 500;
+        color: $gray-700;
+      }
+
+      .status-value {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        &.status-success {
+          color: $success-color;
+        }
+
+        i {
+          font-size: 1.25rem;
+        }
+      }
+    }
+  }
+
+  .bond-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    button {
+      flex: 1;
+      min-width: 150px;
+      border: none;
+      border-radius: $border-radius;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: background-color $transition-speed;
+      color: $light-color;
+      font-weight: 500;
+
+      &.btn-primary {
+        background: $primary-color;
+
+        &:hover {
+          background: darken($primary-color, 10%);
+        }
+      }
+
+      &.btn-success {
+        background: $success-color;
+
+        &:hover {
+          background: darken($success-color, 10%);
+        }
+
+        &[disabled] {
+          background: $gray-400;
+          cursor: not-allowed;
+        }
+      }
+
+      &.btn-info {
+        background: $accent-color;
+
+        &:hover {
+          background: darken($accent-color, 10%);
+        }
+      }
+
+      i {
+        font-size: 1.25rem;
+      }
+    }
+  }
+}
+
+// Surety Card
+.surety-card {
+  .surety-info {
+    padding: 1.5rem;
+    background: $gray-100;
+    border-radius: $border-radius;
+    margin-bottom: 1rem;
+
+    .surety-header {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid $gray-300;
+
+      .surety-name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: $dark-color;
+        margin-bottom: 0.5rem;
+      }
+
+      .surety-nib {
+        color: $gray-600;
+        font-size: 1rem;
+      }
+    }
+
+    .surety-details {
+      .detail-section {
+        margin-bottom: 1.5rem;
+
+        .section-title {
+          font-size: 1.1rem;
+          font-weight: 500;
+          color: $primary-color;
+          margin-bottom: 0.75rem;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px dashed $gray-300;
+        }
+
+        .detail-row {
+          display: flex;
+          margin-bottom: 0.5rem;
+
+          .detail-label {
+            width: 120px;
+            font-weight: 500;
+            color: $gray-700;
+          }
+
+          .detail-value {
+            flex: 1;
+          }
+        }
+      }
+    }
+
+    .loading-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      color: $gray-600;
+
+      i {
+        margin-right: 0.5rem;
+        color: $primary-color;
+      }
+    }
+  }
+
+  .surety-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: $gray-500;
+    background: $gray-100;
+    border-radius: $border-radius;
+    margin-bottom: 1rem;
+
+    i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    span {
+      font-size: 1.1rem;
+    }
+  }
+
+  .surety-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+
+    .btn-primary {
+      background: $primary-color;
+      color: $light-color;
+      border: none;
+      border-radius: $border-radius;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: background-color $transition-speed;
+
+      &:hover {
+        background: darken($primary-color, 10%);
+      }
+    }
+
+    .btn-danger {
+      background: $danger-color;
+      color: $light-color;
+      border: none;
+      border-radius: $border-radius;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: background-color $transition-speed;
+
+      &:hover {
+        background: darken($danger-color, 10%);
+      }
+    }
+  }
+}
+
+// Kiosk Monitoring Styles
+.check-in-requirements-card {
+  .requirements-section {
+    margin-bottom: 1.5rem;
+
+    h4 {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin: 0 0 0.75rem 0;
+      color: $dark-color;
+      border-bottom: 1px solid $gray-300;
+      padding-bottom: 0.5rem;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .check-in-days {
+      display: flex;
+      gap: 0.5rem;
+      margin: 0.75rem 0;
+
+      .day-item {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: $gray-200;
+        color: $gray-600;
+        font-weight: 500;
+        font-size: 0.875rem;
+
+        &.active {
+          background: $primary-color;
+          color: $light-color;
+        }
+      }
+    }
+  }
+
+  .alert {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: $border-radius;
+
+    &.alert-warning {
+      background-color: rgba($warning-color, 0.1);
+      border-left: 4px solid $warning-color;
+      color: darken($warning-color, 20%);
+    }
+
+    &.alert-info {
+      background-color: rgba($primary-color, 0.1);
+      border-left: 4px solid $primary-color;
+      color: darken($primary-color, 10%);
+    }
+
+    i {
+      font-size: 1.5rem;
+      margin-right: 1rem;
+    }
+
+    span {
+      flex: 1;
+    }
+  }
+}
+
+.check-in-history-card {
+  .loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: $gray-600;
+
+    i {
+      font-size: 2rem;
+      margin-right: 1rem;
+      animation: spin 1s infinite linear;
+    }
+  }
+
+  .check-in-list {
+    .check-in-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid $gray-200;
+      transition: background-color $transition-speed;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background-color: $gray-100;
+      }
+
+      &.compliant {
+        .check-in-status i {
+          color: $success-color;
+        }
+      }
+
+      &.non-compliant {
+        .check-in-status i {
+          color: $danger-color;
+        }
+      }
+
+      .check-in-status {
+        margin-right: 1rem;
+
+        i {
+          font-size: 1.5rem;
+        }
+      }
+
+      .check-in-details {
+        flex: 1;
+
+        .check-in-date {
+          font-weight: 500;
+          margin-bottom: 0.25rem;
+        }
+
+        .check-in-location {
+          color: $gray-600;
+          font-size: 0.875rem;
+        }
+      }
+
+      .check-in-compliance {
+        .badge {
+          padding: 0.5rem 0.75rem;
+          border-radius: 12px;
+          font-weight: 500;
+          font-size: 0.75rem;
+
+          &.badge-success {
+            background-color: rgba($success-color, 0.1);
+            color: $success-color;
+          }
+
+          &.badge-danger {
+            background-color: rgba($danger-color, 0.1);
+            color: $danger-color;
+          }
+        }
+      }
+    }
+  }
+}
+
+.missed-check-ins-card {
+  .alert-danger {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: $border-radius;
+    background-color: rgba($danger-color, 0.1);
+    border-left: 4px solid $danger-color;
+    color: darken($danger-color, 10%);
+    margin-bottom: 1rem;
+
+    i {
+      font-size: 1.5rem;
+      margin-right: 1rem;
+    }
+  }
+
+  .missed-check-in-list {
+    .missed-check-in-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid $gray-200;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .missed-check-in-icon {
+        margin-right: 1rem;
+
+        i {
+          font-size: 1.5rem;
+          color: $danger-color;
+        }
+      }
+
+      .missed-check-in-details {
+        flex: 1;
+
+        .missed-check-in-date {
+          font-weight: 500;
+          margin-bottom: 0.25rem;
+        }
+
+        .missed-check-in-day {
+          color: $gray-700;
+        }
+
+        .missed-check-in-time {
+          color: $gray-600;
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
+}
+
+// Termination Card
+.termination-card {
+  .termination-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba($danger-color, 0.1);
+    border-radius: $border-radius;
+    margin-bottom: 1.5rem;
+
+    i {
+      font-size: 1.5rem;
+      color: $danger-color;
+    }
+
+    p {
+      margin: 0;
+      color: $gray-800;
+    }
+  }
+
+  .termination-actions {
+    display: flex;
+    justify-content: flex-end;
+
+    .btn-danger {
+      background: $danger-color;
+      color: $light-color;
+      border: none;
+      border-radius: $border-radius;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: background-color $transition-speed;
+
+      &:hover {
+        background: darken($danger-color, 10%);
+      }
+    }
+  }
+}
+
+// Order Modal
+.order-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+  overflow-y: auto;
+
+  .order-modal-header, .order-modal-footer {
+    background: $dark-color;
+    color: $light-color;
+    padding: 1rem;
+    text-align: center;
+    font-weight: 500;
+    width: 100%;
+    max-width: 8.5in;
+    cursor: pointer;
+
+    &:hover {
+      background: lighten($dark-color, 10%);
+    }
+  }
+
+  .order-modal-content {
+    background: $light-color;
+    padding: 2rem;
+    width: 100%;
+    max-width: 8.5in;
+    min-height: 11in;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+}
+
+// Responsive Adjustments
+@media (max-width: 992px) {
+  .navigation-sidebar {
+    width: 60px;
+
+    .nav-item {
+      padding: 0.75rem;
+      justify-content: center;
+
+      span {
+        display: none;
+      }
+
+      i {
+        margin-right: 0;
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .documents-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+
+    .title {
+      font-size: 1.25rem;
+    }
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
+
+  .documents-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .status-display {
+    flex-direction: column;
+    text-align: center;
+
+    .status-icon {
+      margin-right: 0;
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+// Animation Classes
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+// Pulse Animation for Status Icons
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.status-icon {
+  i {
+    animation: pulse 2s infinite;
+  }
+}

@@ -1,0 +1,420 @@
+<div class="container-fluid">
+  <!-- Header Section -->
+  <div class="row header-section">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Offender Details</h5>
+          <div>
+            <button class="btn btn-light btn-sm mr-2" (click)="toggleEditMode()">
+              <i class="fa" [ngClass]="isEditing ? 'fa-times' : 'fa-edit'"></i>
+              {{ isEditing ? 'Cancel Edit' : 'Edit Record' }}
+            </button>
+            <button class="btn btn-danger btn-sm" (click)="closeDetails()">
+              <i class="fa fa-times"></i> Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offender Information Section -->
+  <div class="row mt-3">
+    <div class="col-md-3">
+      <!-- Photo Section -->
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          <h6 class="mb-0">Offender Photo</h6>
+        </div>
+        <div class="card-body text-center">
+          <div class="photo-container mb-3">
+            <img [src]="photoURL || offender.mainPhoto || 'assets/img/users/default-user.jpg'"
+                 class="img-fluid rounded" alt="Offender Photo">
+          </div>
+          <div *ngIf="isEditing" class="custom-file mb-3">
+            <input type="file" class="custom-file-input" id="photoUpload"
+                   (change)="onPhotoSelected($event)" accept="image/*">
+            <label class="custom-file-label" for="photoUpload">Choose photo...</label>
+          </div>
+          <div *ngIf="isUploading" class="progress mb-3">
+            <div class="progress-bar progress-bar-striped progress-bar-animated"
+                 [style.width.%]="uploadProgress"></div>
+          </div>
+          <button *ngIf="isEditing && selectedPhoto" class="btn btn-info btn-sm"
+                  (click)="updatePhoto()" [disabled]="isUploading">
+            <i class="fa fa-upload"></i> Update Photo
+          </button>
+        </div>
+      </div>
+
+      <!-- AFIS Information -->
+      <div class="card mt-3">
+        <div class="card-header bg-info text-white">
+          <h6 class="mb-0">AFIS Information</h6>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>AFIS ID</label>
+            <div class="input-group">
+              <input type="text" class="form-control" [value]="offender.spn || 'N/A'" readonly>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>AFIS Source</label>
+            <div class="input-group">
+              <input type="text" class="form-control" [value]="offender.jetAfis || 'N/A'" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <!-- Personal Information -->
+      <div class="card">
+        <div class="card-header bg-info text-white">
+          <h6 class="mb-0">Personal Information</h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" class="form-control" id="lastName"
+                       [(ngModel)]="offender.lName" [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" class="form-control" id="firstName"
+                       [(ngModel)]="offender.fName" [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="middleName">Middle Name</label>
+                <input type="text" class="form-control" id="middleName"
+                       [(ngModel)]="offender.mName" [readonly]="!isEditing">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" class="form-control" id="dob"
+                       [(ngModel)]="offender.dob" [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="gender">Gender</label>
+                <select class="form-control" id="gender"
+                        [(ngModel)]="offender.gender" [disabled]="!isEditing">
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="race">Race</label>
+                <select class="form-control" id="race"
+                        [(ngModel)]="offender.race" [disabled]="!isEditing">
+                  <option value="">Select Race</option>
+                  <option value="Black">Black</option>
+                  <option value="White">White</option>
+                  <option value="Hispanic">Hispanic</option>
+                  <option value="Asian">Asian</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="height">Height</label>
+                <input type="text" class="form-control" id="height"
+                       [(ngModel)]="offender.height" [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="weight">Weight</label>
+                <input type="text" class="form-control" id="weight"
+                       [(ngModel)]="offender.weight" [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="eyeColor">Eye Color</label>
+                <select class="form-control" id="eyeColor"
+                        [(ngModel)]="offender.eyeColor" [disabled]="!isEditing">
+                  <option value="">Select Eye Color</option>
+                  <option value="Brown">Brown</option>
+                  <option value="Blue">Blue</option>
+                  <option value="Green">Green</option>
+                  <option value="Hazel">Hazel</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="hairColor">Hair Color</label>
+                <select class="form-control" id="hairColor"
+                        [(ngModel)]="offender.hairColor" [disabled]="!isEditing">
+                  <option value="">Select Hair Color</option>
+                  <option value="Black">Black</option>
+                  <option value="Brown">Brown</option>
+                  <option value="Blonde">Blonde</option>
+                  <option value="Red">Red</option>
+                  <option value="Gray">Gray</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="complex">Complexion</label>
+                <input type="text" class="form-control" id="complex"
+                       [(ngModel)]="offender.complex" [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="build">Build</label>
+                <select class="form-control" id="build"
+                        [(ngModel)]="offender.build" [disabled]="!isEditing">
+                  <option value="">Select Build</option>
+                  <option value="Slim">Slim</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Heavy">Heavy</option>
+                  <option value="Athletic">Athletic</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="card mt-3">
+        <div class="card-header bg-success text-white">
+          <h6 class="mb-0">Contact Information</h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="address1">Address Line 1</label>
+                <input type="text" class="form-control" id="address1"
+                       [(ngModel)]="offender.addLine1" [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="address2">Address Line 2</label>
+                <input type="text" class="form-control" id="address2"
+                       [(ngModel)]="offender.addLine2" [readonly]="!isEditing">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="city">City/Locality</label>
+                <input type="text" class="form-control" id="city"
+                       [(ngModel)]="offender.city" [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="state">Island/State</label>
+                <input type="text" class="form-control" id="state"
+                       [(ngModel)]="offender.state" [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="zip">Postal Code</label>
+                <input type="text" class="form-control" id="zip"
+                       [(ngModel)]="offender.zip" [readonly]="!isEditing">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" class="form-control" id="phone"
+                       [(ngModel)]="offender.phone" [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="homePhone">Home Phone</label>
+                <input type="tel" class="form-control" id="homePhone"
+                       [(ngModel)]="offender.homePhone" [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email"
+                       [(ngModel)]="offender.email" [readonly]="!isEditing">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Information -->
+      <div class="card mt-3">
+        <div class="card-header bg-warning text-dark">
+          <h6 class="mb-0">Additional Information</h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="pob">Place of Birth</label>
+                <input type="text" class="form-control" id="pob"
+                       [(ngModel)]="offender.pob" [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="nib">NIB Number</label>
+                <input type="text" class="form-control" id="nib"
+                       [(ngModel)]="offender.nib" [readonly]="!isEditing">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="emergContact">Emergency Contact</label>
+                <input type="text" class="form-control" id="emergContact"
+                       [(ngModel)]="offender.emergContact" [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="emergRelation">Relationship to Emergency Contact</label>
+                <input type="text" class="form-control" id="emergRelation"
+                       [(ngModel)]="offender.emergRelation" [readonly]="!isEditing">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <div class="form-group">
+                <label for="profileNotes">Notes</label>
+                <textarea class="form-control" id="profileNotes" rows="3"
+                          [(ngModel)]="offender.profileNotes" [readonly]="!isEditing"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Save Button (only visible in edit mode) -->
+      <div *ngIf="isEditing" class="row mt-3">
+        <div class="col-12 text-center">
+          <button class="btn btn-success" (click)="saveOffender()">
+            <i class="fa fa-save"></i> Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bookings Section -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Bookings</h5>
+          <button class="btn btn-light btn-sm" (click)="addBooking()">
+            <i class="fa fa-plus"></i> Add New Booking
+          </button>
+        </div>
+        <div class="card-body">
+          <!-- No Bookings Message -->
+          <div *ngIf="events.length === 0" class="alert alert-info">
+            <h5 class="alert-heading">No Bookings Found</h5>
+            <p>This offender has no bookings on record. Click "Add New Booking" to create one.</p>
+          </div>
+
+          <!-- Bookings Timeline -->
+          <p-timeline [value]="events" styleClass="custom-timeline" *ngIf="events.length > 0">
+            <ng-template pTemplate="marker" let-event>
+              <span class="custom-marker shadow-2">
+                <i [ngClass]="event.icon"></i>
+              </span>
+            </ng-template>
+            <ng-template pTemplate="content" let-event>
+              <p-card [header]="event.status" [subheader]="'Booked on: ' + dateFromUnixTime(event.bookDate)" styleClass="booking-card">
+                <div class="row booking-status">
+                  <div class="col-md-3">
+                    <span [ngClass]="{'text-success': event.bookingStatus !== 'Open', 'text-danger': event.bookingStatus === 'Open'}" class="font-weight-bold h5">
+                      {{event.bookingStatus === 'Open' ? 'OPEN BOOKING' : 'CLOSED BOOKING'}}
+                    </span>
+                  </div>
+                  <div class="col-md-3">
+                    <strong>Bail Application:</strong><br>
+                    {{event.bailAppPending ? 'Submitted on ' + dateFromUnixTime(event.bailAppSubmitedDate) : 'Not Submitted'}}
+                  </div>
+                  <div class="col-md-3">
+                    <strong>Attorney:</strong><br>
+                    {{event.attorneyName || 'No Attorney Assigned'}}
+                  </div>
+                  <div class="col-md-3">
+                    <strong>Registration #:</strong><br>
+                    {{event.genRegisterNumber || 'N/A'}}
+                  </div>
+                </div>
+                <div class="row booking-details">
+                  <div class="col-md-4">
+                    <strong>Judge:</strong><br>
+                    {{event.judgeAssigned ? event.judgeAssigned + ' (assigned on ' + dateFromUnixTime(event.judgeAssignedDate) + ')' : 'No Judge Assigned'}}
+                  </div>
+                  <div class="col-md-4">
+                    <strong>Next Hearing:</strong><br>
+                    {{event.hearingAssignDate || 'Not Scheduled'}}
+                  </div>
+                  <div class="col-md-4">
+                    <strong>Last Hearing:</strong><br>
+                    {{dateFromUnixTime(event.lastBailHearingDate) || 'N/A'}}
+                  </div>
+                </div>
+                <div class="booking-actions mt-3">
+                  <button class="btn btn-info btn-sm mr-2" (click)="viewBooking(event)">
+                    <i class="fa fa-eye"></i> View Details
+                  </button>
+                  <button class="btn btn-danger btn-sm" (click)="deleteBooking(event)">
+                    <i class="fa fa-trash"></i> Delete
+                  </button>
+                </div>
+              </p-card>
+            </ng-template>
+          </p-timeline>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

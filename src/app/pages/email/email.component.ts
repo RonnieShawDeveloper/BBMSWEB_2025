@@ -534,7 +534,16 @@ export class EmailComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!this.selectedRecipients.some(r => r.id === member.id)) {
       this.selectedRecipients.push(member);
     }
+    const recipientInput = document.getElementById('recipient') as HTMLInputElement;
+    recipientInput.value = ''; // Clear the input field after adding recipient
+    // Clear the input field by setting the value to empty string
     this.recipientControl.setValue('');
+    // Reset the form control to ensure the input field is cleared
+    this.recipientControl.reset();
+    // Force the control to update
+    setTimeout(() => {
+      this.recipientControl.updateValueAndValidity();
+    }, 0);
   }
 
   public removeRecipient(member: Members) {
