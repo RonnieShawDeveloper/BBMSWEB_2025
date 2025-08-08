@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { UntypedFormGroup, UntypedFormControl, AbstractControl, UntypedFormBuilder, Validators} from '@angular/forms';
 import {AuthService} from "../../services/auth.service";
 import Swal from "sweetalert2";
+import swal from "sweetalert2";
 
 @Component({
   selector: 'app-login',
@@ -40,7 +41,9 @@ export class LoginComponent implements OnInit {
             Swal.showLoading();
           }
         });
-          this.authService.login(this.email.value, this.password.value);
+          let loggedin = this.authService.login(this.email.value, this.password.value).then((v) => {
+            swal.close();
+          });
       }
   }
 

@@ -147,6 +147,7 @@ export class AuthService {
             let lastLoginDate = lastLogin.toLocaleDateString() + ' ' + lastLogin.toLocaleTimeString();
             let membersince = user.user.metadata.creationTime;
             this.router.navigate(['/']);
+            return;
 
             //           Swal.fire({
             //             icon: 'success',
