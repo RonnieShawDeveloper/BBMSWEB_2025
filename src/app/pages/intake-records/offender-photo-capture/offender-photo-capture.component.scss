@@ -1,0 +1,246 @@
+.photo-capture-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.close-button-top {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.close-button-bottom {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.instructions-section {
+  margin-bottom: 20px;
+
+  .alert {
+    margin-bottom: 0;
+  }
+
+  h5 {
+    margin-bottom: 10px;
+  }
+
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.photo-display-section {
+  margin-bottom: 30px;
+
+  h5 {
+    margin-bottom: 15px;
+    color: #343a40;
+    font-weight: 600;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 8px;
+  }
+
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+
+    .photo-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      border: 1px solid #dee2e6;
+
+      &:hover {
+        background-color: #e9ecef;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .photo-container {
+        position: relative;
+        margin-bottom: 8px;
+
+        .photo-image {
+          width: 120px;
+          height: 120px;
+          object-fit: cover;
+          border-radius: 4px;
+        }
+
+        .badge-pill {
+          position: absolute;
+          top: -10px;
+          right: -10px;
+          background-color: #dc3545;
+          color: white;
+          font-size: 0.75rem;
+          font-weight: bold;
+          padding: 3px 8px;
+          border-radius: 20px;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          transition: all 0.2s ease;
+
+          &:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+          }
+        }
+
+        .main-photo-badge {
+          position: absolute;
+          bottom: -10px;
+          left: 50%;
+          transform: translateX(-50%);
+          background-color: #28a745;
+          color: white;
+          font-size: 0.75rem;
+          font-weight: bold;
+          padding: 3px 8px;
+          border-radius: 20px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+      }
+
+      .photo-label {
+        font-size: 0.9rem;
+        text-align: center;
+        color: #495057;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.camera-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  background-color: #fff;
+
+  h5 {
+    align-self: flex-start;
+    margin-bottom: 15px;
+    color: #343a40;
+    font-weight: 600;
+  }
+
+  .camera-feed {
+    width: 100%;
+    max-width: 640px;
+    height: auto;
+    border-radius: 8px;
+    border: 2px solid #007bff;
+    margin-bottom: 15px;
+  }
+
+  .camera-controls {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+  }
+}
+
+.preview-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+
+  .preview-image {
+    width: 100%;
+    max-width: 640px;
+    height: auto;
+    border-radius: 8px;
+    border: 2px solid #28a745;
+    margin-bottom: 15px;
+  }
+
+  .preview-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+}
+
+.photo-details-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  background-color: #fff;
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  label {
+    font-weight: 500;
+    color: #495057;
+  }
+}
+
+.cancel-section {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* Dialog styles */
+:host ::ng-deep {
+  .camera-dialog-content {
+    .camera-feed {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      border: 2px solid #007bff;
+      margin-bottom: 15px;
+    }
+
+    .preview-image {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      border: 2px solid #28a745;
+      margin-bottom: 15px;
+    }
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .photo-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+  }
+
+  .photo-image {
+    width: 100px !important;
+    height: 100px !important;
+  }
+
+  .photo-label {
+    font-size: 0.8rem !important;
+  }
+}

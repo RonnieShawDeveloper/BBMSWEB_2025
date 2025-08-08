@@ -130,6 +130,22 @@ $box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
           border-color: $secondary-color;
         }
 
+        &.pending-btn {
+          background-color: #87CEFA; // Light blue color
+          color: $text-primary;
+          border-color: #87CEFA;
+
+          &:hover {
+            background-color: darken(#87CEFA, 5%);
+          }
+
+          &.active {
+            background-color: $secondary-color;
+            color: white;
+            border-color: $secondary-color;
+          }
+        }
+
         i {
           font-size: 1rem;
         }

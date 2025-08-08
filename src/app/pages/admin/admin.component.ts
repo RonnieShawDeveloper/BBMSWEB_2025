@@ -24,6 +24,7 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
   allMembers: Members[] = [];
   originalAllMembers: Members[] = [];
   showLoggedInTodayOnly = false;
+  showPendingOnly = false;
   subscriptions: any[] = [];
   dt1: Table | undefined;
 
@@ -170,6 +171,8 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       this.originalAllMembers = [...this.allMembers]; // Create a backup of the original list
       if (this.showLoggedInTodayOnly) {
         this.applyTodayFilter(); // Re-apply the filter if it was active
+      } else if (this.showPendingOnly) {
+        this.applyPendingFilter(); // Re-apply the pending filter if it was active
       }
 
       // Update dashboard charts and statistics with the latest data
@@ -483,8 +486,19 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
 
   toggleLoggedInTodayFilter() {
     this.showLoggedInTodayOnly = !this.showLoggedInTodayOnly;
+    this.showPendingOnly = false; // Turn off pending filter when toggling today filter
     if (this.showLoggedInTodayOnly) {
       this.applyTodayFilter();
+    } else {
+      this.allMembers = [...this.originalAllMembers]; // Restore from backup
+    }
+  }
+
+  togglePendingFilter() {
+    this.showPendingOnly = !this.showPendingOnly;
+    this.showLoggedInTodayOnly = false; // Turn off today filter when toggling pending filter
+    if (this.showPendingOnly) {
+      this.applyPendingFilter();
     } else {
       this.allMembers = [...this.originalAllMembers]; // Restore from backup
     }
@@ -503,6 +517,12 @@ export class AdminComponent implements OnInit, OnDestroy, AfterViewInit {
       return loginDate.getFullYear() === today.getFullYear() &&
              loginDate.getMonth() === today.getMonth() &&
              loginDate.getDate() === today.getDate();
+    });
+  }
+
+  applyPendingFilter() {
+    this.allMembers = this.originalAllMembers.filter(member => {
+      return member.status === 'New';
     });
   }
 }

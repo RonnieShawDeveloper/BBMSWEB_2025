@@ -14,18 +14,21 @@ import Swal from "sweetalert2";
   animations: [
     trigger('fade', [
       transition('void => *', [
-        style({opacity: 0, height: 0, overflow: 'hidden'}),
-        animate(500, keyframes([
-          style({height: '*', offset: .5}),
-          style({opacity: 1, offset: 1})
-        ]))
+        style({opacity: 0, transform: 'translateX(50px)'}),
+        animate('500ms ease-out', style({opacity: 1, transform: 'translateX(0)'}))
       ]),
       transition('* => void', [
-        animate(500, keyframes([
-          style({height: 0, offset: 0}),
-          style({opacity: 0, offset: .5})
-        ]))
+        animate('500ms ease-in', style({opacity: 0, transform: 'translateX(-50px)'}))
       ]),
+    ]),
+    trigger('stepTransition', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(50px)' }),
+        animate('500ms ease-out', style({ opacity: 1, transform: 'translateX(0)' }))
+      ]),
+      transition(':leave', [
+        animate('500ms ease-in', style({ opacity: 0, transform: 'translateX(-50px)' }))
+      ])
     ])
   ]
 })
@@ -46,6 +49,22 @@ export class RegisterComponent implements OnInit {
   page1Invalid = false;
 
   mobNumberPattern = '^[2-9]\\d{2}-\\d{3}-\\d{4}$';
+
+  /**
+   * Calculates the progress percentage for the stepper progress bar
+   * @returns {number} The percentage of completion (25%, 50%, 75%, or 100%)
+   */
+  getProgressPercentage(): number {
+    if (this.screenFour) {
+      return 100;
+    } else if (this.screenThree) {
+      return 75;
+    } else if (this.screenTwo) {
+      return 50;
+    } else {
+      return 25;
+    }
+  }
 
 
   constructor(private authService: AuthService, private router: Router) { }
@@ -87,66 +106,97 @@ export class RegisterComponent implements OnInit {
 
 
   }
+  /**
+   * Validates the cell phone number format
+   */
   checkCell() {
+    const cellNumber: HTMLInputElement = document.getElementById('phoneNumber') as HTMLInputElement;
+
     if (this.newMember.cellPhone !== undefined && !this.newMember.cellPhone.match(this.mobNumberPattern)) {
-      const cellNumber: HTMLInputElement = document.getElementById('phoneNumber') as HTMLInputElement;
-      cellNumber.setAttribute('style', 'background-color: red; color: white; width: 430px');
+      cellNumber.classList.remove('is-valid');
+      cellNumber.classList.add('is-invalid');
     } else if (this.newMember.cellPhone !== undefined && this.newMember.cellPhone.match(this.mobNumberPattern)) {
-      const cellNumber: HTMLInputElement = document.getElementById('phoneNumber') as HTMLInputElement;
-      cellNumber.setAttribute('style', 'background-color: green; color: white; width: 430px');
+      cellNumber.classList.remove('is-invalid');
+      cellNumber.classList.add('is-valid');
     }
   }
 
+  /**
+   * Clears the cell phone validation styling
+   */
   clearCell() {
     const cellNumber: HTMLInputElement = document.getElementById('phoneNumber') as HTMLInputElement;
-    cellNumber.setAttribute('style', 'background-color: white; color: black; width: 430px');
+    cellNumber.classList.remove('is-valid', 'is-invalid');
   }
 
+  /**
+   * Validates that both password fields match
+   */
   checkPass() {
-    console.log(this.newMember.password + ' ' + this.passCheck);
-    if (this.passCheck !== '' && this.newMember.password !== '' && this.newMember.password !== this.passCheck) {
-      const pass1: HTMLInputElement = document.getElementById('password') as HTMLInputElement;
-      const pass2: HTMLInputElement = document.getElementById('password2') as HTMLInputElement;
-      pass1.setAttribute('style', 'background-color: red; color: white; width: 300px');
-      pass2.setAttribute('style', 'background-color: red; color: white; width: 300px');
-    } else if (this.passCheck !== '' && this.newMember.password !== '' && this.newMember.password === this.passCheck) {
-      const pass1: HTMLInputElement = document.getElementById('password') as HTMLInputElement;
-      const pass2: HTMLInputElement = document.getElementById('password2') as HTMLInputElement;
-      pass1.setAttribute('style', 'background-color: green; color: white; width: 300px');
-      pass2.setAttribute('style', 'background-color: green; color: white; width: 300px');
+    const pass1: HTMLInputElement = document.getElementById('password') as HTMLInputElement;
+    const pass2: HTMLInputElement = document.getElementById('password2') as HTMLInputElement;
+
+    if (this.passCheck !== '' && this.newMember.password !== '') {
+      if (this.newMember.password !== this.passCheck) {
+        pass1.classList.remove('is-valid');
+        pass2.classList.remove('is-valid');
+        pass1.classList.add('is-invalid');
+        pass2.classList.add('is-invalid');
+      } else {
+        pass1.classList.remove('is-invalid');
+        pass2.classList.remove('is-invalid');
+        pass1.classList.add('is-valid');
+        pass2.classList.add('is-valid');
+      }
     }
   }
 
+  /**
+   * Validates the email format
+   */
   checkEmail() {
     const emailRegex = '(?:[a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\\])';
+    const emailEle: HTMLInputElement = document.getElementById('emailAddress') as HTMLInputElement;
+
     if (!this.newMember.email.match(emailRegex)) {
-      const emailEle: HTMLInputElement = document.getElementById('emailAddress') as HTMLInputElement;
-      emailEle.setAttribute('style', 'width: 430px; background-color: red; color: white');
-    } else if (this.newMember.email.match(emailRegex)) {
-      const emailEle: HTMLInputElement = document.getElementById('emailAddress') as HTMLInputElement;
-      emailEle.setAttribute('style', 'width: 430px; background-color: green; color: white');
+      emailEle.classList.remove('is-valid');
+      emailEle.classList.add('is-invalid');
+    } else {
+      emailEle.classList.remove('is-invalid');
+      emailEle.classList.add('is-valid');
     }
   }
 
+  /**
+   * Clears the email validation styling
+   */
   resetEmail() {
     const emailEle: HTMLInputElement = document.getElementById('emailAddress') as HTMLInputElement;
-    emailEle.setAttribute('style', 'width: 430px; background-color: white; color: black');
+    emailEle.classList.remove('is-valid', 'is-invalid');
   }
 
-
+  /**
+   * Clears the password validation styling and resets the confirmation field
+   */
   clearPass() {
     const pass1: HTMLInputElement = document.getElementById('password') as HTMLInputElement;
     const pass2: HTMLInputElement = document.getElementById('password2') as HTMLInputElement;
-    pass1.setAttribute('style', 'background-color: white; color: black; width: 300px');
-    pass2.setAttribute('style', 'background-color: white; color: black; width: 300px');
+
+    pass1.classList.remove('is-valid', 'is-invalid');
+    pass2.classList.remove('is-valid', 'is-invalid');
     pass2.value = '';
   }
 
+  /**
+   * Capitalizes the first letter of name fields and validates input
+   */
   capitalize(event) {
+    const ele: HTMLInputElement = event.target as HTMLInputElement;
+
     if (event.target.value !== undefined && event.target.value.length >= 1) {
-      event.target.style.backgroundColor = 'green';
-      event.target.style.color = 'white';
-      const ele: HTMLInputElement = event.target as HTMLInputElement;
+      ele.classList.remove('is-invalid');
+      ele.classList.add('is-valid');
+
       if (ele.id === 'firstName') {
         this.newMember.fName = this.newMember.fName.charAt(0).toUpperCase() + this.newMember.fName.slice(1).toLowerCase();
       }
@@ -157,9 +207,8 @@ export class RegisterComponent implements OnInit {
         this.newMember.lName = this.newMember.lName.charAt(0).toUpperCase() + this.newMember.lName.slice(1).toLowerCase();
       }
     } else {
-      event.target.style.backgroundColor = 'white';
-      event.target.style.color = 'black';
-
+      ele.classList.remove('is-valid');
+      ele.classList.add('is-invalid');
     }
   }
 
@@ -198,47 +247,91 @@ export class RegisterComponent implements OnInit {
 
   }
 
+  /**
+   * Validates and submits the first step of the registration form
+   */
   submitpage1() {
     this.page1Invalid = false;
+
+    // Check required fields
     Array.from(document.getElementsByTagName('input') as HTMLCollection).forEach(node => {
       const curElement: HTMLInputElement = node as HTMLInputElement;
       const eleID = curElement.id;
+
       if (eleID === 'firstName' ||
         eleID === 'lastName' ||
         eleID === 'emailAddress' ||
         eleID === 'phoneNumber' ||
         eleID === 'password') {
         if (curElement.value === '') {
-          curElement.setAttribute('style', 'width:' + curElement.style.width + ';background-color: yellow; color: white');
+          curElement.classList.remove('is-valid');
+          curElement.classList.add('is-invalid');
           this.page1Invalid = true;
         }
       }
-      if (curElement.style.backgroundColor === 'yellow' || curElement.style.backgroundColor === 'red') {
-        this.page1Invalid = true;
-        console.log('Page Invalid');
-      }
 
+      // Check if any field has validation errors
+      if (curElement.classList.contains('is-invalid')) {
+        this.page1Invalid = true;
+      }
     });
-    // If page form is valid, continue
+
+    // If page form is valid, continue to next step
     if (this.page1Invalid === false) {
       // check members and see if this email already exist in database
-
       // if all is well, go on to the next page
       this.screenOne = false;
       this.screenTwo = true;
+    } else {
+      // Show validation message
+      Swal.fire({
+        title: 'Form Validation',
+        text: 'Please complete all required fields correctly before continuing.',
+        icon: 'warning',
+        confirmButtonText: 'OK'
+      });
     }
   }
 
+  /**
+   * Validates and submits the second step of the registration form
+   */
   submitpage2() {
-    if (typeof this.newMember.requested !== 'undefined') {
+    const positionSelect = document.getElementById('position') as HTMLSelectElement;
+
+    if (typeof this.newMember.requested !== 'undefined' && this.newMember.requested !== '') {
+      positionSelect.classList.remove('is-invalid');
+      positionSelect.classList.add('is-valid');
       this.screenTwo = false;
       this.screenThree = true;
     } else {
-      document.getElementById('position').setAttribute('style', 'background-color: red; color: white');
+      positionSelect.classList.remove('is-valid');
+      positionSelect.classList.add('is-invalid');
+
+      Swal.fire({
+        title: 'Department Required',
+        text: 'Please select your department before continuing.',
+        icon: 'warning',
+        confirmButtonText: 'OK'
+      });
     }
   }
 
+  /**
+   * Submits the final registration form and creates the user account
+   */
   submitpage3() {
+    // Show loading indicator
+    Swal.fire({
+      title: 'Creating Account',
+      text: 'Please wait while we process your registration...',
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      willOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
     this.newMember.name = this.newMember.fName + ' ' + this.newMember.mName + ' ' + this.newMember.lName;
     this.authService.register(this.newMember.email, this.newMember.password)
       .then(res => {
@@ -250,6 +343,7 @@ export class RegisterComponent implements OnInit {
           this.authService.saveNewMember(this.newMember);
           this.screenThree = false;
           this.screenFour = true;
+          Swal.close();
         }
       }).catch(err => {
       console.log(err);
@@ -276,19 +370,41 @@ export class RegisterComponent implements OnInit {
     });
   }
 
+  /**
+   * Clears input field styling when focused
+   */
   clearInput(event) {
-    if (event.target.style.backgroundColor !== 'green') {
-      event.target.style.backgroundColor = 'white';
-      event.target.style.color = 'black';
+    const element = event.target as HTMLInputElement;
+    if (!element.classList.contains('is-valid')) {
+      element.classList.remove('is-valid', 'is-invalid');
     }
   }
 
+  /**
+   * Clears all form fields and resets validation styling
+   */
   clearForm() {
     Array.from(document.getElementsByTagName('input') as HTMLCollection).forEach(node => {
       const curElement: HTMLInputElement = node as HTMLInputElement;
-      curElement.setAttribute('style', 'width:' + curElement.style.width + ';background-color: white; color: black');
+      curElement.classList.remove('is-valid', 'is-invalid');
       curElement.value = '';
     });
+
+    // Reset model values
+    this.newMember = {
+      fName: '',
+      lName: '',
+      email: '',
+      cellPhone: '',
+      password: '',
+      mName: '',
+      requested: '',
+      position: '',
+      workPhone: '',
+      comments: ''
+    };
+
+    this.passCheck = '';
   }
 
   doCancel() {

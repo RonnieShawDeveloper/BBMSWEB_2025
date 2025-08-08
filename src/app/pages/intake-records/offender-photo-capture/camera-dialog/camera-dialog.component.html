@@ -1,0 +1,40 @@
+<h2 mat-dialog-title>Taking Photo: {{data.photoTypeLabel}}</h2>
+
+<mat-dialog-content class="camera-dialog-content">
+  <!-- Camera Feed -->
+  <div *ngIf="isCameraActive" class="camera-container">
+    <video #dialogCameraFeed autoplay class="camera-feed"></video>
+  </div>
+
+  <!-- Photo Preview -->
+  <div *ngIf="!isCameraActive" class="preview-container">
+    <img [src]="snapshotDataUrl" class="preview-image" alt="Photo Preview">
+  </div>
+
+  <!-- Canvas for snapshot (hidden) -->
+  <canvas #dialogSnapshotCanvas style="display: none;"></canvas>
+
+  <!-- Photo Details Form -->
+  <div class="photo-details-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Photo Comment *Required</mat-label>
+      <input matInput [(ngModel)]="photoComment" placeholder="e.g., Front view, Left side, Tattoo on arm">
+    </mat-form-field>
+
+    <mat-checkbox [(ngModel)]="isMainPhoto" class="main-photo-checkbox">
+      Set as Main Photo
+    </mat-checkbox>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <ng-container *ngIf="isCameraActive">
+    <button mat-button (click)="cancel()">Cancel</button>
+    <button mat-raised-button color="primary" (click)="takeSnapshot()">Take Photo</button>
+  </ng-container>
+
+  <ng-container *ngIf="!isCameraActive">
+    <button mat-button (click)="retakePhoto()">Retake</button>
+    <button mat-raised-button color="primary" (click)="savePhoto()" [disabled]="!photoComment">Save</button>
+  </ng-container>
+</mat-dialog-actions>

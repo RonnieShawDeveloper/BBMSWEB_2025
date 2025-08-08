@@ -7,8 +7,12 @@ import { IntakeRecordsSearchComponent } from './intake-records-search/intake-rec
 import { IntakeRecordsCreateComponent } from './intake-records-create/intake-records-create.component';
 import { IntakeRecordsDetailsComponent } from './intake-records-details/intake-records-details.component';
 import { IntakeRecordsBookingComponent } from './intake-records-booking/intake-records-booking.component';
+import { HearingViewComponent } from './hearing-view/hearing-view.component';
+import { OffenderPhotoCaptureComponent } from './offender-photo-capture/offender-photo-capture.component';
 import { TimelineModule } from 'primeng/timeline';
 import { CardModule } from 'primeng/card';
+import { TableModule } from 'primeng/table';
+import { AccordionModule } from 'primeng/accordion';
 
 const routes: Routes = [
   {
@@ -26,7 +30,8 @@ const routes: Routes = [
     IntakeRecordsSearchComponent,
     IntakeRecordsCreateComponent,
     IntakeRecordsDetailsComponent,
-    IntakeRecordsBookingComponent
+    IntakeRecordsBookingComponent,
+    HearingViewComponent
   ],
   imports: [
     CommonModule,
@@ -34,10 +39,16 @@ const routes: Routes = [
     ReactiveFormsModule,
     RouterModule.forChild(routes),
     TimelineModule,
-    CardModule
+    CardModule,
+    TableModule,
+    AccordionModule,
+    OffenderPhotoCaptureComponent
   ],
   exports: [
-    IntakeRecordsComponent
+    IntakeRecordsComponent,
+    IntakeRecordsSearchComponent,
+    IntakeRecordsDetailsComponent,
+    IntakeRecordsBookingComponent
   ]
 })
 export class IntakeRecordsModule { }

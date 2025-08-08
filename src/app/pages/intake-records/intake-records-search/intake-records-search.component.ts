@@ -56,7 +56,7 @@ export class IntakeRecordsSearchComponent implements OnInit, OnDestroy {
 
   // Search for offenders in the local database
   searchOffenders(): void {
-    if (!this.lastName) {
+    if (!this.lastName || this.lastName.trim() === '') {
       Swal.fire({
         title: 'Input Required',
         text: 'Please enter at least a last name to search',
@@ -69,8 +69,9 @@ export class IntakeRecordsSearchComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.searchAttempted = true;
 
-    // Format the last name (capitalize first letter, lowercase rest)
-    const formattedLastName = this.lastName.charAt(0).toUpperCase() + this.lastName.slice(1).toLowerCase();
+    // Format the last name (trim whitespace, capitalize first letter, lowercase rest)
+    const trimmedLastName = this.lastName.trim();
+    const formattedLastName = trimmedLastName.charAt(0).toUpperCase() + trimmedLastName.slice(1).toLowerCase();
 
     // Query Firestore for offenders with matching last name
     this.subscriptions.push(
@@ -90,7 +91,7 @@ export class IntakeRecordsSearchComponent implements OnInit, OnDestroy {
 
   // Search for offenders in AFIS
   searchAfis(): void {
-    if (!this.lastName || !this.dob) {
+    if (!this.lastName || this.lastName.trim() === '' || !this.dob) {
       Swal.fire({
         title: 'Input Required',
         text: 'Please enter both last name and date of birth to search AFIS',
@@ -104,7 +105,8 @@ export class IntakeRecordsSearchComponent implements OnInit, OnDestroy {
     this.searchAttempted = true;
 
     // Format the last name and DOB for the AFIS API
-    const formattedLastName = this.lastName.charAt(0).toUpperCase() + this.lastName.slice(1).toLowerCase();
+    const trimmedLastName = this.lastName.trim();
+    const formattedLastName = trimmedLastName.charAt(0).toUpperCase() + trimmedLastName.slice(1).toLowerCase();
     const date = new Date(this.dob + 'T00:00:00');
     const formattedDOB = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
     const encodedDOB = encodeURIComponent(formattedDOB);

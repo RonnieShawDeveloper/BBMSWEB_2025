@@ -13,4 +13,5 @@ export interface PhotoTemplate {
   photoComment?: string;
   photoLat?: string;
   photoLon?: string;
+  photoShot?: string;
 }

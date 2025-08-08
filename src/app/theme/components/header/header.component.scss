@@ -1,13 +1,13 @@
 @import "../../../theme/styles/variables";
 
 .navbar.app-header{
-    padding: 0; 
+    padding: 0;
     z-index: 9;
-    -webkit-transition: z-index 0.5s linear;  
-    -moz-transition: z-index 0.5s linear;  
-    transition: z-index 0.5s linear;   
+    -webkit-transition: z-index 0.5s linear;
+    -moz-transition: z-index 0.5s linear;
+    transition: z-index 0.5s linear;
     .top-navbar{
-        padding: 0 1rem; 
+        padding: 0 1rem;
         height: $top-navbar-height;
         .logo{
             width: $sidebar-width - 30px;
@@ -16,12 +16,12 @@
             -ms-transform: translate3d(0,0,0);
             -o-transform: translate3d(0,0,0);
             transform: translate3d(0,0,0);
-        }  
+        }
     }
     &.logo-visible{
-        z-index: 99999;  
+        z-index: 99999;
     }
-   
+
 }
 
 
@@ -29,6 +29,35 @@
     span{
         font-size: 14px;
         cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        margin: 0 4px;
+    }
+
+    .header-button {
+        padding: 4px 8px;
+        font-size: 14px;
+        line-height: 20px;
+        border-radius: 8px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        vertical-align: middle;
+        margin: 0;
+    }
+
+    app-user-menu {
+        ::ng-deep .dropdown-toggle {
+            padding: 4px 8px;
+            font-size: 14px;
+            line-height: 20px;
+            border-radius: 8px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0;
+        }
     }
 }
 
@@ -71,17 +100,17 @@
             width: 0%;
             left: 50%;
         }
-        .line:nth-child(2){            
+        .line:nth-child(2){
             -webkit-transform: rotate(-45deg);
             -moz-transform: rotate(-45deg);
             -o-transform: rotate(-45deg);
-            transform: rotate(-45deg);         
+            transform: rotate(-45deg);
         }
         .line:nth-child(3){
             -webkit-transform: rotate(45deg);
             -moz-transform: rotate(45deg);
             -o-transform: rotate(45deg);
-            transform: rotate(45deg);            
+            transform: rotate(45deg);
         }
     }
 }
@@ -92,7 +121,7 @@
     padding: 0;
     font-size:27px;
     display: inline-block;
-    width: $sidebar-width;  
+    width: $sidebar-width;
     &:hover, &:focus{
         text-decoration: none;
         color: initial;

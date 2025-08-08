@@ -6,6 +6,7 @@ import { Booking } from '../../../models/booking';
 import { Offender } from '../../../models/offender';
 import { Count } from '../../../models/count';
 import { BookingEvents } from '../../../models/events';
+import { Hearings } from '../../../models/hearings';
 import { HelperService } from '../../../services/helper.service';
 import Swal from 'sweetalert2';
 
@@ -45,6 +46,12 @@ export class IntakeRecordsBookingComponent implements OnInit, OnDestroy {
   downloadURL3: Observable<string>;
   eventID: string;
 
+  // Hearings handling
+  hearings: Hearings[] = [];
+  selectedHearing: Hearings = {};
+  showHearingDetails: boolean = false;
+  showHearingView: boolean = false;
+
   // Subscriptions
   private subscriptions: Subscription[] = [];
 
@@ -74,6 +81,9 @@ export class IntakeRecordsBookingComponent implements OnInit, OnDestroy {
 
       // Load booking events
       this.loadBookingEvents();
+
+      // Load hearings for existing booking
+      this.loadHearings();
     }
   }
 
@@ -474,6 +484,40 @@ export class IntakeRecordsBookingComponent implements OnInit, OnDestroy {
             bookingStatus: 'Open',
             bailStatus: '',
           });
+
+          // Create a New Hearing Object to add to the Registrar New Listings
+          const hearing: Hearings = {
+            active: true,
+            newApplicationEmail: false,
+            bookingID: this.booking.id,
+            bailAppLink: url,
+            deniedBailChecked: false,
+            eventID: this.eventID,
+            grantBailChecked: false,
+            holdRulingChecked: false,
+            bailBondEmailed: false,
+            denyBailEmail: false,
+            grantBailEmail: false,
+            holdRulingEmail: false,
+            id: this.firestore.createId(),
+            offenderID: this.booking.linkedOffenderID || this.booking.offender,
+            offenderName: this.booking.offenderName || `${this.offender.lName}, ${this.offender.fName} ${this.offender.mName || ''}`.trim(),
+            registrarAck: false,
+            released: false,
+            disposition: 'pending',
+            unixDate: Date.now().toString(),
+          } as Hearings;
+
+          // Create a new hearing in the Firestore database
+          this.firestore.collection('hearings').doc(hearing.id).set(hearing);
+          console.log('Hearing: ', hearing);
+        });
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire({
+          title: 'Cancelled',
+          icon: 'error',
+          timer: 2000,
+          showConfirmButton: false,
         });
       }
     });
@@ -652,5 +696,104 @@ export class IntakeRecordsBookingComponent implements OnInit, OnDestroy {
     } else {
       this.close.emit();
     }
+  }
+
+  // Load hearings for the current booking
+  loadHearings(): void {
+    console.log("Load Hearings for Booking ID:", this.booking.id);
+    if (!this.booking.id) {
+      return;
+    }
+    console.log("Booking ID exists: ", this.booking.id);
+    this.subscriptions.push(
+      this.firestore.collection('hearings', ref =>
+        ref.where('bookingID', '==', this.booking.id)
+        .orderBy('unixDate', 'desc')
+      ).valueChanges().subscribe((hearings: Hearings[]) => {
+        this.hearings = hearings;
+        console.log("Hearings loaded: ", this.hearings);
+      })
+    );
+  }
+
+  // Convert Unix date to readable format
+  convertUnixDate(unixDate: string | number): string {
+    if (!unixDate) {
+      return 'N/A';
+    }
+
+    let timestamp: number;
+
+    // Handle both string and number types
+    if (typeof unixDate === 'string') {
+      // If unixDate is a string in milliseconds, convert to seconds
+      if (unixDate.length > 10) {
+        unixDate = unixDate.substring(0, 10);
+      }
+      timestamp = parseInt(unixDate);
+    } else {
+      // If unixDate is a number in milliseconds, convert to seconds
+      timestamp = unixDate > 10000000000 ? Math.floor(unixDate / 1000) : unixDate;
+    }
+
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  // Humanize date for relative time display
+  humanizeDate(unixDate: string | number): string {
+    if (!unixDate) {
+      return '';
+    }
+
+    let timestamp: number;
+
+    // Handle both string and number types
+    if (typeof unixDate === 'string') {
+      // If unixDate is a string in milliseconds, convert to seconds
+      timestamp = parseInt(unixDate);
+      if (unixDate.length > 10) {
+        timestamp = Math.floor(timestamp / 1000);
+      }
+    } else {
+      // If unixDate is a number in milliseconds, convert to seconds
+      timestamp = unixDate > 10000000000 ? Math.floor(unixDate / 1000) : unixDate;
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    const diff = now - timestamp;
+
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.floor(diff / 60) + ' minutes ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + ' hours ago';
+    if (diff < 2592000) return Math.floor(diff / 86400) + ' days ago';
+    if (diff < 31536000) return Math.floor(diff / 2592000) + ' months ago';
+    return Math.floor(diff / 31536000) + ' years ago';
+  }
+
+  // Check if hearing date is set
+  checkHearingDate(hearingDateUnix: string | number): boolean {
+    return !!hearingDateUnix;
+  }
+
+  // Clear table filters
+  clearHearingFilters(table: any): void {
+    table.clear();
+  }
+
+  // View hearing details
+  viewHearing(hearing: Hearings): void {
+    this.selectedHearing = hearing;
+    this.showHearingView = true;
+  }
+
+  // Close hearing details
+  closeHearingDetails(): void {
+    this.showHearingDetails = false;
+    this.showHearingView = false;
   }
 }

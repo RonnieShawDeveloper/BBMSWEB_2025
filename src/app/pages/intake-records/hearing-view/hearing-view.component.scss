@@ -1,0 +1,880 @@
+// Variables
+$primary-color: #1a73e8;
+$secondary-color: #5f6368;
+$accent-color: #4285f4;
+$success-color: #0f9d58;
+$warning-color: #f4b400;
+$danger-color: #db4437;
+$dark-color: #000040;
+$light-color: #ffffff;
+$gray-50: #f9fafb;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #6c757d;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
+
+$border-radius: 8px;
+$card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+$transition-speed: 0.3s;
+
+// Mixins
+@mixin glassmorphism {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+@mixin card {
+  background: $light-color;
+  border-radius: $border-radius;
+  box-shadow: $card-shadow;
+  transition: transform $transition-speed, box-shadow $transition-speed;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+  }
+}
+
+// Main Container
+.case-management-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: $gray-800;
+  font-family: 'Roboto', sans-serif;
+  overflow: hidden;
+}
+
+// Header
+.header {
+  background: $dark-color;
+  color: $light-color;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+
+  .title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-exit {
+    background: $danger-color;
+    color: $light-color;
+    border: none;
+    border-radius: $border-radius;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background-color $transition-speed;
+
+    &:hover {
+      background: darken($danger-color, 10%);
+    }
+
+    i {
+      font-size: 1rem;
+    }
+  }
+}
+
+// Dashboard Content
+.dashboard-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+// Navigation Sidebar
+.navigation-sidebar {
+  width: 220px;
+  background: $dark-color;
+  color: $light-color;
+  padding: 1.5rem 0;
+  overflow-y: auto;
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: background-color $transition-speed;
+    border-left: 3px solid transparent;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    &.active {
+      background-color: rgba(255, 255, 255, 0.15);
+      border-left: 3px solid $primary-color;
+    }
+
+    i {
+      font-size: 1.2rem;
+      margin-right: 0.75rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    span {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+  }
+}
+
+// Main Content Area
+.main-content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  background-color: $gray-100;
+}
+
+// Content Sections
+.content-section {
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .section-header {
+    margin-bottom: 1.5rem;
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: $gray-800;
+      margin: 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid $gray-300;
+    }
+  }
+}
+
+// Cards
+.card {
+  @include card;
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: $gray-100;
+    border-bottom: 1px solid $gray-300;
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0;
+      color: $gray-800;
+    }
+
+    .card-controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+// Offender Card
+.offender-card {
+  .info-row {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid $gray-200;
+
+    &:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: $gray-700;
+    }
+
+    .info-value {
+      color: $gray-800;
+    }
+  }
+}
+
+// Charges Card
+.charges-card {
+  .charge-item {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: $gray-50;
+    border-radius: $border-radius;
+    border-left: 4px solid $primary-color;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .charge-number {
+      font-weight: 600;
+      color: $gray-700;
+      margin-bottom: 0.25rem;
+    }
+
+    .charge-description {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .charge-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      .tag {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+
+      .drug-tag {
+        background-color: rgba($danger-color, 0.1);
+        color: $danger-color;
+      }
+
+      .alcohol-tag {
+        background-color: rgba($warning-color, 0.1);
+        color: darken($warning-color, 20%);
+      }
+
+      .sex-tag {
+        background-color: rgba($danger-color, 0.1);
+        color: $danger-color;
+      }
+
+      .child-tag {
+        background-color: rgba($danger-color, 0.1);
+        color: $danger-color;
+      }
+
+      .violent-tag {
+        background-color: rgba($danger-color, 0.1);
+        color: $danger-color;
+      }
+    }
+  }
+}
+
+// Status Card
+.status-card {
+  .status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid $gray-200;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .status-label {
+      font-weight: 600;
+      color: $gray-700;
+    }
+
+    .status-value {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      i {
+        font-size: 1.2rem;
+      }
+
+      &.status-granted {
+        color: $success-color;
+      }
+
+      &.status-denied {
+        color: $danger-color;
+      }
+
+      &.status-pending {
+        color: $warning-color;
+      }
+    }
+  }
+}
+
+// Documents Grid
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+
+  .document-card {
+    @include card;
+    display: flex;
+    padding: 1.5rem;
+    cursor: pointer;
+
+    .document-icon {
+      font-size: 2rem;
+      color: $primary-color;
+      margin-right: 1rem;
+    }
+
+    .document-info {
+      flex: 1;
+
+      h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0 0 0.25rem 0;
+      }
+
+      p {
+        font-size: 0.9rem;
+        color: $gray-600;
+        margin: 0;
+      }
+    }
+
+    .document-action {
+      .btn-view {
+        background-color: $primary-color;
+        color: $light-color;
+        border: none;
+        border-radius: $border-radius;
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: background-color $transition-speed;
+
+        &:hover {
+          background-color: darken($primary-color, 10%);
+        }
+
+        &.disabled {
+          background-color: $gray-400;
+          cursor: not-allowed;
+
+          &:hover {
+            background-color: $gray-400;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Judge Card
+.judge-card {
+  .current-assignment {
+    margin-bottom: 1rem;
+
+    .assignment-label {
+      font-size: 0.9rem;
+      color: $gray-600;
+      margin-bottom: 0.25rem;
+    }
+
+    .assignment-value {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+  }
+}
+
+// Hearing Date Card
+.hearing-date-card {
+  .current-date {
+    margin-bottom: 1rem;
+
+    .date-label {
+      font-size: 0.9rem;
+      color: $gray-600;
+      margin-bottom: 0.25rem;
+    }
+
+    .date-value {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+  }
+}
+
+// Bail Status Card
+.bail-status-card {
+  .status-display {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    .status-icon {
+      font-size: 3rem;
+
+      &.status-granted {
+        color: $success-color;
+      }
+
+      &.status-denied {
+        color: $danger-color;
+      }
+
+      &.status-pending {
+        color: $warning-color;
+      }
+    }
+
+    .status-text {
+      h4 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+      }
+
+      p {
+        margin: 0;
+        color: $gray-700;
+      }
+    }
+  }
+}
+
+// Bail Conditions Card
+.bail-conditions-card {
+  .condition-section {
+    margin-bottom: 2rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0 0 1rem 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid $gray-300;
+    }
+
+    .condition-value {
+      .report-location, .report-days, .report-time {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+
+        i {
+          color: $primary-color;
+        }
+      }
+
+      .report-days-list, .report-times-list, .special-conditions-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+
+        .day-badge, .time-badge, .condition-badge {
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          font-weight: 500;
+        }
+
+        .day-badge {
+          background-color: rgba($primary-color, 0.1);
+          color: $primary-color;
+        }
+
+        .time-badge {
+          background-color: rgba($accent-color, 0.1);
+          color: $accent-color;
+        }
+
+        .condition-badge {
+          background-color: rgba($warning-color, 0.1);
+          color: darken($warning-color, 20%);
+        }
+      }
+
+      .additional-conditions {
+        margin-top: 1.5rem;
+
+        h5 {
+          font-size: 1rem;
+          font-weight: 600;
+          margin: 0 0 0.5rem 0;
+        }
+
+        p {
+          margin: 0;
+          color: $gray-700;
+          white-space: pre-line;
+        }
+      }
+    }
+  }
+}
+
+// Bail Bond Card
+.bail-bond-card {
+  .bond-info {
+    .bond-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .bond-date {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      color: $gray-700;
+    }
+
+    .bond-actions {
+      .btn-view {
+        background-color: $primary-color;
+        color: $light-color;
+        border: none;
+        border-radius: $border-radius;
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: background-color $transition-speed;
+
+        &:hover {
+          background-color: darken($primary-color, 10%);
+        }
+      }
+    }
+  }
+}
+
+// Surety Card
+.surety-card {
+  .surety-info {
+    .surety-detail {
+      display: flex;
+      margin-bottom: 1rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .detail-label {
+        width: 100px;
+        font-weight: 600;
+        color: $gray-700;
+      }
+
+      .detail-value {
+        flex: 1;
+      }
+    }
+  }
+
+  .no-surety {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: $gray-600;
+    font-style: italic;
+
+    i {
+      color: $warning-color;
+    }
+  }
+}
+
+// Requirements Card
+.requirements-card {
+  .requirements-info {
+    .requirement-item {
+      display: flex;
+      margin-bottom: 1.5rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .requirement-label {
+        width: 100px;
+        font-weight: 600;
+        color: $gray-700;
+      }
+
+      .requirement-value {
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+
+        .day-badge {
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          font-weight: 500;
+          background-color: rgba($primary-color, 0.1);
+          color: $primary-color;
+        }
+
+        .time-badge {
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          font-weight: 500;
+          background-color: rgba($accent-color, 0.1);
+          color: $accent-color;
+        }
+      }
+    }
+  }
+
+  .no-requirements {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: $gray-600;
+    font-style: italic;
+
+    i {
+      color: $warning-color;
+    }
+  }
+}
+
+// Check-in History Card
+.checkin-history-card {
+  .loading-checkins {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    color: $gray-600;
+
+    i {
+      color: $primary-color;
+    }
+  }
+
+  .no-checkins {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: $gray-600;
+    font-style: italic;
+
+    i {
+      color: $warning-color;
+    }
+  }
+
+  .checkins-list {
+    .checkin-item {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background-color: $gray-50;
+      border-radius: $border-radius;
+      border-left: 4px solid $success-color;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &.non-compliant {
+        border-left-color: $danger-color;
+      }
+
+      .checkin-date, .checkin-time, .checkin-location, .checkin-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        i {
+          color: $primary-color;
+        }
+      }
+
+      .checkin-status {
+        margin-left: auto;
+      }
+    }
+  }
+}
+
+// Missed Check-ins Card
+.missed-checkins-card {
+  .missed-checkins-list {
+    .missed-item {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background-color: $gray-50;
+      border-radius: $border-radius;
+      border-left: 4px solid $danger-color;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .missed-date, .missed-day, .missed-time {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        i {
+          color: $danger-color;
+        }
+      }
+    }
+  }
+}
+
+// Buttons
+.btn-toggle {
+  background: none;
+  border: none;
+  color: $gray-600;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color $transition-speed;
+
+  &:hover {
+    background-color: $gray-200;
+  }
+
+  i {
+    font-size: 1rem;
+  }
+}
+
+.btn-primary {
+  background-color: $primary-color;
+  color: $light-color;
+  border: none;
+  border-radius: $border-radius;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background-color $transition-speed;
+
+  &:hover {
+    background-color: darken($primary-color, 10%);
+  }
+
+  i {
+    font-size: 1rem;
+  }
+}
+
+.btn-success {
+  background-color: $success-color;
+  color: $light-color;
+  border: none;
+  border-radius: $border-radius;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background-color $transition-speed;
+
+  &:hover {
+    background-color: darken($success-color, 10%);
+  }
+
+  i {
+    font-size: 1rem;
+  }
+}
+
+.btn-danger {
+  background-color: $danger-color;
+  color: $light-color;
+  border: none;
+  border-radius: $border-radius;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background-color $transition-speed;
+
+  &:hover {
+    background-color: darken($danger-color, 10%);
+  }
+
+  i {
+    font-size: 1rem;
+  }
+}
+
+.btn-view {
+  background-color: $primary-color;
+  color: $light-color;
+  border: none;
+  border-radius: $border-radius;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background-color $transition-speed;
+
+  &:hover {
+    background-color: darken($primary-color, 10%);
+  }
+
+  &.disabled {
+    background-color: $gray-400;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: $gray-400;
+    }
+  }
+
+  i {
+    font-size: 1rem;
+  }
+}

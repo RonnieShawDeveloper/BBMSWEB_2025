@@ -124,7 +124,7 @@ export class AuthService {
           }
           currentMember.lastLogin = user.user.metadata.lastSignInTime;
           currentMember.memberSince = user.user.metadata.creationTime;
-          console.log('Current Member: ',currentMember);
+          console.log('Current Member: ', currentMember);
           localStorage.setItem('member', JSON.stringify(currentMember));
           this.updateMemberRecord(currentMember);
           if (data[0].status === 'New') {
@@ -146,104 +146,109 @@ export class AuthService {
             // Format the lastLogin with data and time
             let lastLoginDate = lastLogin.toLocaleDateString() + ' ' + lastLogin.toLocaleTimeString();
             let membersince = user.user.metadata.creationTime;
-
-            Swal.fire({
-              icon: 'success',
-              title: 'You are logged in',
-              html: `
-                <div style="overflow: hidden; border: solid 1px black; border-radius: 10px">
-                  <div class="row">
-                      <div class="col" style="text-align: center;background: var(--blue);color: var(--light);">
-                        <span style="font-weight: bold;font-size: 19px;">Welcome ${currentMember.fName}</span>
-                      </div>
-                  </div>
-                  <div class="row small" style="margin-top: 5px;margin-bottom: 5px;">
-                      <div class="col d-flex flex-column align-items-sm-center" style="background: #f9f0f0;">
-                        <span style="font-weight: bold;">Your Last Login was</span><span>${currentMember.lastLogin}</span>
-                      </div>
-                  </div>
-                  <div class="row small">
-                      <div class="col d-flex flex-column align-items-sm-center" style="background: #f9f0f0;">
-                        <span style="font-weight: bold;">You have been a member since</span><span>${currentMember.memberSince}</span>
-                      </div>
-                  </div>
-                    <div class="m-1 text-danger font-weight-bold text-center">
-                    YOUR IP ADDRESS (${this.ipAddress}) HAS BEEN LOGGED AND ALL MOVEMENT, CHANGES, DELETIONS, AND UPDATES ARE BEING MONITORED AND RECORDED.
-                    </div>
-                </div>`,
-              confirmButtonText: 'Ok'
-            });
             this.router.navigate(['/']);
+
+            //           Swal.fire({
+            //             icon: 'success',
+            //             title: 'You are logged in',
+            //             html: `
+            //               <div style="overflow: hidden; border: solid 1px black; border-radius: 10px">
+            //                 <div class="row">
+            //                     <div class="col" style="text-align: center;background: var(--blue);color: var(--light);">
+            //                       <span style="font-weight: bold;font-size: 19px;">Welcome ${currentMember.fName}</span>
+            //                     </div>
+            //                 </div>
+            //                 <div class="row small" style="margin-top: 5px;margin-bottom: 5px;">
+            //                     <div class="col d-flex flex-column align-items-sm-center" style="background: #f9f0f0;">
+            //                       <span style="font-weight: bold;">Your Last Login was</span><span>${currentMember.lastLogin}</span>
+            //                     </div>
+            //                 </div>
+            //                 <div class="row small">
+            //                     <div class="col d-flex flex-column align-items-sm-center" style="background: #f9f0f0;">
+            //                       <span style="font-weight: bold;">You have been a member since</span><span>${currentMember.memberSince}</span>
+            //                     </div>
+            //                 </div>
+            //                   <div class="m-1 text-danger font-weight-bold text-center">
+            //                   YOUR IP ADDRESS (${this.ipAddress}) HAS BEEN LOGGED AND ALL MOVEMENT, CHANGES, DELETIONS, AND UPDATES ARE BEING MONITORED AND RECORDED.
+            //                   </div>
+            //               </div>`,
+            //             confirmButtonText: 'Ok'
+            //           });
+            //           this.router.navigate(['/']);
+            //         }
+            //       });
+            //     })
+            //     .catch((error: FirebaseError) => {
+            //       // Create a Swal Alert providing the user with the error message from Firebase
+            //       Swal.fire({
+            //         icon: 'error',
+            //         title: 'Login Error',
+            //         text: error.message,
+            //         confirmButtonText: 'Ok'
+            //       });
+            //     });
+            // }
+
+
+            /**
+             * Logs in a user with the given email and password, leveraging OpenAI for error handling
+             * @param {string} email - The email of the user
+             * @param {string} password - The password of the user
+             * @param {Function} handleOpenAIResponse - Callback to send messages via OpenAI
+             * @returns {Promise<void>} - A promise that resolves when the login is successful
+             */
+            // async loginAI(email: string, password: string, handleOpenAIResponse: (message: string) => void): Promise<void> {
+            //   try {
+            //     const userCredential = await this.afAuth.signInWithEmailAndPassword(email, password);
+
+            //     // Handle successful login
+            //     this.saveAuthExpiration();
+            //     this.checkAuthExpiration();
+            //     this.getSingleMember(userCredential.user.uid);
+
+            //     this.singleMember.pipe(take(1)).subscribe(async (data) => {
+            //       if (data.length === 0) {
+            //         handleOpenAIResponse(
+            //           `There was a problem finding your account. Please contact the administrator for assistance.`
+            //         );
+            //         return;
+            //       }
+
+            //       let currentMember = data[0];
+            //       currentMember.ipAddress = this.ipAddress;
+
+            //       // Check for email mismatch
+            //       if (currentMember.email !== email && !currentMember.emailMismatch) {
+            //         handleOpenAIResponse(
+            //           `The email address you used (${email}) does not match our records (${currentMember.email}). Would you like to update it?`
+            //         );
+            //         currentMember.emailMismatch = true;
+            //         await this.updateMemberRecord(currentMember);
+            //         return;
+            //       }
+
+            //       // Success response
+            //       handleOpenAIResponse(
+            //         `Welcome back, ${currentMember.fName}! Your last login was on ${new Date(
+            //           userCredential.user.metadata.lastSignInTime
+            //         ).toLocaleString()} and you have been a member since ${new Date(
+            //           currentMember.memberSince
+            //         ).toLocaleString()}. I will now direct you to the Dashboard`
+            //       );
+
+            //       setTimeout(() => {
+            //         this.router.navigate(['/']); // Navigate to the root route
+            //       }, 5000);
+            //     });
+            //   } catch (error: any) {
+            //     const errorMessage = this.getFirebaseErrorMessage(error.code);
+            //     handleOpenAIResponse(errorMessage);
+            //   }
+            // }
           }
-        });
+        })
       })
-      .catch((error: FirebaseError) => {
-        // Create a Swal Alert providing the user with the error message from Firebase
-        Swal.fire({
-          icon: 'error',
-          title: 'Login Error',
-          text: error.message,
-          confirmButtonText: 'Ok'
-        });
-      });
   }
-
-
-  /**
-   * Logs in a user with the given email and password, leveraging OpenAI for error handling
-   * @param {string} email - The email of the user
-   * @param {string} password - The password of the user
-   * @param {Function} handleOpenAIResponse - Callback to send messages via OpenAI
-   * @returns {Promise<void>} - A promise that resolves when the login is successful
-   */
-  // async loginAI(email: string, password: string, handleOpenAIResponse: (message: string) => void): Promise<void> {
-  //   try {
-  //     const userCredential = await this.afAuth.signInWithEmailAndPassword(email, password);
-
-  //     // Handle successful login
-  //     this.saveAuthExpiration();
-  //     this.checkAuthExpiration();
-  //     this.getSingleMember(userCredential.user.uid);
-
-  //     this.singleMember.pipe(take(1)).subscribe(async (data) => {
-  //       if (data.length === 0) {
-  //         handleOpenAIResponse(
-  //           `There was a problem finding your account. Please contact the administrator for assistance.`
-  //         );
-  //         return;
-  //       }
-
-  //       let currentMember = data[0];
-  //       currentMember.ipAddress = this.ipAddress;
-
-  //       // Check for email mismatch
-  //       if (currentMember.email !== email && !currentMember.emailMismatch) {
-  //         handleOpenAIResponse(
-  //           `The email address you used (${email}) does not match our records (${currentMember.email}). Would you like to update it?`
-  //         );
-  //         currentMember.emailMismatch = true;
-  //         await this.updateMemberRecord(currentMember);
-  //         return;
-  //       }
-
-  //       // Success response
-  //       handleOpenAIResponse(
-  //         `Welcome back, ${currentMember.fName}! Your last login was on ${new Date(
-  //           userCredential.user.metadata.lastSignInTime
-  //         ).toLocaleString()} and you have been a member since ${new Date(
-  //           currentMember.memberSince
-  //         ).toLocaleString()}. I will now direct you to the Dashboard`
-  //       );
-
-  //       setTimeout(() => {
-  //         this.router.navigate(['/']); // Navigate to the root route
-  //       }, 5000);
-  //     });
-  //   } catch (error: any) {
-  //     const errorMessage = this.getFirebaseErrorMessage(error.code);
-  //     handleOpenAIResponse(errorMessage);
-  //   }
-  // }
 
   async loginAI(email: string, password: string, handleOpenAIResponse: (message: string) => void): Promise<void> {
     try {

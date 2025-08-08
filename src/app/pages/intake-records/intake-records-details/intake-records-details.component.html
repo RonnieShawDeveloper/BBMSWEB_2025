@@ -32,19 +32,15 @@
             <img [src]="photoURL || offender.mainPhoto || 'assets/img/users/default-user.jpg'"
                  class="img-fluid rounded" alt="Offender Photo">
           </div>
-          <div *ngIf="isEditing" class="custom-file mb-3">
-            <input type="file" class="custom-file-input" id="photoUpload"
-                   (change)="onPhotoSelected($event)" accept="image/*">
-            <label class="custom-file-label" for="photoUpload">Choose photo...</label>
+          <div class="mb-3">
+            <button class="btn btn-primary btn-sm" (click)="openPhotoCapture()">
+              <i class="fa fa-camera"></i> Capture Photos
+            </button>
           </div>
           <div *ngIf="isUploading" class="progress mb-3">
             <div class="progress-bar progress-bar-striped progress-bar-animated"
                  [style.width.%]="uploadProgress"></div>
           </div>
-          <button *ngIf="isEditing && selectedPhoto" class="btn btn-info btn-sm"
-                  (click)="updatePhoto()" [disabled]="isUploading">
-            <i class="fa fa-upload"></i> Update Photo
-          </button>
         </div>
       </div>
 
@@ -54,18 +50,193 @@
           <h6 class="mb-0">AFIS Information</h6>
         </div>
         <div class="card-body">
+          <!-- Loading indicator -->
+          <div *ngIf="isLoadingAfis" class="text-center">
+            <i class="fa fa-spinner fa-spin"></i> Loading AFIS records...
+          </div>
+
+          <!-- Error message -->
+          <div *ngIf="afisError" class="alert alert-danger">
+            {{ afisError }}
+          </div>
+
+          <!-- No records message with fingerprint prompt -->
+          <div *ngIf="!isLoadingAfis && afisRecords.length === 0 && !afisError" class="alert alert-warning">
+            <i class="fa fa-fingerprint"></i> The Offender needs to be Fingerprinted.
+          </div>
+
+          <!-- Link to AFIS button (only shown for temporary IDs when AFIS records exist) -->
+          <div *ngIf="offender.spn && offender.spn.startsWith('TEMP-') && afisRecords.length > 0" class="mb-3">
+            <button class="btn btn-success btn-block" (click)="linkToAfisRecord()">
+              <i class="fa fa-link"></i> LINK TO AFIS RECORD
+            </button>
+          </div>
+
+          <!-- Current AFIS ID (always shown) -->
           <div class="form-group">
-            <label>AFIS ID</label>
+            <label>Current AFIS ID</label>
             <div class="input-group">
               <input type="text" class="form-control" [value]="offender.spn || 'N/A'" readonly>
             </div>
           </div>
+
+          <!-- AFIS Source (always shown) -->
           <div class="form-group">
             <label>AFIS Source</label>
             <div class="input-group">
               <input type="text" class="form-control" [value]="offender.jetAfis || 'N/A'" readonly>
             </div>
           </div>
+
+          <!-- AFIS Records Accordion -->
+          <p-accordion *ngIf="afisRecords.length > 0">
+            <p-accordionTab *ngFor="let record of afisRecords; let i = index"
+                           [header]="'AFIS Record #' + record.id + ' (' + (record.datetime || 'N/A') + ')'"
+                           [selected]="i === 0">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>AFIS ID</label>
+                    <input type="text" class="form-control" [value]="record.id || 'N/A'" readonly>
+                  </div>
+                  <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" class="form-control" [value]="(record.fName || '') + ' ' + (record.mName || '') + ' ' + (record.lName || '')" readonly>
+                  </div>
+                  <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="text" class="form-control" [value]="record.dob || 'N/A'" readonly>
+                  </div>
+                  <div class="form-group">
+                    <label>Gender</label>
+                    <input type="text" class="form-control" [value]="record.sex || 'N/A'" readonly>
+                  </div>
+                  <div class="form-group">
+                    <label>Race</label>
+                    <input type="text" class="form-control" [value]="record.race || 'N/A'" readonly>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>AFIS Source</label>
+                    <input type="text" class="form-control" [value]="record.afis || 'N/A'" readonly>
+                  </div>
+                  <div class="form-group">
+                    <label>Officer</label>
+                    <input type="text" class="form-control" [value]="record.officer || 'N/A'" readonly>
+                  </div>
+                  <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" class="form-control" [value]="record.location || 'N/A'" readonly>
+                  </div>
+                  <div class="form-group">
+                    <label>Date/Time</label>
+                    <input type="text" class="form-control" [value]="record.datetime || 'N/A'" readonly>
+                  </div>
+                  <div class="form-group">
+                    <label>Comment</label>
+                    <textarea class="form-control" rows="2" readonly>{{ record.comment || 'N/A' }}</textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Additional AFIS information in collapsible sections -->
+              <p-accordion>
+                <p-accordionTab header="Physical Characteristics">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>Height</label>
+                        <input type="text" class="form-control" [value]="record.height || 'N/A'" readonly>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>Weight</label>
+                        <input type="text" class="form-control" [value]="record.weight || 'N/A'" readonly>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>Hair</label>
+                        <input type="text" class="form-control" [value]="record.hair || 'N/A'" readonly>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>Eyes</label>
+                        <input type="text" class="form-control" [value]="record.eyes || 'N/A'" readonly>
+                      </div>
+                    </div>
+                  </div>
+                </p-accordionTab>
+
+                <p-accordionTab header="Address Information">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Address Line 1</label>
+                        <input type="text" class="form-control" [value]="record.address1 || 'N/A'" readonly>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Address Line 2</label>
+                        <input type="text" class="form-control" [value]="record.address2 || 'N/A'" readonly>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>Locality</label>
+                        <input type="text" class="form-control" [value]="record.locality || 'N/A'" readonly>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>Island</label>
+                        <input type="text" class="form-control" [value]="record.island || 'N/A'" readonly>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>Country</label>
+                        <input type="text" class="form-control" [value]="record.country || 'N/A'" readonly>
+                      </div>
+                    </div>
+                  </div>
+                </p-accordionTab>
+
+                <p-accordionTab header="Additional Information">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Alias</label>
+                        <input type="text" class="form-control" [value]="record.alias || 'N/A'" readonly>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Citizenship</label>
+                        <input type="text" class="form-control" [value]="record.citizenship || 'N/A'" readonly>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Place of Birth</label>
+                        <input type="text" class="form-control" [value]="record.pob || 'N/A'" readonly>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>SPN</label>
+                        <input type="text" class="form-control" [value]="record.spn || 'N/A'" readonly>
+                      </div>
+                    </div>
+                  </div>
+                </p-accordionTab>
+              </p-accordion>
+            </p-accordionTab>
+          </p-accordion>
         </div>
       </div>
     </div>

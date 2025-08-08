@@ -36,6 +36,10 @@
         <i class="fa fa-clock-o"></i>
         <span>{{showLoggedInTodayOnly ? 'Show All Users' : 'Show Active Today'}}</span>
       </button>
+      <button class="btn-filter pending-btn" [class.active]="showPendingOnly" (click)="togglePendingFilter()">
+        <i class="fa fa-user-plus"></i>
+        <span>{{showPendingOnly ? 'Show All Users' : 'Show All Pending'}}</span>
+      </button>
       <button class="btn-filter" (click)="clear(dt1)">
         <i class="fa fa-refresh"></i>
         <span>Reset Filters</span>

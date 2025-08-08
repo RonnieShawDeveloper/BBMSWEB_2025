@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>Assign Photo to Type</h2>
+
+<mat-dialog-content class="photo-assignment-dialog-content">
+  <!-- Photo Preview -->
+  <div class="photo-preview">
+    <img [src]="data.photo.photoUrl" alt="Photo to assign" class="preview-image">
+  </div>
+
+  <!-- Photo Type Selection -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Select Photo Type</mat-label>
+    <mat-select [(ngModel)]="selectedTypeId">
+      <mat-option *ngFor="let type of data.photoTypes" [value]="type.id">
+        {{type.label}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Main Photo Checkbox -->
+  <mat-checkbox [(ngModel)]="isMainPhoto" class="main-photo-checkbox">
+    Set as Main Photo
+  </mat-checkbox>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onAssign()">Assign</button>
+</mat-dialog-actions>

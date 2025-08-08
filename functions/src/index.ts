@@ -506,3 +506,411 @@ exports.newApplication = functions.firestore.document('hearings/{hearingId}').on
     functions.logger.error(error);
   }); // End SendApp
 }); // End New Application
+
+// Define the KioskCheckin interface for the functions
+interface KioskCheckin {
+  afisID: string; // Links the offender to the check-in
+  datetime: string;
+  location: string; // Police station the offender checked in at
+  name: string; // Offender name
+  photoURL?: string;
+  unix: string; // Unix timestamp of the check-in
+}
+
+// Define interfaces for the report data
+interface OffenderInfo {
+  name: string;
+  afisID: string;
+  photoURL: string;
+  checkInLocation: string;
+  bookingId: string;
+}
+
+interface CompliantOffender extends OffenderInfo {
+  checkinTime: string;
+  checkinLocation: string;
+}
+
+interface ViolationOffender extends OffenderInfo {
+  lastCheckin: string;
+}
+
+interface CheckinReport {
+  compliantOffenders: CompliantOffender[];
+  violationOffenders: ViolationOffender[];
+}
+
+/**
+ * Send an error notification to the specified admin
+ */
+async function sendErrorNotification(error: any, context: string): Promise<void> {
+  try {
+    // Admin member ID who should receive error notifications
+    const adminMemberId = '1WrrWMegVWvTVj4UwUzX';
+
+    // Get admin information
+    const adminDoc = await db.collection('members').doc(adminMemberId).get();
+    if (!adminDoc.exists) {
+      functions.logger.error('Admin member not found for error notification');
+      return;
+    }
+
+    const adminMember = adminDoc.data() as Members;
+
+    // Generate HTML error report
+    const now = new Date();
+    const timestamp = now.toLocaleString('en-US', {
+      timeZone: 'America/Nassau',
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric'
+    });
+
+    // Format the error message
+    let errorMessage = 'Unknown error';
+    if (error instanceof Error) {
+      errorMessage = `${error.name}: ${error.message}\n${error.stack || ''}`;
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    } else {
+      try {
+        errorMessage = JSON.stringify(error, null, 2);
+      } catch (e) {
+        errorMessage = String(error);
+      }
+    }
+
+    const html = `
+      <div style="text-align: center;"><img src="https://bbmsweb.com/assets/img/app/judiciary_logo.png" alt="Judiciary Logo"></div>
+      <div style="text-align: center;background: #ed0303;"><span style="font-weight: bold;font-size: 28px;color: rgb(240,242,244);">SIEM FUNCTION ERROR NOTIFICATION</span></div>
+      <div style="text-align: center;font-size: 16px;margin: 10px 0;">Error Timestamp: ${timestamp}</div>
+
+      <h2 style="color: #d9534f;">ERROR DETAILS</h2>
+      <div style="background-color: #f9f2f2; padding: 15px; border: 1px solid #d9534f; border-radius: 5px; margin-bottom: 20px;">
+        <p><strong>Context:</strong> ${context}</p>
+        <p><strong>Error:</strong></p>
+        <pre style="background-color: #f5f5f5; padding: 10px; border: 1px solid #ddd; white-space: pre-wrap;">${errorMessage}</pre>
+      </div>
+
+      <div style="text-align: center; margin-top: 20px; font-size: 12px;">
+        <p>This is an automated error notification from the SIEM system. Please investigate this issue.</p>
+      </div>
+    `;
+
+    // Encrypt the email body
+    const encryptedBody = encryptMessage(html);
+
+    // Create and send the email
+
+    // Create a document reference without specifying an ID
+    const docRef = db.collection('emails').doc();
+
+    // Use the auto-generated ID for the email object
+    const email = {
+      id: docRef.id,
+      sender: 'SIEM System',
+      senderId: 'SIEM-SYSTEM',
+      recipients: [adminMemberId],
+      recipientNames: [`${adminMember.fName} ${adminMember.lName}`],
+      subject: `SIEM Function Error - ${timestamp}`,
+      date: now.toISOString(),
+      body: html,
+      encryptedBody: encryptedBody,
+      attachment: false,
+      attachments: [],
+      unread: true,
+      readBy: [],
+      sent: true,
+      starred: false,
+      draft: false,
+      trash: false,
+      selected: false
+    };
+
+    // Set the document with the same ID
+    await docRef.set(email);
+
+    functions.logger.info('Error notification sent to admin');
+  } catch (notificationError) {
+    // If sending the error notification itself fails, just log it
+    functions.logger.error('Failed to send error notification:', notificationError);
+  }
+}
+
+// SIEM (Security Information and Event Management) function for monitoring bail check-ins
+exports.siemBailCheckinMonitor = functions.runWith({ timeoutSeconds: 300 })  // Set timeout to 5 minutes
+  .pubsub
+  .schedule('30 0 * * *')  // Run at 12:30 AM every day
+  .timeZone('America/Nassau')  // Bahamas timezone
+  .onRun(async (context: any) => {
+    try {
+      const today = new Date();
+      // Calculate previous day's date
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const dayOfWeek = yesterday.getDay(); // 0 = Sunday, 1 = Monday, etc.
+      const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      const previousDay = dayNames[dayOfWeek];
+
+      functions.logger.info(`Running SIEM bail check-in monitoring for previous day (${previousDay})`);
+
+      // Get all open bookings with required check-ins for the previous day
+      let requiredCheckinsSnapshot: QuerySnapshot;
+      try {
+        requiredCheckinsSnapshot = await db.collection('magistrateBookings')
+          .where('bookingStatus', '==', 'Open')
+          .where('custodyStatus', '==', 'Released Bail')
+          .where(`${previousDay}Checked`, '==', true)
+          .get();
+      } catch (error) {
+        await sendErrorNotification(error, 'Error querying magistrateBookings collection');
+        throw error;
+      }
+
+      // Get all check-ins from the previous day (full 24 hours)
+      const startOfPreviousDay = new Date(yesterday);
+      startOfPreviousDay.setHours(0, 0, 0, 0);
+      const startOfPreviousDayUnix = Math.floor(startOfPreviousDay.getTime() / 1000).toString();
+
+      const endOfPreviousDay = new Date(yesterday);
+      endOfPreviousDay.setHours(23, 59, 59, 999);
+      const endOfPreviousDayUnix = Math.floor(endOfPreviousDay.getTime() / 1000).toString();
+
+      let actualCheckinsSnapshot: QuerySnapshot;
+      try {
+        actualCheckinsSnapshot = await db.collection('kioskCheckin')
+          .where('unix', '>=', startOfPreviousDayUnix)
+          .where('unix', '<=', endOfPreviousDayUnix)
+          .get();
+      } catch (error) {
+        await sendErrorNotification(error, 'Error querying kioskCheckin collection');
+        throw error;
+      }
+
+      // Process the data and generate the report
+      let report: CheckinReport;
+      try {
+        report = await generateCheckinReport(requiredCheckinsSnapshot, actualCheckinsSnapshot);
+      } catch (error) {
+        await sendErrorNotification(error, 'Error generating check-in report');
+        throw error;
+      }
+
+      // Send the report to specified recipients
+      try {
+        await sendSiemReport(report, yesterday);
+      } catch (error) {
+        await sendErrorNotification(error, 'Error sending SIEM report');
+        throw error;
+      }
+
+      return null;
+    } catch (error) {
+      functions.logger.error('SIEM function failed:', error);
+      return null;
+    }
+  });
+
+/**
+ * Generate a report of compliant and non-compliant offenders
+ */
+async function generateCheckinReport(
+  requiredCheckinsSnapshot: QuerySnapshot,
+  actualCheckinsSnapshot: QuerySnapshot
+): Promise<CheckinReport> {
+  const requiredCheckins: Booking[] = [];
+  requiredCheckinsSnapshot.forEach((doc: any) => {
+    requiredCheckins.push(doc.data() as Booking);
+  });
+
+  const actualCheckins: Record<string, KioskCheckin> = {};
+  actualCheckinsSnapshot.forEach((doc: any) => {
+    const checkin = doc.data() as KioskCheckin;
+    actualCheckins[checkin.afisID] = checkin;
+  });
+
+  const compliantOffenders: CompliantOffender[] = [];
+  const violationOffenders: ViolationOffender[] = [];
+
+  // Compare required check-ins with actual check-ins
+  for (const booking of requiredCheckins) {
+    if (!booking.afisID) continue;
+
+    const offenderInfo: OffenderInfo = {
+      name: `${booking.lastName}, ${booking.firstName} ${booking.middleName || ''}`,
+      afisID: booking.afisID,
+      photoURL: booking.photoURL || 'https://bbmsweb.com/assets/img/users/default-user.jpg',
+      checkInLocation: booking.checkLocation || 'Any Location',
+      bookingId: booking.id || ''
+    };
+
+    if (actualCheckins[booking.afisID]) {
+      // Offender checked in
+      compliantOffenders.push({
+        ...offenderInfo,
+        checkinTime: new Date(parseInt(actualCheckins[booking.afisID].unix) * 1000).toLocaleString(),
+        checkinLocation: actualCheckins[booking.afisID].location
+      });
+    } else {
+      // Offender did not check in
+      violationOffenders.push({
+        ...offenderInfo,
+        lastCheckin: 'No check-in recorded for the required day'
+      });
+    }
+  }
+
+  return { compliantOffenders, violationOffenders };
+}
+
+/**
+ * Send the SIEM report to specified recipients
+ */
+async function sendSiemReport(report: CheckinReport, reportDate: Date): Promise<boolean> {
+  // Recipient IDs from the requirements
+  const recipientIds: string[] = ['tbpBuXFFXdQS7gDq6DJz', '1WrrWMegVWvTVj4UwUzX', 'BomHnl5Pc4CKWbMskgEL'];
+  // const recipientIds: string[] = ['1WrrWMegVWvTVj4UwUzX'];
+
+  // Get recipient information
+  const recipients: Members[] = [];
+  for (const id of recipientIds) {
+    const memberDoc = await db.collection('members').doc(id).get();
+    if (memberDoc.exists) {
+      recipients.push(memberDoc.data() as Members);
+    }
+  }
+
+  // Generate HTML report
+  const reportDateFormatted = reportDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
+  const html = `
+    <div style="text-align: center;"><img src="https://bbmsweb.com/assets/img/app/judiciary_logo.png" alt="Judiciary Logo"></div>
+    <div style="text-align: center;background: #ed0303;"><span style="font-weight: bold;font-size: 28px;color: rgb(240,242,244);">BAIL CHECK-IN COMPLIANCE REPORT</span></div>
+    <div style="text-align: center;font-size: 16px;margin: 10px 0;">Report Date: ${reportDateFormatted} (Previous Day Report)</div>
+    <div style="text-align: center; color: blue; font-size: 11px; margin: 10px 0;">THIS REPORT RUNS EVERY MORNING AT 12:30 AM</div>
+    <h2 style="color: #d9534f;">VIOLATION OFFENDERS (${report.violationOffenders.length})</h2>
+    <div style="text-align: center; color: red; font-size: 16px; margin: 10px 0;">The following offenders have an active case and show they are released on bond but did not check in.</div>
+    <div style="text-align: center; color: blue; font-size: 9px; margin: 10px 0;">Please check the current status of these offenders to determine if they are still released and failed to check in</div>
+    <div class="table-responsive">
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background-color: #f2dede; color: #a94442;">
+            <th style="padding: 8px; border: 1px solid #ddd;">Photo</th>
+            <th style="padding: 8px; border: 1px solid #ddd;">Name</th>
+            <th style="padding: 8px; border: 1px solid #ddd;">AFIS ID</th>
+            <th style="padding: 8px; border: 1px solid #ddd;">Required Check-in Location</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${report.violationOffenders.map((offender: ViolationOffender) => `
+            <tr style="background-color: #f9f2f2;">
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><img src="${offender.photoURL}" style="max-width: 100px; max-height: 100px;"></td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${offender.name}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${offender.afisID}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${offender.checkInLocation}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 style="color: #5cb85c; margin-top: 30px;">COMPLIANT OFFENDERS (${report.compliantOffenders.length})</h2>
+    <div class="table-responsive">
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background-color: #dff0d8; color: #3c763d;">
+            <th style="padding: 8px; border: 1px solid #ddd;">Photo</th>
+            <th style="padding: 8px; border: 1px solid #ddd;">Name</th>
+            <th style="padding: 8px; border: 1px solid #ddd;">AFIS ID</th>
+            <th style="padding: 8px; border: 1px solid #ddd;">Check-in Time</th>
+            <th style="padding: 8px; border: 1px solid #ddd;">Check-in Location</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${report.compliantOffenders.map((offender: CompliantOffender) => `
+            <tr style="background-color: #f9f9f9;">
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><img src="${offender.photoURL}" style="max-width: 100px; max-height: 100px;"></td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${offender.name}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${offender.afisID}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${offender.checkinTime}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${offender.checkinLocation}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; font-size: 12px;">
+      <p>This report is automatically generated by the SIEM system. Please do not reply to this email.</p>
+      <p>For questions or concerns, please contact the system administrator.</p>
+    </div>
+  `;
+
+  // Encrypt the email body
+  const encryptedBody = encryptMessage(html);
+
+  // Create and send the email
+  const now = new Date();
+
+  // Create a document reference without specifying an ID
+  const docRef = db.collection('emails').doc();
+
+  // Use the auto-generated ID for the email object
+  const email = {
+    id: docRef.id,
+    sender: 'SIEM System',
+    senderId: 'SIEM-SYSTEM',
+    recipients: recipientIds,
+    recipientNames: recipients.map(r => `${r.fName} ${r.lName}`),
+    subject: `Bail Check-in Compliance Report - ${reportDateFormatted} (Previous Day)`,
+    date: now.toISOString(),
+    body: html,
+    encryptedBody: encryptedBody,
+    attachment: false,
+    attachments: [],
+    unread: true,
+    readBy: [],
+    sent: true,
+    starred: false,
+    draft: false,
+    trash: false,
+    selected: false
+  };
+
+  // Set the document with the same ID
+  await docRef.set(email);
+
+  functions.logger.info('SIEM report sent successfully');
+  return true;
+}
+
+/**
+ * Encrypt a message for email
+ */
+function encryptMessage(text: string): string {
+  // Simple encryption for demonstration purposes
+  // This matches the existing encryption in the mailbox service
+  const key = 'BBMS-SECRET-KEY';
+  let result = '';
+
+  // Convert the text to base64 first
+  const base64 = Buffer.from(text).toString('base64');
+
+  // Simple XOR encryption with the key
+  for (let i = 0; i < base64.length; i++) {
+    const charCode = base64.charCodeAt(i) ^ key.charCodeAt(i % key.length);
+    result += String.fromCharCode(charCode);
+  }
+
+  // Return the encrypted text encoded as base64 for safe storage
+  return Buffer.from(result).toString('base64');
+}

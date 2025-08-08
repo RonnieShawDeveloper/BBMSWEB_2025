@@ -20,12 +20,11 @@
             </div>
 
             <div class="top-rigth-icons ml-auto">
-              <span class="mr-2">
-                <button class="btn btn-outline-light btn-sm position-relative"
-                        style="padding: 3px 4px; font-size: 14px; border-radius: 8px; line-height: 19px"
+              <span>
+                <button class="btn btn-outline-light btn-sm position-relative header-button"
                         (click)="goToEmails()"
                         title="Go to Messages">
-                  <i class="fa fa-envelope" aria-hidden="true"></i>
+                  <i class="fa fa-envelope" aria-hidden="true"></i> <span>Messages</span>
                   <span *ngIf="unreadEmailCount > 0"
                         class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
                         style="top: -5px; right: -5px; font-size: 10px; background-color: #dc3545 !important;">
@@ -33,30 +32,43 @@
                   </span>
                 </button>
               </span>
-              <span
-                  *ngIf="updateAvailable"
-                  class="mb-1 mt-0 mr-1 btn btn-danger btn-sm text-white"
-                  style="padding: 0px 2px; font-size: 14px; border-radius: 8px; line-height: 19px"
+              <span>
+                <label class="btn btn-outline-light btn-sm header-button"
+                       title="Toggle speech notifications">
+                  <input type="checkbox"
+                         [checked]="speechEnabled"
+                         (change)="toggleSpeech()"
+                         style="margin-right: 3px;">
+                  <span>Speech</span>
+                </label>
+              </span>
+              <span *ngIf="updateAvailable">
+                <button class="btn btn-danger btn-sm text-white header-button"
                   (click)="reloadPage()"
                 >
                   <i class="fa fa-refresh fa-spin" aria-hidden="true"></i> UPDATE AVAILABLE - INSTALL UPDATE
-                </span>
-                <span class="hidden-xs-down">
-                  <app-user-menu></app-user-menu>
-                </span>
-                <span
-                  class="mb-1 mt-0 btn btn-outline-warning btn-sm"
-                  style="padding: 0px 2px; font-size: 14px; border-radius: 8px; line-height: 19px"
+                </button>
+              </span>
+              <span class="hidden-xs-down btn btn-outline-light btn-sm header-button">
+                <app-user-menu></app-user-menu>
+              </span>
+              <span>
+                <button class="btn btn-outline-light btn-sm header-button"
                   (click)="logout()"
                 >
                   <i class="fa fa-sign-out" aria-hidden="true"></i> LOGOUT
-                </span>
-                <button (click)="zoomOut()" class="btn btn-sm btn-outline-info ml-2 text-white" style="padding: 0px 4px; font-size: 14px; border-radius: 8px; line-height: 19px">
+                </button>
+              </span>
+              <span>
+                <button (click)="zoomOut()" class="btn btn-sm btn-outline-info text-white header-button">
                   <i class="fa fa-search-minus"></i>
                 </button>
-                <button (click)="zoomIn()" class="btn btn-sm btn-outline-info ml-1 text-white" style="padding: 0px 4px; font-size: 14px; border-radius: 8px; line-height: 19px">
+              </span>
+              <span>
+                <button (click)="zoomIn()" class="btn btn-sm btn-outline-info text-white header-button">
                   <i class="fa fa-search-plus"></i>
                 </button>
+              </span>
               </div>
 
         </div>

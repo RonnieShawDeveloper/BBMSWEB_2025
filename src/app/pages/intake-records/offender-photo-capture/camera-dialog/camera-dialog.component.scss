@@ -1,0 +1,64 @@
+.camera-dialog-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  padding: 0 16px; /* Add horizontal padding */
+  margin: 0;
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: 100%; /* Take full height of the dialog */
+}
+
+.camera-container, .preview-container {
+  width: 100%;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.camera-feed {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 2px solid #007bff;
+}
+
+.preview-image {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 2px solid #28a745;
+}
+
+.photo-details-form {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.main-photo-checkbox {
+  margin-top: 8px;
+  display: block;
+}
+
+mat-dialog-actions {
+  padding: 16px 0;
+  margin-bottom: 0;
+}
+
+/* Override Material Dialog styles for better scrolling */
+::ng-deep .mat-mdc-dialog-content {
+  max-height: none !important; /* Remove Material's default max-height */
+}
+
+/* Make dialog responsive */
+@media (max-width: 600px) {
+  .camera-dialog-content {
+    max-width: 100%;
+  }
+}
