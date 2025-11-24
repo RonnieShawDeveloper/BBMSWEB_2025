@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { UntypedFormGroup, UntypedFormControl, AbstractControl, UntypedFormBuilder, Validators} from '@angular/forms';
 import {AuthService} from "../../services/auth.service";
 import Swal from "sweetalert2";
-import swal from "sweetalert2";
 
 @Component({
   selector: 'app-login',
@@ -29,22 +28,37 @@ export class LoginComponent implements OnInit {
       this.password = this.form.controls['password'];
   }
 
-  public onSubmit(values:Object):void {
-      if (this.form.valid) {
-        // Create swal alert to let the user know that they are being logged in
-        Swal.fire({
-          title: 'Logging In',
-          text: 'Please wait...',
-          allowOutsideClick: false,
-          showConfirmButton: false,
-          willOpen: () => {
-            Swal.showLoading();
-          }
-        });
-          let loggedin = this.authService.login(this.email.value, this.password.value).then((v) => {
-            swal.close();
-          });
-      }
+  public async onSubmit(values: Object): Promise<void> {
+    if (!this.form.valid) {
+      return;
+    }
+
+    try {
+      // Show loading modal
+      Swal.fire({
+        title: 'Logging In',
+        text: 'Please wait...',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      await this.authService.login(this.email.value, this.password.value);
+      // On success, the service will handle navigation; no further action needed here
+    } catch (error: any) {
+      const message = this.mapFirebaseAuthError(error?.code, error?.message);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Login Error',
+        text: message,
+        confirmButtonText: 'OK'
+      });
+    } finally {
+      // Ensure the loading dialog is closed in all cases
+      Swal.close();
+    }
   }
 
   ngOnInit() {
@@ -62,45 +76,99 @@ export class LoginComponent implements OnInit {
       this.showPassword = !this.showPassword;
   }
 
-  doForgotPassword() {
-    // Use Swal to ask for the user's email address and send a password reset email using the auth service and wait for the return promise
-    Swal.fire({
+  private mapFirebaseAuthError(code?: string, fallback?: string): string {
+    switch (code) {
+      case 'auth/invalid-email':
+        return 'The email address format is invalid. Please check and try again.';
+      case 'auth/user-disabled':
+        return 'This account has been disabled. Please contact the administrator for assistance.';
+      case 'auth/user-not-found':
+        return 'No account was found with that email address. Please check the spelling or register for an account.';
+      case 'auth/wrong-password':
+        return 'The password you entered is incorrect. Please try again or reset your password.';
+      case 'auth/too-many-requests':
+        return 'Too many unsuccessful attempts. Please wait a few minutes and try again.';
+      case 'auth/network-request-failed':
+        return 'A network error occurred. Please check your internet connection and try again.';
+      case 'auth/invalid-credential':
+        return 'The supplied credentials are invalid or have expired. Please sign in again.';
+      case 'auth/operation-not-allowed':
+        return 'Password sign-in is currently disabled for this project. Please contact support.';
+      case 'auth/weak-password':
+        return 'Your password is too weak. Please use at least 6 characters and try again.';
+      case 'auth/requires-recent-login':
+        return 'For security reasons, please sign in again to complete this action.';
+      case 'auth/popup-closed-by-user':
+        return 'The sign-in popup was closed before completing the sign in. Please try again.';
+      case 'auth/popup-blocked':
+        return 'The sign-in popup was blocked by your browser. Please allow popups and try again.';
+      case 'auth/credential-already-in-use':
+        return 'These credentials are already associated with another account.';
+      case 'auth/email-already-in-use':
+        return 'That email address is already in use by another account.';
+      case 'auth/missing-email':
+        return 'Please enter your email address.';
+      case 'auth/internal-error':
+        return 'An internal error occurred. Please try again later.';
+      case 'auth/timeout':
+        return 'The request timed out. Please try again.';
+      case 'auth/unauthorized-domain':
+        return 'This domain is not authorized for authentication. Please contact support.';
+      case 'auth/app-not-authorized':
+        return 'This app is not authorized to use Firebase Authentication. Please contact support.';
+      default:
+        return fallback || 'An error occurred while attempting to sign in. Please try again.';
+    }
+  }
+
+  async doForgotPassword() {
+    const { value: email } = await Swal.fire({
       title: 'Forgot Password',
-      html: '<div>Enter your email into the box below. A Password Reset Link will be sent to this email if it exist.</div><input id="swal-input1" class="swal2-input" placeholder="Email">',
+      input: 'email',
+      inputLabel: 'Enter the email address used to log in to this system',
+      inputPlaceholder: 'name@example.com',
+      html: '<div class="small" style="margin-top:6px">This must be the same email address you use to log in.</div>',
+      inputAttributes: { autocapitalize: 'off', autocorrect: 'off' },
+      showCancelButton: true,
       confirmButtonText: 'Send Email',
       cancelButtonText: 'Cancel',
-      showCancelButton: true,
-      focusConfirm: false,
-      preConfirm: () => {
-        return {
-          email: (<HTMLInputElement>document.getElementById('swal-input1')).value
+      showLoaderOnConfirm: true,
+      allowOutsideClick: () => !Swal.isLoading(),
+      preConfirm: async (value) => {
+        const trimmed = (value || '').trim().toLowerCase();
+        const emailRegex = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+        if (!trimmed) {
+          Swal.showValidationMessage('Please enter your email address.');
+          return false;
         }
+        if (!emailRegex.test(trimmed)) {
+          Swal.showValidationMessage('Please enter a valid email address.');
+          return false;
+        }
+        const res = await this.authService.resetPassword(trimmed);
+        if (!res.success) {
+          Swal.showValidationMessage(res.message);
+          return false;
+        }
+        return trimmed; // pass email forward
       }
-    } as any).then((result) => {
-      if (result.isConfirmed) {
-        this.authService.resetPassword(result.value.email).then((v) => {
-          if(v) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Email Sent',
-            text: 'Please check your email for password reset instructions.'
-           });
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'An error occurred while sending the email.'
-            });
-          }
-        }).catch((error) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: error.message
-          });
-        });
-      }
-    });
+    } as any);
+
+    if (email) {
+      await Swal.fire({
+        icon: 'success',
+        title: 'Email Sent',
+        html: `
+          <div>
+            We sent a password reset link to <b>${email}</b>.
+            <div class="small" style="margin-top:8px">
+              If you don't see it in a few minutes, check your spam or junk folder. The link may expire; if it does, request a new one.
+            </div>
+          </div>
+        `,
+        confirmButtonText: 'OK'
+      });
+    }
   }
 }
 

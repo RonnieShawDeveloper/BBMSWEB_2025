@@ -1,0 +1,229 @@
+.map-dialog {
+  max-width: 800px;
+  width: 100%;
+
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    margin: -24px -24px 0 -24px;
+
+    .title-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .location-icon {
+        font-size: 24px;
+      }
+
+      h2 {
+        margin: 0;
+        font-weight: 500;
+        font-size: 20px;
+      }
+    }
+
+    .close-button {
+      color: white;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+
+  .dialog-content {
+    padding: 24px;
+
+    .checkin-info {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      border-left: 4px solid #667eea;
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .label {
+          font-weight: 500;
+          color: #555;
+          flex: 1;
+          font-size: 14px;
+        }
+
+        .value {
+          font-weight: 600;
+          color: #333;
+          text-align: right;
+          flex: 2;
+        }
+      }
+    }
+
+    .map-container {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      margin-bottom: 16px;
+
+      .google-map {
+        display: block;
+        border-radius: 12px;
+      }
+    }
+
+    .coordinates-info {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      background: #e8f4fd;
+      border-radius: 8px;
+      padding: 12px;
+
+      .coordinate-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .coord-label {
+          font-size: 12px;
+          color: #666;
+          font-weight: 500;
+        }
+
+        .coord-value {
+          font-size: 12px;
+          font-weight: 600;
+          color: #333;
+          background: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-family: 'Courier New', monospace;
+        }
+      }
+    }
+  }
+
+  .dialog-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding: 16px 24px;
+    border-top: 1px solid #e0e0e0;
+    background: #fafafa;
+    margin: 0 -24px -24px -24px;
+
+    button {
+      border-radius: 8px;
+      text-transform: none;
+      font-weight: 500;
+
+      &[color="primary"] {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+        mat-icon {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .map-dialog {
+    max-width: 95vw;
+
+    .dialog-header {
+      padding: 12px 16px;
+
+      .title-content h2 {
+        font-size: 18px;
+      }
+    }
+
+    .dialog-content {
+      padding: 16px;
+
+      .checkin-info {
+        .info-row {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 4px;
+
+          .value {
+            text-align: left;
+          }
+        }
+      }
+
+      .coordinates-info {
+        flex-direction: column;
+        gap: 8px;
+
+        .coordinate-item {
+          justify-content: space-between;
+        }
+      }
+
+      .map-container .google-map {
+        height: 300px;
+      }
+    }
+
+    .dialog-actions {
+      flex-direction: column-reverse;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Animation enhancements
+.map-dialog {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Hover effects
+.checkin-info {
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.map-container {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  }
+}

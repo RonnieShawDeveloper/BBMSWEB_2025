@@ -1,48 +1,186 @@
-<section>
-  <div class="container">
-    <div class="row">
-      <div class="col-12 text-center">
-        <h1>BBMS PHONE CHECK-INS</h1>
-      </div>
+<div class="phone-checkin-report">
+  <!-- Header Section -->
+  <div class="report-header">
+    <div class="header-content">
+      <mat-icon class="header-icon">📱</mat-icon>
+      <h1>BBMS Phone Check-ins Report</h1>
+      <p class="subtitle">Comprehensive tracking of offender mobile check-ins with device analytics</p>
     </div>
-    <div class="row font-weight-bold text-center" style="background-color: lightgrey; margin-bottom: 5px">
-      <div class="col-2">
-        Picture
+    <div class="report-stats">
+      <div class="stat-item">
+        <span class="stat-number">{{phoneCheckins.length}}</span>
+        <span class="stat-label">Total Check-ins</span>
       </div>
-      <div class="col-2">
-        Name
+      <div class="stat-item">
+        <span class="stat-number">{{verifiedRecordsCount}}</span>
+        <span class="stat-label">Verified Records</span>
       </div>
-        <div class="col-6">
-          Check-in Information
-        </div>
-        <div class="col-2">
-          VIEW MAP
-        </div>
-    </div>
-    <div *ngFor="let c of phoneCheckins" class="row font-weight-bold border border-dark mb-1">
-      <div class="col-2">
-        <img src="{{c.photo}}" alt="picture" class="img-thumbnail">
-      </div>
-      <div class="col-2 d-flex flex-column justify-content-center align-items-center">
-        <span class="h4 font-weight-bold">{{c.fName}} {{c.lName}}</span>
-        <span>DOB: {{c.dob}}</span>
-        <span *ngIf="c.BBMSID" class="badge badge-sm badge-pill badge-success small m-1">VERIFIED BBMS ID<br>{{c.BBMSID}}</span>
-        <span *ngIf="c.AFISID" class="badge badge-sm badge-pill badge-success small m-1">VERIFIED AFIS ID<br>{{c.AFISID}}</span>
-      </div>
-        <div class="col-6 d-flex flex-column justify-content-center align-items-center">
-          <span><b>CHECK-IN DATE/TIME:</b> {{c.datetime}}</span>
-          <span *ngIf="c.magistrate" class="bg-success text-white p-2 px-5 rounded-lg">MAGISTRATE COURT BAIL</span>
-          <span *ngIf="c.supreme" class="bg-success text-white p-2 px-5 rounded-lg">SUPREME COURT BAIL</span>
-          <span class="mt-2"><b>ADDRESS:</b> {{c.address1}} {{c.address2}}</span>
-          <span><b>LOCALITY:</b> {{c.city}} <b>ISLAND:</b> {{c.state}}</span>
-          <span class="mt-2 mb-2"><b>PHONE:</b> {{c.phone}}</span>
-          <span class="my-3 p-2 border border-danger" style="background-color: lightpink; border-radius: 10px;"><b>Check-in Location:</b> {{c.policestation}} - <b>Distance:</b> {{c.distance}}</span>
-          <span *ngIf="!c.BBMSID" class="p-2 rounded bg-danger text-white text-center">NO BBMS RECORD FOUND</span>
-          <span *ngIf="c.BBMSID" class="p-2 rounded bg-success text-dark text-center">BBMS RECORD FOUND</span>
-        </div>
-        <div class="col-2 d-flex flex-column justify-content-center align-items-center">
-          <div class="btn btn-sm btn-success" (click)="doMap(c)">VIEW ON MAP</div>
-        </div>
     </div>
   </div>
-</section>
+
+  <!-- Check-in Cards -->
+  <div class="checkins-container">
+    <mat-card *ngFor="let c of phoneCheckins" class="checkin-card" [class.verified]="c.BBMSID">
+
+      <!-- Card Header -->
+      <mat-card-header class="card-header">
+        <div class="profile-section">
+          <div class="photo-container">
+            <img mat-card-avatar [src]="c.photo" [alt]="c.fName + ' ' + c.lName" class="profile-photo">
+            <div class="verification-badge" *ngIf="c.BBMSID">
+              <mat-icon class="verified-icon">✅</mat-icon>
+            </div>
+          </div>
+          <div class="name-info">
+            <mat-card-title class="offender-name">{{c.fName}} {{c.lName}}</mat-card-title>
+            <mat-card-subtitle class="dob-info">📅 DOB: {{c.dob}}</mat-card-subtitle>
+            <div class="id-badges">
+              <mat-chip-set>
+                <mat-chip *ngIf="c.BBMSID" class="success-chip" highlighted>
+                  🛡️ BBMS: {{c.BBMSID}}
+                </mat-chip>
+                <mat-chip *ngIf="c.AFISID" class="success-chip" highlighted>
+                  🔍 AFIS: {{c.AFISID}}
+                </mat-chip>
+                <mat-chip *ngIf="!c.BBMSID" class="warning-chip">
+                  ❌ No BBMS Record
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Indicators -->
+        <div class="status-section">
+          <div class="court-status">
+            <mat-chip *ngIf="c.magistrate" class="court-chip magistrate-chip">
+              🏛️ Magistrate Court
+            </mat-chip>
+            <mat-chip *ngIf="c.supreme" class="court-chip supreme-chip">
+              ⚖️ Supreme Court
+            </mat-chip>
+          </div>
+          <button mat-fab color="primary" (click)="doMap(c)" class="map-button" matTooltip="View Location on Map">
+            <mat-icon>📍</mat-icon>
+          </button>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content class="card-content">
+
+        <!-- Check-in Information -->
+        <div class="info-section">
+          <h3 class="section-title">📍 Check-in Details</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">🕐 Date & Time:</span>
+              <span class="info-value">{{c.datetime}}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">🚔 Police Station:</span>
+              <span class="info-value">{{c.policestation}}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">📏 Distance from Station:</span>
+              <span class="info-value distance-value">{{c.distance}} feet</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">📞 Phone:</span>
+              <span class="info-value">{{c.phone || 'Not provided'}}</span>
+            </div>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Address Information -->
+        <div class="info-section">
+          <h3 class="section-title">🏠 Address Information</h3>
+          <div class="address-details">
+            <div class="address-line">{{c.address1}} {{c.address2}}</div>
+            <div class="locality-info">{{c.city}}, {{c.state}}</div>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Device Tracking Information -->
+        <mat-expansion-panel class="device-panel" *ngIf="c.deviceUserAgent || c.deviceBrowser">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon class="device-icon">📱</mat-icon>
+              Device Tracking Information
+            </mat-panel-title>
+            <mat-panel-description>
+              🔒 Fraud Prevention & Security Analytics
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="device-info">
+            <div class="device-grid">
+              <div class="device-item" *ngIf="c.deviceBrowser">
+                <span class="device-label">🌐 Browser:</span>
+                <span class="device-value">{{c.deviceBrowser}} {{c.deviceBrowserVersion}}</span>
+              </div>
+              <div class="device-item" *ngIf="c.devicePlatform">
+                <span class="device-label">💻 Platform:</span>
+                <span class="device-value">{{c.devicePlatform}}</span>
+              </div>
+              <div class="device-item" *ngIf="c.deviceScreenResolution">
+                <span class="device-label">🖥️ Resolution:</span>
+                <span class="device-value">{{c.deviceScreenResolution}}</span>
+              </div>
+              <div class="device-item" *ngIf="c.deviceLanguage">
+                <span class="device-label">🌐 Language:</span>
+                <span class="device-value">{{c.deviceLanguage}}</span>
+              </div>
+              <div class="device-item" *ngIf="c.deviceTimeZone">
+                <span class="device-label">🕐 Timezone:</span>
+                <span class="device-value">{{c.deviceTimeZone}}</span>
+              </div>
+              <div class="device-item" *ngIf="c.deviceNetworkInfo">
+                <span class="device-label">📶 Network:</span>
+                <span class="device-value">{{c.deviceNetworkInfo}}</span>
+              </div>
+            </div>
+
+            <div class="user-agent-info" *ngIf="c.deviceUserAgent">
+              <div class="device-item full-width">
+                <span class="device-label">🔍 User Agent:</span>
+                <span class="device-value user-agent">{{c.deviceUserAgent}}</span>
+              </div>
+            </div>
+
+            <div class="tracking-timestamp" *ngIf="c.deviceTrackingTimestamp">
+              <small class="timestamp-info">
+                📊 Device data collected: {{c.deviceTrackingTimestamp}}
+              </small>
+            </div>
+          </div>
+        </mat-expansion-panel>
+
+      </mat-card-content>
+
+      <!-- Card Actions -->
+      <mat-card-actions class="card-actions">
+        <button mat-raised-button color="#000000" (click)="doMap(c)">
+          <mat-icon>map</mat-icon>
+          View Location
+        </button>
+        <button mat-button>
+          <mat-icon>download</mat-icon>
+          Export Data
+        </button>
+      </mat-card-actions>
+
+    </mat-card>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="phoneCheckins.length === 0">
+    <mat-icon class="empty-icon">📱</mat-icon>
+    <h2>No Check-ins Found</h2>
+    <p>No phone check-in records are currently available.</p>
+  </div>
+
+</div>

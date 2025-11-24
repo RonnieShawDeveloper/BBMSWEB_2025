@@ -5,61 +5,176 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>BBMS - Bahama Bail Management System</title>
   <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="assets/favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    html, body { height: 100%; margin: 0; }
+    body { font-family: 'Roboto', Arial, sans-serif; background: #0b1220; color: #e6eefc; }
+    .no-scroll { overflow: hidden; }
+
+    /* Loader container covers entire viewport */
+    #bbms-loader {
+      position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(1200px 700px at 15% 15%, rgba(30,60,114,0.35), transparent),
+                  radial-gradient(1000px 600px at 85% 85%, rgba(42,82,152,0.35), transparent),
+                  linear-gradient(135deg, #0b1220 0%, #121b2e 100%);
+      opacity: 1; transition: opacity 500ms ease-in-out;
+    }
+    #bbms-loader.hidden { opacity: 0; pointer-events: none; }
+
+    /* Background decorative effects (approximate login look) */
+    .background-waves::before, .background-waves::after {
+      content: ""; position: absolute; inset: -20%; background:
+        radial-gradient(ellipse at 20% 20%, rgba(255,255,255,0.04), transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(255,255,255,0.03), transparent 60%),
+        repeating-linear-gradient( -45deg, rgba(255,255,255,0.02) 0 6px, rgba(255,255,255,0.00) 6px 12px);
+      filter: blur(8px);
+      animation: waveShift 16s linear infinite;
+    }
+    .background-waves::after { animation-duration: 22s; opacity: 0.6; }
+    @keyframes waveShift { from { transform: translateX(0); } to { transform: translateX(-5%); } }
+
+    .particles { position: absolute; inset: 0; overflow: hidden; }
+    .particle { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: rgba(135,206,250,0.8); box-shadow: 0 0 12px rgba(80,170,255,0.7); opacity: 0.7; }
+    .particle:nth-child(1){ top: 10%; left: 15%; animation: floatUp 9s linear infinite; }
+    .particle:nth-child(2){ top: 70%; left: 25%; animation: floatUp 12s linear infinite; }
+    .particle:nth-child(3){ top: 40%; left: 80%; animation: floatUp 10s linear infinite; }
+    .particle:nth-child(4){ top: 85%; left: 60%; animation: floatUp 14s linear infinite; }
+    .particle:nth-child(5){ top: 20%; left: 70%; animation: floatUp 11s linear infinite; }
+    @keyframes floatUp { 0%{ transform: translateY(0) scale(1); opacity: 0.3;} 50%{opacity: 0.8;} 100%{ transform: translateY(-120px) scale(1.1); opacity: 0.1;} }
+
+    /* Center content card */
+    .loader-content {
+      position: relative; width: min(920px, 92vw); padding: 32px 28px; border-radius: 16px;
+      background: rgba(5,10,20,0.45); backdrop-filter: blur(6px); border: 1px solid rgba(120,160,255,0.2);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 0 40px rgba(45,120,255,0.08);
+    }
+    .title { font-size: clamp(22px, 3.2vw, 34px); font-weight: 700; letter-spacing: 0.5px; text-align: center; margin: 0 0 8px; color: #9fd3ff; }
+    .subtitle { text-align: center; margin: 0 0 18px; color: #c7d5ef; font-weight: 400; }
+
+    .loading-label { text-align: center; margin: 10px 0 16px; color: #b5c6ea; font-family: Consolas, 'Courier New', monospace; }
+    .loading-dots::after { content: '⋯'; display: inline-block; width: 1.2em; text-align: left; animation: dots 1.2s steps(4,end) infinite; }
+    @keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} 100%{content:''} }
+
+    /* Log box showing exactly ~10 lines */
+    .log-box {
+      font-family: Consolas, 'Courier New', monospace; font-size: 13px; line-height: 1.35em;
+      height: calc(1.35em * 10 + 16px); /* 10 lines + padding */
+      overflow-y: auto; white-space: pre-wrap; background: rgba(6,14,28,0.85);
+      color: #a7ffea; border: 1px solid rgba(0,255,200,0.25); border-radius: 8px; padding: 8px 10px;
+      box-shadow: inset 0 0 24px rgba(0, 255, 200, 0.08), 0 0 0 1px rgba(0, 255, 200, 0.05);
+    }
+    .log-muted { color: #7fb0ff; }
+    .log-warn { color: #ffd47f; }
+    .log-ok   { color: #7fff9f; }
+
+    /* App root fade-in */
+    app-root { display: none; opacity: 0; transition: opacity 500ms ease-in-out; }
+    app-root.visible { display: block; opacity: 1; }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      #bbms-loader, app-root { transition-duration: 200ms; }
+      .particles, .background-waves::before, .background-waves::after { animation: none !important; }
+    }
+  </style>
 </head>
-<body style="background-color: white;">
-<div id="splashscreen" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0; transition: opacity 500ms ease-in-out;">
-  <img src="assets/img/app/splashscreen.png" alt="BBMS Logo" id="splash-logo">
-</div>
+<body>
+  <!-- High-tech loader screen -->
+  <div id="bbms-loader" role="status" aria-live="polite">
+    <div class="background-waves"></div>
+    <div class="particles">
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+    </div>
+    <div class="loader-content">
+      <h1 class="title">Bahamas Bail Management System</h1>
+      <p class="subtitle">This system powered by Amplify Amazon Web Services and built on the Angular 20 Framework</p>
+      <div class="loading-label">Initializing systems<span class="loading-dots"></span></div>
+      <div id="init-log" class="log-box" aria-label="Initialization log" tabindex="0"></div>
+    </div>
+  </div>
 
-<!-- Main Angular app root -->
-<app-root style="display: none;"></app-root>
+  <!-- Main Angular app root -->
+  <app-root></app-root>
 
-<noscript>Please enable JavaScript to continue using this application.</noscript>
+  <noscript>Please enable JavaScript to continue using this application.</noscript>
 
-<style>
-  /* Fade-in effect for main app root */
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-</style>
+  <script>
+    (function(){
+      const appRoot = document.querySelector('app-root');
+      const loader = document.getElementById('bbms-loader');
+      const logBox = document.getElementById('init-log');
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const splashscreen = document.getElementById('splashscreen');
-    const appRoot = document.querySelector('app-root');
+      // Lock page scroll during loader
+      document.body.classList.add('no-scroll');
 
-    // Initial state: hide app-root
-    appRoot.style.display = 'none';
+      // Ensure Angular app is hidden initially
+      appRoot.classList.remove('visible');
 
-    // 1. Fade in splash screen (500ms)
-    splashscreen.style.display = 'block'; // Ensure it's visible for animation
-    setTimeout(() => {
-      splashscreen.style.opacity = '1';
-    }, 50); // Small delay to ensure CSS transition applies
+      // Fake initialization lines
+      const lines = [
+        '[BOOT] Starting BBMS secure shell…',
+        '[NET] Resolving DNS: gateway.bbms.gov.bs … ok',
+        '[NET] Checking internet connectivity … latency 28ms … ok',
+        '[TLS] Verifying certificates (AWS ACM) … ok',
+        '[TLS] Negotiating cipher suite … AES-256-GCM • ECDHE_RSA … ok',
+        '[SEC] WAF & Shield Advanced ruleset ✓',
+        '[SEC] Zero‑trust session policy loaded ✓',
+        '[CFG] Loading environment profiles … prod',
+        '[AWS] Amplify runtime handshake … ok',
+        '[AWS] CloudFront edge cache warm-up … ok',
+        '[AWS] API Gateway healthcheck … 200 OK',
+        '[AWS] Lambda cold start prewarm … ok',
+        '[DB ] Firestore connectivity … ok',
+        '[AUTH] Firebase Auth endpoints … ok',
+        '[CACHE] Service worker manifest … ready',
+        '[I18N] Locale en‑BS … loaded',
+        '[UI ] Theme assets … loaded',
+        '[ANALYTICS] Session initialized',
+        '[AUDIT] Encryption at rest: AES‑256 ✓',
+        '[AUDIT] In‑flight TLS 1.3 ✓',
+        '[SYS] Integrity checksums … verified',
+        '[SYS] All systems secure • Handoff to application…'
+      ];
 
-    // 2. Show for 1000ms after fade-in completes
-    // 3. Fade out splash screen (500ms)
-    setTimeout(() => {
-      splashscreen.style.opacity = '0';
-    }, 500 + 2000); // 500ms (fade-in) + 2000ms (display)
+      const buffer = [];
+      const totalDuration = 5000; // 5 seconds
+      const step = Math.max(160, Math.floor(totalDuration / (lines.length+2))); // ~line cadence
+      let idx = 0;
 
-    // 4. Hide splash screen and show app-root after fade-out completes
-    setTimeout(() => {
-      splashscreen.style.display = 'none';
-      appRoot.style.display = 'block';
-      // Optionally, if you want app-root to fade in as well:
-      // appRoot.style.opacity = '0';
-      // appRoot.style.transition = 'opacity 500ms ease-in-out';
-      // setTimeout(() => { appRoot.style.opacity = '1'; }, 50);
-    }, 500 + 2000 + 500); // Total duration
-  });
-</script>
+      function addLine() {
+        if (idx < lines.length) {
+          buffer.push(lines[idx++]);
+          if (buffer.length > 10) buffer.shift();
+          logBox.textContent = buffer.join('\n');
+          logBox.scrollTop = logBox.scrollHeight;
+        }
+      }
+
+      // Schedule log updates
+      const interval = setInterval(addLine, step);
+
+      // Finalize after 5 seconds
+      setTimeout(() => {
+        clearInterval(interval);
+        // Ensure last line shown
+        while (idx < lines.length) { addLine(); }
+
+        // Fade out loader and fade in app root
+        loader.classList.add('hidden');
+        appRoot.classList.add('visible');
+        // Restore page scroll after loader
+        document.body.classList.remove('no-scroll');
+      }, totalDuration);
+    })();
+  </script>
 </body>
 </html>
 

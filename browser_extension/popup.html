@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BBMS Login</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <main class="container" role="main">
+    <header class="header">
+      <div class="logo" aria-label="BBMS">BBMS</div>
+    </header>
+
+    <!-- Login View -->
+    <section id="loginView">
+      <p class="instruction">Please Login with your BBMS Credentials</p>
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="username">Email</label>
+          <input id="username" name="username" type="email" autocomplete="username" required placeholder="you@example.com" />
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Your password" />
+        </div>
+
+        <div class="field row">
+          <label class="checkbox">
+            <input id="remember" name="remember" type="checkbox" />
+            <span>Remember me</span>
+          </label>
+          <a class="link" href="#" id="forgotLink" aria-disabled="true" title="Demo only">Forgot password?</a>
+        </div>
+
+        <button id="loginBtn" type="submit" class="btn">Log in</button>
+
+
+        <div id="message" class="message" aria-live="polite" aria-atomic="true"></div>
+      </form>
+    </section>
+
+    <!-- Authenticated View -->
+    <section id="authedView" hidden>
+      <p>Welcome, <strong id="userEmail"></strong>!</p>
+      <div class="row" style="margin: 8px 0 4px 0;">
+        <div class="subtitle">Today's logins</div>
+        <button id="refreshBtn" class="btn" type="button" style="width:auto;padding:6px 10px;">Refresh</button>
+      </div>
+      <div id="authedMessage" class="message" aria-live="polite" aria-atomic="true"></div>
+
+      <div class="tableWrap">
+        <table class="table" aria-describedby="tableCaption">
+          <caption id="tableCaption" class="sr-only">Members who logged in today</caption>
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">Logged At</th>
+            </tr>
+          </thead>
+          <tbody id="membersTbody"></tbody>
+        </table>
+      </div>
+
+      <button id="logoutBtn" class="btn" type="button" style="margin-top:10px;">Sign out</button>
+    </section>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>

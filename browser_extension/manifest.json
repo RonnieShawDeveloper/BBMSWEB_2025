@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "BBMS Daily Login Report DEVELOPMENT BUILD",
+  "short_name": "BBMS Login",
+  "version": "0.1.7",
+  "description": "An extension that shows daily logins to the BBMS and provides notifications. THIS EXTENSION IS FOR BETA TESTING",
+  "icons": {
+    "16": "icons/favicon.png",
+    "32": "icons/favicon.png",
+    "48": "icons/favicon.png",
+    "128": "icons/favicon.png"
+  },
+  "action": {
+    "default_title": "BBMS Login",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/favicon.png",
+      "32": "icons/favicon.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "notifications", "alarms", "offscreen"],
+  "host_permissions": [
+    "https://identitytoolkit.googleapis.com/*",
+    "https://securetoken.googleapis.com/*",
+    "https://firestore.googleapis.com/*"
+  ]
+}

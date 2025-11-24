@@ -1,0 +1,41 @@
+Privacy Policy for BBMS Login Reporter
+Last updated: August 17, 2025
+
+This Privacy Policy describes how the BBMS Test Login extension collects, uses, and handles your information.
+
+1. Information We Collect
+We collect the following information to provide and improve the service:
+
+Authentication Information: When you sign in, we collect your email address and authentication tokens (ID token and refresh token) provided by Firebase Authentication.
+
+Member Login Data: The extension retrieves a list of members who have logged in on the current day. This includes the member's name, email, and the time they logged in.
+
+2. How We Use Your Information
+Your information is used for the following purposes:
+
+To Provide Core Functionality: Your authentication information is used to sign you in and maintain your session. The member login data is displayed in the extension's main view to show who has logged in today.
+
+To Personalize Your Experience: Your email address is displayed in the authenticated view to confirm that you are logged in.
+
+To Send Notifications: The extension uses member login data to send you desktop notifications and play a chime when a new user logs in.
+
+3. Data Storage and Security
+Local Storage: Your authentication information (email, ID token, and refresh token) is stored locally on your device using chrome.storage.local. This data is not accessible to other websites you visit.
+
+Data Transmission: All communication with our backend services (Firebase Authentication and Firestore) is transmitted securely over HTTPS.
+
+4. Data Sharing
+We do not sell, trade, or otherwise transfer your personally identifiable information to outside parties. All data collected is used solely for the functionality of the BBMS Test Login extension.
+
+5. Your Rights
+You have the right to control your information:
+
+Access and Update: You can access and update your information through your BBMS account.
+
+Sign Out: You can sign out of the extension at any time, which will clear your authentication session from local storage.
+
+6. Changes to This Privacy Policy
+We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.
+
+7. Contact Us
+If you have any questions about this Privacy Policy, please contact us.

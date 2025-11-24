@@ -115,8 +115,8 @@ export class ChatLoginComponent implements OnInit, AfterViewInit {
     if (emailRegex.test(input)) {
       this.email = input;
       if (this.isResettingPassword) {
-        const resetMessage = await this.auth.resetPassword(this.email);
-        this.displayMessage(resetMessage, false);
+        const res = await this.auth.resetPassword(this.email);
+        this.displayMessage(res.message, false);
         this.resetLoginState(); // Reset state after password reset
       } else {
         this.displayMessage('Great! Now, please enter your password:', false);

@@ -4,17 +4,32 @@ import {HttpClient} from "@angular/common/http";
 import {Phonecheckin} from "../../../models/phonecheckin";
 import {doc} from "@angular/fire/firestore";
 import {NgForOf, NgIf} from "@angular/common";
-import swal from "sweetalert2";
-import {SafePipe} from "../../../pipes/safe.pipe";
 import {DomSanitizer} from "@angular/platform-browser";
+import { MatDialog } from '@angular/material/dialog';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MapDialogComponent } from './map-dialog/map-dialog.component';
 
 @Component({
   selector: 'app-phonechekinreport',
   standalone: true,
   imports: [
     NgForOf,
-    SafePipe,
-    NgIf
+    NgIf,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    MatExpansionModule,
+    MatDividerModule,
+    MatBadgeModule,
+    MatTooltipModule
   ],
   templateUrl: './phonechekinreport.component.html',
   styleUrl: './phonechekinreport.component.scss'
@@ -23,7 +38,7 @@ export class PhonechekinreportComponent implements OnInit, OnDestroy {
 
   phoneCheckins: Phonecheckin[] = [];
   subscription: any[] = [];
-  constructor(private httpClient: HttpClient, private fs: AngularFirestore, sanatize: DomSanitizer) {
+  constructor(private httpClient: HttpClient, private fs: AngularFirestore, private sanitizer: DomSanitizer, private dialog: MatDialog) {
     // Get all of the phonecheckins from the database and put them into the phoneCheckins array
     this.subscription.push(this.fs.collection('phonecheckins').get().subscribe((data) => {
       this.phoneCheckins = [];
@@ -39,16 +54,15 @@ export class PhonechekinreportComponent implements OnInit, OnDestroy {
   }
 
   doMap(c: Phonecheckin) {
-    // Open a swal alert with and iframe to google maps showing the location of the checkin with lat and lng
-    swal.fire({
-      title: 'Check In Location',
-      width: 650,
-      heightAuto: true,
-      html: '<div class="text-center"><h3>CHECKED IN HERE ON '+c.datetime+'</h3></div><br><iframe width="600" height="400" src="https://maps.google.com/maps?q='+c.lat+','+c.lon+'&hl=en&z=18&amp;output=embed"></iframe>',
-      showCancelButton: false,
-      showConfirmButton: true,
-      confirmButtonText: 'Close',
-    })
+    // Open a Material dialog with the map component
+    this.dialog.open(MapDialogComponent, {
+      width: '90vw',
+      maxWidth: '800px',
+      height: 'auto',
+      maxHeight: '90vh',
+      data: { checkin: c },
+      panelClass: 'map-dialog-panel'
+    });
   }
 
   ngOnInit(): void {
@@ -59,6 +73,10 @@ export class PhonechekinreportComponent implements OnInit, OnDestroy {
     this.subscription.forEach((sub) => {
       sub.unsubscribe();
     })
+  }
+
+  get verifiedRecordsCount(): number {
+    return this.phoneCheckins.filter(c => c.BBMSID).length;
   }
 
   protected readonly parseInt = parseInt;

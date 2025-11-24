@@ -98,4 +98,8 @@ export class UserMenuComponent implements OnInit {
     });
   }
 
+  doLogout() {
+    this.auth.logout();
+  }
+
 }

@@ -472,23 +472,32 @@ export class AuthService {
   /**
    * Sends a password reset email to the given email
    * @param {string} email - The email to send the password reset email to
-   * @returns {Promise<string>} - A promise that resolves with a success message or an error message
+   * @returns {Promise<{ success: boolean; message: string }>} - Structured result indicating success or failure
    */
-  resetPassword(email: string): Promise<string> {
-    return this.afAuth.sendPasswordResetEmail(email)
-      .then(() => {
-        return 'A password reset email has been sent to your email address.';
-      })
-      .catch((error) => {
-        // Return a user-friendly error message
-        if (error.code === 'auth/invalid-email') {
-          return 'The email address provided is not valid. Please check and try again.';
-        } else if (error.code === 'auth/user-not-found') {
-          return 'There is no account associated with this email address.';
-        } else {
-          return 'An error occurred while sending the password reset email. Please try again later.';
-        }
-      });
+  async resetPassword(email: string): Promise<{ success: boolean; message: string }> {
+    const trimmed = (email || '').trim().toLowerCase();
+
+    try {
+      await this.afAuth.sendPasswordResetEmail(trimmed);
+      return {
+        success: true,
+        message: 'We have sent a password reset email. Please check your inbox and spam folder.'
+      };
+    } catch (error: any) {
+      const code = error?.code as string;
+      switch (code) {
+        case 'auth/invalid-email':
+          return { success: false, message: 'The email address is not valid. Please check and try again.' };
+        case 'auth/user-not-found':
+          return { success: false, message: 'No account exists with that email address.' };
+        case 'auth/too-many-requests':
+          return { success: false, message: 'Too many attempts. Please wait a few minutes and try again.' };
+        case 'auth/network-request-failed':
+          return { success: false, message: 'Network error. Check your connection and try again.' };
+        default:
+          return { success: false, message: 'We were unable to send the reset email. Please try again later.' };
+      }
+    }
   }
 
 

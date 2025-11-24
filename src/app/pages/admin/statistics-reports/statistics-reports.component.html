@@ -1,0 +1,65 @@
+<div class="reports-container">
+  <h2>Magistrates Court Statistics Reports</h2>
+  <p>Select a date range and export CSV reports. All exports include a descriptive header row for each column.</p>
+
+  <div class="filters">
+    <label>
+      Start Date
+      <input type="date" [(ngModel)]="startDate" />
+    </label>
+    <label>
+      End Date
+      <input type="date" [(ngModel)]="endDate" />
+    </label>
+  </div>
+
+  <div class="reports-grid">
+    <div class="report-card">
+      <h3>Bail Status by Month</h3>
+      <p>Rows are months in range; columns are bail statuses with counts per month and a monthly total.</p>
+      <button (click)="exportBailStatusCounts()" [disabled]="loadingBail">
+        {{ loadingBail ? 'Exporting…' : 'Export CSV' }}
+      </button>
+    </div>
+
+    <div class="report-card">
+      <h3>Case Progression by Month</h3>
+      <p>Monthly totals: total bookings, new cases opened, cases closed, bail approvals and denials.</p>
+      <button (click)="exportCaseProgression()" [disabled]="loadingProgression">
+        {{ loadingProgression ? 'Exporting…' : 'Export CSV' }}
+      </button>
+    </div>
+
+    <div class="report-card">
+      <h3>Top Crimes by Month</h3>
+      <p>Top 10 charges (countCharge) across the range with counts per month and totals.</p>
+      <button (click)="exportTopCrimesByMonth()" [disabled]="loadingTopCrimes">
+        {{ loadingTopCrimes ? 'Exporting…' : 'Export CSV' }}
+      </button>
+    </div>
+
+    <div class="report-card">
+      <h3>Top 10 Highest Bonds</h3>
+      <p>Lists the top 10 highest bail amounts in range with offender name and bond issue date.</p>
+      <button (click)="exportTop10HighestBonds()" [disabled]="loadingBonds">
+        {{ loadingBonds ? 'Exporting…' : 'Export CSV' }}
+      </button>
+    </div>
+
+    <div class="report-card">
+      <h3>Case Counts by Magistrate (Monthly)</h3>
+      <p>Rows are magistrates; columns are months in range plus a total.</p>
+      <button (click)="exportCaseCountsByMagistrate()" [disabled]="loadingMagCounts">
+        {{ loadingMagCounts ? 'Exporting…' : 'Export CSV' }}
+      </button>
+    </div>
+
+    <div class="report-card">
+      <h3>Cases by Island (Monthly)</h3>
+      <p>Top 10 islands by total cases; columns show counts per month and totals.</p>
+      <button (click)="exportCasesByIslandByMonth()" [disabled]="loadingIslands">
+        {{ loadingIslands ? 'Exporting…' : 'Export CSV' }}
+      </button>
+    </div>
+  </div>
+</div>
