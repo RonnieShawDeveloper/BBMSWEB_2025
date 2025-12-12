@@ -7,36 +7,28 @@
   </div>
 
   <!-- Search Component -->
-  <app-intake-records-search
-    *ngIf="showSearch"
-    (offenderSelected)="onOffenderSelected($event)"
-    (createOffender)="onCreateOffender($event)"
-    (createTempAfis)="onCreateTempAfis()">
+  <app-intake-records-search *ngIf="showSearch" (offenderSelected)="onOffenderSelected($event)"
+    (createOffender)="onCreateOffender($event)" (createTempAfis)="onCreateTempAfis()">
   </app-intake-records-search>
 
   <!-- Create Component -->
-  <app-intake-records-create
-    *ngIf="showCreate"
-    [afisRecord]="selectedAfis"
-    [tempAfisId]="tempAfisId"
-    (offenderCreated)="onOffenderCreated($event)"
-    (cancel)="onCreateClosed()">
+  <app-intake-records-create *ngIf="showCreate" [afisRecord]="selectedAfis" [tempAfisId]="tempAfisId"
+    (offenderCreated)="onOffenderCreated($event)" (cancel)="onCreateClosed()">
   </app-intake-records-create>
 
   <!-- Details Component -->
-  <app-intake-records-details
-    *ngIf="showDetails"
-    [offender]="selectedOffender"
-    (bookingSelected)="onBookingSelected($event)"
-    (createBooking)="onCreateBooking()"
-    (close)="onDetailsClosed()">
+  <app-intake-records-details *ngIf="showDetails" [offender]="selectedOffender"
+    (bookingSelected)="onBookingSelected($event)" (createBooking)="onCreateBooking()"
+    (openPhotoCapture)="onOpenPhotoCapture()" (close)="onDetailsClosed()">
   </app-intake-records-details>
 
   <!-- Booking Component -->
-  <app-intake-records-booking
-    *ngIf="showBooking"
-    [booking]="selectedBooking"
-    [offender]="selectedOffender"
+  <app-intake-records-booking *ngIf="showBooking" [booking]="selectedBooking" [offender]="selectedOffender"
     (close)="onBookingClosed()">
   </app-intake-records-booking>
+
+  <!-- Photo Capture Component (Full Page) -->
+  <app-offender-photo-capture *ngIf="showPhotoCapture" [offenderId]="selectedOffender.id"
+    (close)="onPhotoCaptureClose()">
+  </app-offender-photo-capture>
 </div>

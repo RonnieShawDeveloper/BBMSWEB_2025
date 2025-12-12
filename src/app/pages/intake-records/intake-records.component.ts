@@ -16,6 +16,7 @@ export class IntakeRecordsComponent implements OnInit, OnDestroy {
   showCreate = false;
   showDetails = false;
   showBooking = false;
+  showPhotoCapture = false;
 
   // Data objects
   selectedOffender: Offender = {};
@@ -84,6 +85,18 @@ export class IntakeRecordsComponent implements OnInit, OnDestroy {
   // Handler for when booking view is closed
   onBookingClosed(): void {
     this.showBooking = false;
+    this.showDetails = true;
+  }
+
+  // Handler for opening photo capture view
+  onOpenPhotoCapture(): void {
+    this.showDetails = false;
+    this.showPhotoCapture = true;
+  }
+
+  // Handler for when photo capture is closed
+  onPhotoCaptureClose(): void {
+    this.showPhotoCapture = false;
     this.showDetails = true;
   }
 

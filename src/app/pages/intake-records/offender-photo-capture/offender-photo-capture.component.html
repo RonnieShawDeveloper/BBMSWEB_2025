@@ -1,80 +1,254 @@
 <div class="photo-capture-container">
-  <!-- Top close button -->
-  <div class="close-button-top">
-    <button class="btn btn-danger" (click)="closeDialog()">
+  <!-- Header -->
+  <div class="capture-header">
+    <div class="header-title">
+      <div class="camera-icon">
+        <i class="fa fa-camera"></i>
+      </div>
+      <h2>Offender Photo Capture</h2>
+    </div>
+    <button class="close-btn" (click)="closeDialog()">
       <i class="fa fa-times"></i> Close
     </button>
   </div>
 
   <!-- Instructions -->
-  <div class="instructions-section mb-4">
-    <div class="alert alert-info">
-      <h5><i class="fa fa-info-circle"></i> Instructions</h5>
-      <p>Click on the ADD or UPDATE badge on any photo to capture or update it.</p>
+  <div class="instructions-alert">
+    <div class="alert-icon">
+      <i class="fa fa-info-circle"></i>
+    </div>
+    <div class="alert-content">
+      <h5>Photo Capture Instructions</h5>
+      <p>Click on any photo slot to capture or update. Complete all required photos for booking.</p>
     </div>
   </div>
 
-  <!-- Photo Display Section -->
-  <div class="photo-display-section mb-4">
-    <h5>Standard Photos</h5>
-    <div class="photo-grid">
-      <div *ngFor="let type of standardPhotoTypes"
-           class="photo-item">
-        <div class="photo-container">
-          <img [src]="offenderPhotos[type.id] || type.placeholder"
-               alt="{{type.label}}" class="photo-image">
-          <span class="badge-pill" (click)="openCameraDialog(type.id)">
-            {{ hasPhotoForType(type.id) ? 'UPDATE' : 'ADD' }}
-          </span>
-          <!-- Main photo indicator for Head Front -->
-          <span *ngIf="type.id === 'headFront' && hasPhotoForType('headFront')" class="main-photo-badge">
-            MAIN
-          </span>
+  <!-- HEAD SHOTS Section -->
+  <div class="photo-section">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon head-icon">
+          <i class="fa fa-user"></i>
         </div>
-        <span class="photo-label">{{type.label}}</span>
+        <h3>Head Shots</h3>
+        <span class="required-badge">Required</span>
+      </div>
+      <div class="section-progress">
+        <span class="progress-text">{{ getHeadShotsCompleted() }}/3</span>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" [style.width.%]="getHeadShotsProgress()"></div>
+        </div>
       </div>
     </div>
+    <div class="photo-grid">
+      <div *ngFor="let type of headPhotoTypes"
+           class="photo-card fade-in"
+           [class.has-photo]="hasPhotoForType(type.id)"
+           [class.is-main]="type.id === 'headFront' && hasPhotoForType('headFront')"
+           (click)="openCameraDialog(type.id)">
+        
+        <div class="photo-wrapper">
+          <img *ngIf="hasPhotoForType(type.id)"
+               [src]="offenderPhotos[type.id]"
+               [alt]="type.label"
+               class="photo-image">
+          <i *ngIf="!hasPhotoForType(type.id)" 
+             class="fa fa-user placeholder-icon"></i>
+          
+          <!-- Upload Progress Overlay -->
+          <div *ngIf="uploadingPhotoType === type.id" class="upload-progress-overlay">
+            <div class="progress-spinner"></div>
+            <span class="progress-text">{{ uploadProgress }}%</span>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+            </div>
+          </div>
+        </div>
+        
+        <span class="photo-label">{{ type.label }}</span>
+        <span class="photo-status" [class.status-done]="hasPhotoForType(type.id)" [class.status-empty]="!hasPhotoForType(type.id)">
+          <i class="fa" [class.fa-check-circle]="hasPhotoForType(type.id)" [class.fa-circle-o]="!hasPhotoForType(type.id)"></i>
+          {{ hasPhotoForType(type.id) ? 'Captured' : 'Click to add' }}
+        </span>
 
-    <h5 class="mt-4">Custom Photos (Scars, Marks, Tattoos)</h5>
+        <!-- Hover Actions (only for photos that exist) -->
+        <div *ngIf="hasPhotoForType(type.id)" class="photo-actions" (click)="$event.stopPropagation()">
+          <button class="action-btn view-btn" (click)="viewPhoto(type.id)" title="View Full Size">
+            <i class="fa fa-search-plus"></i>
+          </button>
+          <button class="action-btn replace-btn" (click)="openCameraDialog(type.id)" title="Replace Photo">
+            <i class="fa fa-refresh"></i>
+          </button>
+          <button class="action-btn delete-btn" (click)="deletePhoto(type.id)" title="Delete Photo">
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL BODY Section -->
+  <div class="photo-section">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon body-icon">
+          <i class="fa fa-male"></i>
+        </div>
+        <h3>Full Body Shots</h3>
+        <span class="optional-badge">Optional</span>
+      </div>
+      <div class="section-progress">
+        <span class="progress-text">{{ getBodyShotsCompleted() }}/3</span>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" [style.width.%]="getBodyShotsProgress()"></div>
+        </div>
+      </div>
+    </div>
+    <div class="photo-grid">
+      <div *ngFor="let type of bodyPhotoTypes"
+           class="photo-card fade-in"
+           [class.has-photo]="hasPhotoForType(type.id)"
+           (click)="openCameraDialog(type.id)">
+        
+        <div class="photo-wrapper">
+          <img *ngIf="hasPhotoForType(type.id)"
+               [src]="offenderPhotos[type.id]"
+               [alt]="type.label"
+               class="photo-image">
+          <i *ngIf="!hasPhotoForType(type.id)" 
+             class="fa fa-male placeholder-icon"></i>
+          
+          <!-- Upload Progress Overlay -->
+          <div *ngIf="uploadingPhotoType === type.id" class="upload-progress-overlay">
+            <div class="progress-spinner"></div>
+            <span class="progress-text">{{ uploadProgress }}%</span>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+            </div>
+          </div>
+        </div>
+        
+        <span class="photo-label">{{ type.label }}</span>
+        <span class="photo-status" [class.status-done]="hasPhotoForType(type.id)" [class.status-empty]="!hasPhotoForType(type.id)">
+          <i class="fa" [class.fa-check-circle]="hasPhotoForType(type.id)" [class.fa-circle-o]="!hasPhotoForType(type.id)"></i>
+          {{ hasPhotoForType(type.id) ? 'Captured' : 'Click to add' }}
+        </span>
+
+        <!-- Hover Actions -->
+        <div *ngIf="hasPhotoForType(type.id)" class="photo-actions" (click)="$event.stopPropagation()">
+          <button class="action-btn view-btn" (click)="viewPhoto(type.id)" title="View Full Size">
+            <i class="fa fa-search-plus"></i>
+          </button>
+          <button class="action-btn replace-btn" (click)="openCameraDialog(type.id)" title="Replace Photo">
+            <i class="fa fa-refresh"></i>
+          </button>
+          <button class="action-btn delete-btn" (click)="deletePhoto(type.id)" title="Delete Photo">
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IDENTIFYING MARKS Section -->
+  <div class="photo-section">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon marks-icon">
+          <i class="fa fa-search"></i>
+        </div>
+        <h3>Identifying Marks</h3>
+        <span class="optional-badge">Optional</span>
+      </div>
+      <div class="section-progress">
+        <span class="progress-text">{{ getMarksShotsCompleted() }}/4</span>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" [style.width.%]="getMarksShotsProgress()"></div>
+        </div>
+      </div>
+    </div>
     <div class="photo-grid">
       <div *ngFor="let type of customPhotoTypes"
-           class="photo-item">
-        <div class="photo-container">
-          <img [src]="offenderPhotos[type.id] || type.placeholder"
-               alt="{{type.label}}" class="photo-image">
-          <span class="badge-pill" (click)="openCameraDialog(type.id)">
-            {{ hasPhotoForType(type.id) ? 'UPDATE' : 'ADD' }}
-          </span>
+           class="photo-card fade-in"
+           [class.has-photo]="hasPhotoForType(type.id)"
+           (click)="openCameraDialog(type.id)">
+        
+        <div class="photo-wrapper">
+          <img *ngIf="hasPhotoForType(type.id)"
+               [src]="offenderPhotos[type.id]"
+               [alt]="type.label"
+               class="photo-image">
+          <i *ngIf="!hasPhotoForType(type.id)" 
+             class="fa fa-camera placeholder-icon"></i>
+          
+          <!-- Upload Progress Overlay -->
+          <div *ngIf="uploadingPhotoType === type.id" class="upload-progress-overlay">
+            <div class="progress-spinner"></div>
+            <span class="progress-text">{{ uploadProgress }}%</span>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+            </div>
+          </div>
         </div>
-        <span class="photo-label">{{type.label}}</span>
+        
+        <span class="photo-label">{{ type.label }}</span>
+        <span class="photo-status" [class.status-done]="hasPhotoForType(type.id)" [class.status-empty]="!hasPhotoForType(type.id)">
+          <i class="fa" [class.fa-check-circle]="hasPhotoForType(type.id)" [class.fa-circle-o]="!hasPhotoForType(type.id)"></i>
+          {{ hasPhotoForType(type.id) ? 'Captured' : 'Click to add' }}
+        </span>
+
+        <!-- Hover Actions -->
+        <div *ngIf="hasPhotoForType(type.id)" class="photo-actions" (click)="$event.stopPropagation()">
+          <button class="action-btn view-btn" (click)="viewPhoto(type.id)" title="View Full Size">
+            <i class="fa fa-search-plus"></i>
+          </button>
+          <button class="action-btn replace-btn" (click)="openCameraDialog(type.id)" title="Replace Photo">
+            <i class="fa fa-refresh"></i>
+          </button>
+          <button class="action-btn delete-btn" (click)="deletePhoto(type.id)" title="Delete Photo">
+            <i class="fa fa-trash"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Unassigned Photos Section -->
-  <div class="photo-display-section mb-4" *ngIf="unassignedPhotos.length > 0">
-    <h5>Unassigned Photos</h5>
+  <!-- UNASSIGNED PHOTOS Section (only visible if there are unassigned photos) -->
+  <div class="photo-section unassigned-section" *ngIf="unassignedPhotos.length > 0">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-icon">
+          <i class="fa fa-question-circle"></i>
+        </div>
+        <h3>Unassigned Photos</h3>
+      </div>
+    </div>
     <div class="photo-grid">
       <div *ngFor="let photo of unassignedPhotos"
-           class="photo-item">
-        <div class="photo-container">
-          <img [src]="photo.photoUrl || 'assets/img/placeholders/custom.png'"
-               alt="Unassigned Photo" class="photo-image">
-          <span class="badge-pill" (click)="assignPhoto(photo)">
-            ASSIGN
-          </span>
+           class="photo-card has-photo fade-in"
+           (click)="assignPhoto(photo)">
+        
+        <div class="photo-wrapper">
+          <img [src]="photo.photoUrl"
+               alt="Unassigned Photo"
+               class="photo-image">
         </div>
-        <span class="photo-label">{{photo.photoComment || 'Unassigned Photo'}}</span>
+        
+        <span class="photo-label">{{ photo.photoComment || 'Unassigned' }}</span>
+        <span class="photo-status">
+          <i class="fa fa-hand-pointer-o"></i>
+          Click to assign
+        </span>
       </div>
     </div>
   </div>
 
-  <!-- Hidden elements for camera capture -->
-  <canvas #snapshotCanvas style="display: none;"></canvas>
+  <!-- Hidden Canvas for Snapshot -->
+  <canvas #snapshotCanvas class="hidden-canvas"></canvas>
 
-  <!-- Bottom close button -->
-  <div class="close-button-bottom">
-    <button class="btn btn-danger" (click)="closeDialog()">
+  <!-- Bottom Actions -->
+  <div class="bottom-actions">
+    <button class="close-btn" (click)="closeDialog()">
       <i class="fa fa-times"></i> Close
     </button>
   </div>

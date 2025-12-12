@@ -1,40 +1,117 @@
-<h2 mat-dialog-title>Taking Photo: {{data.photoTypeLabel}}</h2>
-
-<mat-dialog-content class="camera-dialog-content">
-  <!-- Camera Feed -->
-  <div *ngIf="isCameraActive" class="camera-container">
-    <video #dialogCameraFeed autoplay class="camera-feed"></video>
+<div class="camera-dialog">
+  <!-- Header -->
+  <div class="dialog-header">
+    <div class="header-content">
+      <div class="camera-icon">
+        <i class="fa fa-camera"></i>
+      </div>
+      <div class="header-text">
+        <h3>Capture Photo</h3>
+        <p>{{ data.photoTypeLabel }}</p>
+      </div>
+    </div>
   </div>
 
-  <!-- Photo Preview -->
-  <div *ngIf="!isCameraActive" class="preview-container">
-    <img [src]="snapshotDataUrl" class="preview-image" alt="Photo Preview">
+  <div class="camera-content">
+    <!-- Camera Feed (always visible when camera is active) -->
+    <div *ngIf="isCameraActive" class="camera-container">
+      <video #dialogCameraFeed autoplay playsinline class="camera-feed"></video>
+
+      <!-- Positioning Guide -->
+      <div class="positioning-guide" [class.head-guide]="isHeadShot" [class.body-guide]="!isHeadShot">
+        <span class="guide-label">{{ isHeadShot ? 'Center face here' : 'Center body here' }}</span>
+      </div>
+
+      <!-- Corner Guides -->
+      <div class="corner-guides">
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+      </div>
+
+      <!-- Camera Status -->
+      <div class="camera-status" *ngIf="!showCountdown">
+        <div class="recording-dot"></div>
+        <span>Camera Active</span>
+      </div>
+
+      <!-- Countdown Overlay (shows on top of camera) -->
+      <div *ngIf="showCountdown" class="countdown-overlay">
+        <span class="countdown-number">{{ countdownValue }}</span>
+      </div>
+    </div>
+
+    <!-- Photo Preview (after capture) -->
+    <div *ngIf="!isCameraActive && snapshotDataUrl" class="preview-container">
+      <img [src]="snapshotDataUrl" class="preview-image" alt="Photo Preview">
+      <div class="preview-badge">
+        <i class="fa fa-check"></i>
+        Photo Captured
+      </div>
+    </div>
+
+    <!-- Camera Controls (when camera is active and not in countdown) -->
+    <div *ngIf="isCameraActive && !showCountdown" class="camera-controls">
+      <button class="control-btn secondary-btn" (click)="flipCamera()" *ngIf="hasMultipleCameras">
+        <span class="btn-icon"><i class="fa fa-refresh"></i></span>
+        <span class="btn-label">Flip</span>
+      </button>
+
+      <button class="control-btn capture-btn" (click)="startCountdown()">
+        <span class="btn-icon"><i class="fa fa-camera"></i></span>
+        <span class="btn-label">Capture</span>
+      </button>
+
+      <button class="control-btn secondary-btn" (click)="cancel()">
+        <span class="btn-icon"><i class="fa fa-times"></i></span>
+        <span class="btn-label">Cancel</span>
+      </button>
+    </div>
+
+    <!-- Photo Details Form (after capture) -->
+    <div *ngIf="!isCameraActive && snapshotDataUrl && !isUploading" class="photo-details">
+      <div class="form-group">
+        <label>Photo Comment</label>
+        <input type="text" [(ngModel)]="photoComment" placeholder="Add a description for this photo...">
+      </div>
+
+      <div class="checkbox-group" *ngIf="data.photoTypeId === 'headFront'">
+        <input type="checkbox" id="mainPhoto" [(ngModel)]="isMainPhoto">
+        <label for="mainPhoto">Set as Main Profile Photo</label>
+      </div>
+    </div>
+
+    <!-- Upload Progress (when uploading) -->
+    <div *ngIf="isUploading" class="upload-progress">
+      <div class="progress-header">
+        <span><i class="fa fa-cloud-upload"></i> Uploading Photo...</span>
+        <span class="progress-percent">{{ uploadProgress | number:'1.0-0' }}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+      </div>
+    </div>
+
+    <!-- Dialog Actions -->
+    <div class="dialog-actions">
+      <!-- Cancel button always available when not uploading -->
+      <button *ngIf="!isUploading" class="action-btn cancel-btn" (click)="cancel()">
+        <i class="fa fa-times"></i> Cancel
+      </button>
+
+      <!-- Retake and Save after capture -->
+      <ng-container *ngIf="!isCameraActive && snapshotDataUrl && !isUploading">
+        <button class="action-btn retake-btn" (click)="retakePhoto()">
+          <i class="fa fa-refresh"></i> Retake
+        </button>
+        <button class="action-btn save-btn" (click)="savePhoto()" [disabled]="!photoComment">
+          <i class="fa fa-check"></i> Save Photo
+        </button>
+      </ng-container>
+    </div>
   </div>
 
-  <!-- Canvas for snapshot (hidden) -->
-  <canvas #dialogSnapshotCanvas style="display: none;"></canvas>
-
-  <!-- Photo Details Form -->
-  <div class="photo-details-form">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Photo Comment *Required</mat-label>
-      <input matInput [(ngModel)]="photoComment" placeholder="e.g., Front view, Left side, Tattoo on arm">
-    </mat-form-field>
-
-    <mat-checkbox [(ngModel)]="isMainPhoto" class="main-photo-checkbox">
-      Set as Main Photo
-    </mat-checkbox>
-  </div>
-</mat-dialog-content>
-
-<mat-dialog-actions align="end">
-  <ng-container *ngIf="isCameraActive">
-    <button mat-button (click)="cancel()">Cancel</button>
-    <button mat-raised-button color="primary" (click)="takeSnapshot()">Take Photo</button>
-  </ng-container>
-
-  <ng-container *ngIf="!isCameraActive">
-    <button mat-button (click)="retakePhoto()">Retake</button>
-    <button mat-raised-button color="primary" (click)="savePhoto()" [disabled]="!photoComment">Save</button>
-  </ng-container>
-</mat-dialog-actions>
+  <!-- Hidden Canvas -->
+  <canvas #dialogSnapshotCanvas class="hidden-canvas"></canvas>
+</div>

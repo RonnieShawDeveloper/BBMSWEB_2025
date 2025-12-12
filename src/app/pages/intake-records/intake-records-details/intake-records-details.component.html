@@ -29,17 +29,16 @@
         </div>
         <div class="card-body text-center">
           <div class="photo-container mb-3">
-            <img [src]="photoURL || offender.mainPhoto || 'assets/img/users/default-user.jpg'"
-                 class="img-fluid rounded" alt="Offender Photo">
+            <img [src]="photoURL || offender.mainPhoto || 'assets/img/users/default-user.jpg'" class="img-fluid rounded"
+              alt="Offender Photo">
           </div>
           <div class="mb-3">
-            <button class="btn btn-primary btn-sm" (click)="openPhotoCapture()">
+            <button class="btn btn-primary btn-sm" (click)="onOpenPhotoCapture()">
               <i class="fa fa-camera"></i> Capture Photos
             </button>
           </div>
           <div *ngIf="isUploading" class="progress mb-3">
-            <div class="progress-bar progress-bar-striped progress-bar-animated"
-                 [style.width.%]="uploadProgress"></div>
+            <div class="progress-bar progress-bar-striped progress-bar-animated" [style.width.%]="uploadProgress"></div>
           </div>
         </div>
       </div>
@@ -91,8 +90,7 @@
           <!-- AFIS Records Accordion -->
           <p-accordion *ngIf="afisRecords.length > 0">
             <p-accordionTab *ngFor="let record of afisRecords; let i = index"
-                           [header]="'AFIS Record #' + record.id + ' (' + (record.datetime || 'N/A') + ')'"
-                           [selected]="i === 0">
+              [header]="'AFIS Record #' + record.id + ' (' + (record.datetime || 'N/A') + ')'" [selected]="i === 0">
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-group">
@@ -101,7 +99,8 @@
                   </div>
                   <div class="form-group">
                     <label>Name</label>
-                    <input type="text" class="form-control" [value]="(record.fName || '') + ' ' + (record.mName || '') + ' ' + (record.lName || '')" readonly>
+                    <input type="text" class="form-control"
+                      [value]="(record.fName || '') + ' ' + (record.mName || '') + ' ' + (record.lName || '')" readonly>
                   </div>
                   <div class="form-group">
                     <label>Date of Birth</label>
@@ -252,22 +251,22 @@
             <div class="col-md-4">
               <div class="form-group">
                 <label for="lastName">Last Name</label>
-                <input type="text" class="form-control" id="lastName"
-                       [(ngModel)]="offender.lName" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="lastName" [(ngModel)]="offender.lName"
+                  [readonly]="!isEditing">
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group">
                 <label for="firstName">First Name</label>
-                <input type="text" class="form-control" id="firstName"
-                       [(ngModel)]="offender.fName" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="firstName" [(ngModel)]="offender.fName"
+                  [readonly]="!isEditing">
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group">
                 <label for="middleName">Middle Name</label>
-                <input type="text" class="form-control" id="middleName"
-                       [(ngModel)]="offender.mName" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="middleName" [(ngModel)]="offender.mName"
+                  [readonly]="!isEditing">
               </div>
             </div>
           </div>
@@ -276,15 +275,13 @@
             <div class="col-md-4">
               <div class="form-group">
                 <label for="dob">Date of Birth</label>
-                <input type="date" class="form-control" id="dob"
-                       [(ngModel)]="offender.dob" [readonly]="!isEditing">
+                <input type="date" class="form-control" id="dob" [(ngModel)]="offender.dob" [readonly]="!isEditing">
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group">
                 <label for="gender">Gender</label>
-                <select class="form-control" id="gender"
-                        [(ngModel)]="offender.gender" [disabled]="!isEditing">
+                <select class="form-control" id="gender" [(ngModel)]="offender.gender" [disabled]="!isEditing">
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -294,8 +291,7 @@
             <div class="col-md-4">
               <div class="form-group">
                 <label for="race">Race</label>
-                <select class="form-control" id="race"
-                        [(ngModel)]="offender.race" [disabled]="!isEditing">
+                <select class="form-control" id="race" [(ngModel)]="offender.race" [disabled]="!isEditing">
                   <option value="">Select Race</option>
                   <option value="Black">Black</option>
                   <option value="White">White</option>
@@ -311,22 +307,21 @@
             <div class="col-md-3">
               <div class="form-group">
                 <label for="height">Height</label>
-                <input type="text" class="form-control" id="height"
-                       [(ngModel)]="offender.height" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="height" [(ngModel)]="offender.height"
+                  [readonly]="!isEditing">
               </div>
             </div>
             <div class="col-md-3">
               <div class="form-group">
                 <label for="weight">Weight</label>
-                <input type="text" class="form-control" id="weight"
-                       [(ngModel)]="offender.weight" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="weight" [(ngModel)]="offender.weight"
+                  [readonly]="!isEditing">
               </div>
             </div>
             <div class="col-md-3">
               <div class="form-group">
                 <label for="eyeColor">Eye Color</label>
-                <select class="form-control" id="eyeColor"
-                        [(ngModel)]="offender.eyeColor" [disabled]="!isEditing">
+                <select class="form-control" id="eyeColor" [(ngModel)]="offender.eyeColor" [disabled]="!isEditing">
                   <option value="">Select Eye Color</option>
                   <option value="Brown">Brown</option>
                   <option value="Blue">Blue</option>
@@ -339,8 +334,7 @@
             <div class="col-md-3">
               <div class="form-group">
                 <label for="hairColor">Hair Color</label>
-                <select class="form-control" id="hairColor"
-                        [(ngModel)]="offender.hairColor" [disabled]="!isEditing">
+                <select class="form-control" id="hairColor" [(ngModel)]="offender.hairColor" [disabled]="!isEditing">
                   <option value="">Select Hair Color</option>
                   <option value="Black">Black</option>
                   <option value="Brown">Brown</option>
@@ -357,15 +351,14 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="complex">Complexion</label>
-                <input type="text" class="form-control" id="complex"
-                       [(ngModel)]="offender.complex" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="complex" [(ngModel)]="offender.complex"
+                  [readonly]="!isEditing">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
                 <label for="build">Build</label>
-                <select class="form-control" id="build"
-                        [(ngModel)]="offender.build" [disabled]="!isEditing">
+                <select class="form-control" id="build" [(ngModel)]="offender.build" [disabled]="!isEditing">
                   <option value="">Select Build</option>
                   <option value="Slim">Slim</option>
                   <option value="Medium">Medium</option>
@@ -388,15 +381,15 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="address1">Address Line 1</label>
-                <input type="text" class="form-control" id="address1"
-                       [(ngModel)]="offender.addLine1" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="address1" [(ngModel)]="offender.addLine1"
+                  [readonly]="!isEditing">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
                 <label for="address2">Address Line 2</label>
-                <input type="text" class="form-control" id="address2"
-                       [(ngModel)]="offender.addLine2" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="address2" [(ngModel)]="offender.addLine2"
+                  [readonly]="!isEditing">
               </div>
             </div>
           </div>
@@ -405,22 +398,19 @@
             <div class="col-md-4">
               <div class="form-group">
                 <label for="city">City/Locality</label>
-                <input type="text" class="form-control" id="city"
-                       [(ngModel)]="offender.city" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="city" [(ngModel)]="offender.city" [readonly]="!isEditing">
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group">
                 <label for="state">Island/State</label>
-                <input type="text" class="form-control" id="state"
-                       [(ngModel)]="offender.state" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="state" [(ngModel)]="offender.state" [readonly]="!isEditing">
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group">
                 <label for="zip">Postal Code</label>
-                <input type="text" class="form-control" id="zip"
-                       [(ngModel)]="offender.zip" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="zip" [(ngModel)]="offender.zip" [readonly]="!isEditing">
               </div>
             </div>
           </div>
@@ -429,22 +419,21 @@
             <div class="col-md-4">
               <div class="form-group">
                 <label for="phone">Phone Number</label>
-                <input type="tel" class="form-control" id="phone"
-                       [(ngModel)]="offender.phone" [readonly]="!isEditing">
+                <input type="tel" class="form-control" id="phone" [(ngModel)]="offender.phone" [readonly]="!isEditing">
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group">
                 <label for="homePhone">Home Phone</label>
-                <input type="tel" class="form-control" id="homePhone"
-                       [(ngModel)]="offender.homePhone" [readonly]="!isEditing">
+                <input type="tel" class="form-control" id="homePhone" [(ngModel)]="offender.homePhone"
+                  [readonly]="!isEditing">
               </div>
             </div>
             <div class="col-md-4">
               <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" class="form-control" id="email"
-                       [(ngModel)]="offender.email" [readonly]="!isEditing">
+                <input type="email" class="form-control" id="email" [(ngModel)]="offender.email"
+                  [readonly]="!isEditing">
               </div>
             </div>
           </div>
@@ -461,15 +450,13 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="pob">Place of Birth</label>
-                <input type="text" class="form-control" id="pob"
-                       [(ngModel)]="offender.pob" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="pob" [(ngModel)]="offender.pob" [readonly]="!isEditing">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
                 <label for="nib">NIB Number</label>
-                <input type="text" class="form-control" id="nib"
-                       [(ngModel)]="offender.nib" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="nib" [(ngModel)]="offender.nib" [readonly]="!isEditing">
               </div>
             </div>
           </div>
@@ -478,15 +465,15 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="emergContact">Emergency Contact</label>
-                <input type="text" class="form-control" id="emergContact"
-                       [(ngModel)]="offender.emergContact" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="emergContact" [(ngModel)]="offender.emergContact"
+                  [readonly]="!isEditing">
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
                 <label for="emergRelation">Relationship to Emergency Contact</label>
-                <input type="text" class="form-control" id="emergRelation"
-                       [(ngModel)]="offender.emergRelation" [readonly]="!isEditing">
+                <input type="text" class="form-control" id="emergRelation" [(ngModel)]="offender.emergRelation"
+                  [readonly]="!isEditing">
               </div>
             </div>
           </div>
@@ -495,8 +482,8 @@
             <div class="col-12">
               <div class="form-group">
                 <label for="profileNotes">Notes</label>
-                <textarea class="form-control" id="profileNotes" rows="3"
-                          [(ngModel)]="offender.profileNotes" [readonly]="!isEditing"></textarea>
+                <textarea class="form-control" id="profileNotes" rows="3" [(ngModel)]="offender.profileNotes"
+                  [readonly]="!isEditing"></textarea>
               </div>
             </div>
           </div>
@@ -539,16 +526,20 @@
               </span>
             </ng-template>
             <ng-template pTemplate="content" let-event>
-              <p-card [header]="event.status" [subheader]="'Booked on: ' + dateFromUnixTime(event.bookDate)" styleClass="booking-card">
+              <p-card [header]="event.status" [subheader]="'Booked on: ' + dateFromUnixTime(event.bookDate)"
+                styleClass="booking-card">
                 <div class="row booking-status">
                   <div class="col-md-3">
-                    <span [ngClass]="{'text-success': event.bookingStatus !== 'Open', 'text-danger': event.bookingStatus === 'Open'}" class="font-weight-bold h5">
+                    <span
+                      [ngClass]="{'text-success': event.bookingStatus !== 'Open', 'text-danger': event.bookingStatus === 'Open'}"
+                      class="font-weight-bold h5">
                       {{event.bookingStatus === 'Open' ? 'OPEN BOOKING' : 'CLOSED BOOKING'}}
                     </span>
                   </div>
                   <div class="col-md-3">
                     <strong>Bail Application:</strong><br>
-                    {{event.bailAppPending ? 'Submitted on ' + dateFromUnixTime(event.bailAppSubmitedDate) : 'Not Submitted'}}
+                    {{event.bailAppPending ? 'Submitted on ' + dateFromUnixTime(event.bailAppSubmitedDate) : 'Not
+                    Submitted'}}
                   </div>
                   <div class="col-md-3">
                     <strong>Attorney:</strong><br>
@@ -562,7 +553,8 @@
                 <div class="row booking-details">
                   <div class="col-md-4">
                     <strong>Judge:</strong><br>
-                    {{event.judgeAssigned ? event.judgeAssigned + ' (assigned on ' + dateFromUnixTime(event.judgeAssignedDate) + ')' : 'No Judge Assigned'}}
+                    {{event.judgeAssigned ? event.judgeAssigned + ' (assigned on ' +
+                    dateFromUnixTime(event.judgeAssignedDate) + ')' : 'No Judge Assigned'}}
                   </div>
                   <div class="col-md-4">
                     <strong>Next Hearing:</strong><br>

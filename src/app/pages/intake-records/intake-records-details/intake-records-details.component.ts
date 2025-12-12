@@ -40,6 +40,7 @@ export class IntakeRecordsDetailsComponent implements OnInit, OnDestroy {
   @Output() bookingSelected = new EventEmitter<Booking>();
   @Output() createBooking = new EventEmitter<void>();
   @Output() close = new EventEmitter<void>();
+  @Output() openPhotoCapture = new EventEmitter<void>();
 
   // Offender state
   isEditing: boolean = false;
@@ -115,7 +116,7 @@ export class IntakeRecordsDetailsComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.firestore.collection('bookings', ref =>
         ref.where('offender', '==', this.offender.id)
-        .orderBy('bookDate', 'desc')
+          .orderBy('bookDate', 'desc')
       ).valueChanges().subscribe((bookings: any[]) => {
         this.bookings = bookings;
         this.createTimelineEvents();
@@ -125,7 +126,7 @@ export class IntakeRecordsDetailsComponent implements OnInit, OnDestroy {
           this.subscriptions.push(
             this.firestore.collection('bookings', ref =>
               ref.where('linkedOffenderID', '==', this.offender.id)
-              .orderBy('bookDate', 'desc')
+                .orderBy('bookDate', 'desc')
             ).valueChanges().subscribe((linkedBookings: any[]) => {
               if (linkedBookings.length > 0) {
                 this.bookings = linkedBookings;
@@ -328,24 +329,9 @@ export class IntakeRecordsDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Open photo capture dialog
-  openPhotoCapture() {
-    // Open the Angular Material dialog with the OffenderPhotoCaptureComponent
-    const dialogRef = this.dialog.open(OffenderPhotoCaptureComponent, {
-      width: '80%',
-      maxWidth: '1000px',
-      maxHeight: '90vh', // Set maximum height to 90% of viewport height
-      disableClose: false,
-      autoFocus: false, // Prevent auto focus which can cause scrolling issues
-      data: {
-        offenderId: this.offender.id
-      }
-    });
-
-    // Subscribe to the dialog close event
-    dialogRef.componentInstance.photoTaken.subscribe((photo: PhotoTemplate) => {
-      this.handlePhotoTaken(photo);
-    });
+  // Open photo capture view
+  onOpenPhotoCapture(): void {
+    this.openPhotoCapture.emit();
   }
 
   // Handle photo taken from the photo capture component

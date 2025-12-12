@@ -1,246 +1,586 @@
+// ============================================
+// OFFENDER PHOTO CAPTURE - PROFESSIONAL THEME
+// ============================================
+
+// Color Variables
+$primary-dark: #1a1f2e;
+$secondary-dark: #252b3b;
+$accent-blue: #3b82f6;
+$accent-green: #10b981;
+$accent-orange: #f59e0b;
+$accent-red: #ef4444;
+$text-primary: #f1f5f9;
+$text-secondary: #94a3b8;
+$glass-bg: rgba(255, 255, 255, 0.05);
+$glass-border: rgba(255, 255, 255, 0.1);
+$shadow-dark: rgba(0, 0, 0, 0.4);
+
+// Main Container
 .photo-capture-container {
   display: flex;
   flex-direction: column;
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  background: linear-gradient(135deg, $primary-dark 0%, $secondary-dark 100%);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px $shadow-dark;
   position: relative;
+  min-height: 100%;
+  height: auto;
 }
 
-.close-button-top {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
-}
-
-.close-button-bottom {
+// Header Section
+.capture-header {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid $glass-border;
+  margin-bottom: 24px;
+
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .camera-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, $accent-blue 0%, #60a5fa 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: white;
+    }
+
+    h2 {
+      margin: 0;
+      color: $text-primary;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+  }
+
+  .close-btn {
+    background: rgba($accent-red, 0.2);
+    border: 1px solid rgba($accent-red, 0.4);
+    color: $accent-red;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+      background: $accent-red;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba($accent-red, 0.4);
+    }
+
+    i {
+      margin-right: 8px;
+    }
+  }
 }
 
-.instructions-section {
-  margin-bottom: 20px;
+// Photo Section Card (Glassmorphism)
+.photo-section {
+  background: $glass-bg;
+  backdrop-filter: blur(10px);
+  border: 1px solid $glass-border;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
 
-  .alert {
-    margin-bottom: 0;
+  &:hover {
+    border-color: rgba($accent-blue, 0.3);
+    box-shadow: 0 8px 32px rgba($accent-blue, 0.1);
   }
 
-  h5 {
-    margin-bottom: 10px;
-  }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 
-  p {
-    margin-bottom: 0;
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .section-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+
+        &.head-icon {
+          background: linear-gradient(135deg, $accent-blue 0%, #60a5fa 100%);
+        }
+
+        &.body-icon {
+          background: linear-gradient(135deg, $accent-green 0%, #34d399 100%);
+        }
+
+        &.marks-icon {
+          background: linear-gradient(135deg, $accent-orange 0%, #fbbf24 100%);
+        }
+      }
+
+      h3 {
+        margin: 0;
+        color: $text-primary;
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .required-badge {
+        background: rgba($accent-red, 0.2);
+        color: $accent-red;
+        font-size: 0.7rem;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .optional-badge {
+        background: rgba($text-secondary, 0.2);
+        color: $text-secondary;
+        font-size: 0.7rem;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+    }
+
+    .section-progress {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .progress-text {
+        color: $text-secondary;
+        font-size: 0.85rem;
+      }
+
+      .progress-bar-container {
+        width: 120px;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+
+        .progress-bar-fill {
+          height: 100%;
+          background: linear-gradient(90deg, $accent-green 0%, #34d399 100%);
+          border-radius: 3px;
+          transition: width 0.5s ease;
+        }
+      }
+    }
   }
 }
 
-.photo-display-section {
-  margin-bottom: 30px;
+// Photo Grid
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px;
+}
 
-  h5 {
-    margin-bottom: 15px;
-    color: #343a40;
-    font-weight: 600;
-    border-bottom: 1px solid #dee2e6;
-    padding-bottom: 8px;
+// Individual Photo Card
+.photo-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $accent-blue;
+    background: rgba($accent-blue, 0.05);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+
+    .photo-actions {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
-  .photo-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
+  &.has-photo {
+    border-style: solid;
+    border-color: rgba($accent-green, 0.4);
+    background: rgba($accent-green, 0.05);
 
-    .photo-item {
+    &:hover {
+      border-color: $accent-green;
+    }
+  }
+
+  &.is-main {
+    border-color: $accent-blue;
+    box-shadow: 0 0 20px rgba($accent-blue, 0.3);
+
+    &::before {
+      content: '★ MAIN';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, $accent-blue 0%, #60a5fa 100%);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 12px;
+      z-index: 10;
+    }
+  }
+
+  .photo-wrapper {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: $secondary-dark;
+
+    .photo-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .placeholder-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 40px;
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    // Upload Progress Overlay
+    .upload-progress-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 10px;
-      border-radius: 6px;
-      transition: all 0.2s ease;
-      border: 1px solid #dee2e6;
+      justify-content: center;
+      gap: 12px;
 
-      &:hover {
-        background-color: #e9ecef;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      .progress-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top-color: $accent-blue;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
       }
 
-      .photo-container {
-        position: relative;
-        margin-bottom: 8px;
-
-        .photo-image {
-          width: 120px;
-          height: 120px;
-          object-fit: cover;
-          border-radius: 4px;
-        }
-
-        .badge-pill {
-          position: absolute;
-          top: -10px;
-          right: -10px;
-          background-color: #dc3545;
-          color: white;
-          font-size: 0.75rem;
-          font-weight: bold;
-          padding: 3px 8px;
-          border-radius: 20px;
-          cursor: pointer;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-          transition: all 0.2s ease;
-
-          &:hover {
-            transform: scale(1.1);
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-          }
-        }
-
-        .main-photo-badge {
-          position: absolute;
-          bottom: -10px;
-          left: 50%;
-          transform: translateX(-50%);
-          background-color: #28a745;
-          color: white;
-          font-size: 0.75rem;
-          font-weight: bold;
-          padding: 3px 8px;
-          border-radius: 20px;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
+      .progress-text {
+        color: $text-primary;
+        font-size: 0.85rem;
+        font-weight: 600;
       }
 
-      .photo-label {
-        font-size: 0.9rem;
-        text-align: center;
-        color: #495057;
-        font-weight: 500;
+      .progress-bar {
+        width: 80%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+
+        .progress-fill {
+          height: 100%;
+          background: $accent-blue;
+          transition: width 0.3s ease;
+        }
       }
     }
-  }
-}
-
-.camera-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 15px;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  background-color: #fff;
-
-  h5 {
-    align-self: flex-start;
-    margin-bottom: 15px;
-    color: #343a40;
-    font-weight: 600;
-  }
-
-  .camera-feed {
-    width: 100%;
-    max-width: 640px;
-    height: auto;
-    border-radius: 8px;
-    border: 2px solid #007bff;
-    margin-bottom: 15px;
-  }
-
-  .camera-controls {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    margin-top: 10px;
-  }
-}
-
-.preview-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-
-  .preview-image {
-    width: 100%;
-    max-width: 640px;
-    height: auto;
-    border-radius: 8px;
-    border: 2px solid #28a745;
-    margin-bottom: 15px;
-  }
-
-  .preview-controls {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
-  }
-}
-
-.photo-details-section {
-  margin-bottom: 20px;
-  padding: 15px;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  background-color: #fff;
-
-  .form-group {
-    margin-bottom: 15px;
-  }
-
-  label {
-    font-weight: 500;
-    color: #495057;
-  }
-}
-
-.cancel-section {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-/* Dialog styles */
-:host ::ng-deep {
-  .camera-dialog-content {
-    .camera-feed {
-      width: 100%;
-      max-width: 100%;
-      height: auto;
-      border-radius: 8px;
-      border: 2px solid #007bff;
-      margin-bottom: 15px;
-    }
-
-    .preview-image {
-      width: 100%;
-      max-width: 100%;
-      height: auto;
-      border-radius: 8px;
-      border: 2px solid #28a745;
-      margin-bottom: 15px;
-    }
-  }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .photo-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
-  }
-
-  .photo-image {
-    width: 100px !important;
-    height: 100px !important;
   }
 
   .photo-label {
-    font-size: 0.8rem !important;
+    margin-top: 12px;
+    color: $text-primary;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .photo-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 0.75rem;
+
+    &.status-empty {
+      color: $text-secondary;
+    }
+
+    &.status-done {
+      color: $accent-green;
+    }
+
+    i {
+      font-size: 0.7rem;
+    }
+  }
+
+  // Hover Actions
+  .photo-actions {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: all 0.3s ease;
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+
+      &.view-btn {
+        background: rgba($accent-blue, 0.9);
+        color: white;
+
+        &:hover {
+          background: $accent-blue;
+          transform: scale(1.1);
+        }
+      }
+
+      &.replace-btn {
+        background: rgba($accent-orange, 0.9);
+        color: white;
+
+        &:hover {
+          background: $accent-orange;
+          transform: scale(1.1);
+        }
+      }
+
+      &.delete-btn {
+        background: rgba($accent-red, 0.9);
+        color: white;
+
+        &:hover {
+          background: $accent-red;
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+
+  // Add Button Overlay (for empty cards)
+  .add-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+
+    .add-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba($accent-blue, 0.2);
+      border: 2px dashed $accent-blue;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: $accent-blue;
+      transition: all 0.3s ease;
+    }
+
+    &:hover .add-icon {
+      background: $accent-blue;
+      border-style: solid;
+      color: white;
+      transform: scale(1.1);
+    }
+  }
+}
+
+// Unassigned Photos Section
+.unassigned-section {
+  background: rgba($accent-orange, 0.05);
+  border-color: rgba($accent-orange, 0.2);
+
+  .section-header .section-icon {
+    background: linear-gradient(135deg, $accent-orange 0%, #fbbf24 100%);
+  }
+}
+
+// Instructions Alert
+.instructions-alert {
+  background: rgba($accent-blue, 0.1);
+  border: 1px solid rgba($accent-blue, 0.3);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  .alert-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba($accent-blue, 0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: $accent-blue;
+    flex-shrink: 0;
+  }
+
+  .alert-content {
+    h5 {
+      margin: 0 0 4px 0;
+      color: $text-primary;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      color: $text-secondary;
+      font-size: 0.85rem;
+    }
+  }
+}
+
+// Bottom Actions
+.bottom-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid $glass-border;
+}
+
+// Animations
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+// Hidden elements
+.hidden-canvas {
+  display: none;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .photo-capture-container {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .capture-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+
+    .close-btn {
+      align-self: flex-end;
+    }
+  }
+
+  .photo-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+  }
+
+  .photo-card {
+    padding: 10px;
+
+    .photo-wrapper {
+      width: 100px;
+      height: 100px;
+    }
+  }
+
+  .section-progress {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .photo-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
